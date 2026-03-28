@@ -1,0 +1,353 @@
+<!DOCTYPE html>
+<html lang="ko" data-theme="dark">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=1.0">
+<title>KONEXA Adoption Mall — Admin</title>
+<link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+<!-- ════════════════════════════
+     대문 (LANDING PAGE)
+════════════════════════════ -->
+<div id="landing">
+  <div class="land-grid"></div>
+  <div class="land-g1"></div>
+  <div class="land-g2"></div>
+  <div class="land-g3"></div>
+  <div class="land-inner">
+    <div class="land-logo">
+      <div class="land-logo-icon">K</div>
+      <div class="land-logo-text">
+        <div class="land-logo-main">KONEXA</div>
+        <div class="land-logo-sub">ADOPTION MALL PLATFORM</div>
+      </div>
+    </div>
+    <div class="land-tag">
+      <span class="land-tag-dot"></span>
+      PLATFORM v1.0 · BETA
+    </div>
+    <h1 class="land-title">무한 분양몰을<br><span>하나의 플랫폼</span>으로</h1>
+    <p class="land-desc">코넥사는 분양몰과 쇼핑몰을 동시에 운영할 수 있는 올인원 어드민 플랫폼입니다. 무제한 분양몰 생성, 다양한 스킨, 강력한 대시보드로 비즈니스를 확장하세요.</p>
+    <div class="land-features">
+      <div class="lf-card">
+        <div class="lf-icon">🐾</div>
+        <div class="lf-title">무제한 분양몰 생성</div>
+        <div class="lf-desc">클릭 한 번으로 새로운 분양몰을 만들고, 6가지 스킨으로 개성 있는 브랜드를 구성하세요.</div>
+      </div>
+      <div class="lf-card">
+        <div class="lf-icon">🛍️</div>
+        <div class="lf-title">쇼핑몰 통합 관리</div>
+        <div class="lf-desc">상품 등록부터 주문, 배송, 입금 확인까지 모든 쇼핑몰 운영을 하나의 화면에서 관리하세요.</div>
+      </div>
+      <div class="lf-card">
+        <div class="lf-icon">🌏</div>
+        <div class="lf-title">다국어 지원</div>
+        <div class="lf-desc">한국어, 영어, 일본어, 베트남어, 태국어, 인도네시아어로 글로벌 운영을 지원합니다.</div>
+      </div>
+    </div>
+    <button class="land-cta" onclick="enterDashboard()">
+      관리자 대시보드 입장
+      <span class="land-cta-arrow">→</span>
+    </button>
+  </div>
+</div>
+
+<!-- ════════════════════════════
+     APP (DASHBOARD)
+════════════════════════════ -->
+<div id="app">
+  <div class="bg-grid"></div>
+  <div class="bg-g1"></div>
+  <div class="bg-g2"></div>
+
+  <div class="sb-overlay" id="sbOverlay" onclick="toggleMobileSidebar()"></div>
+
+  <!-- ══ SIDEBAR ══ -->
+  <aside class="sidebar" id="sidebar">
+    <button class="sb-collapse" id="sbCollapse" onclick="toggleSidebar()">◀</button>
+
+    <!-- 로고 -->
+    <div class="sb-logo">
+      <div class="sb-k">K</div>
+      <div class="sb-words">
+        <div class="sb-main">KONEXA</div>
+        <div class="sb-sub">ADOPTION MALL · ADMIN</div>
+      </div>
+    </div>
+
+    <!-- 분양몰 생성 버튼 (지구 최강) -->
+    <div class="create-btn-wrap">
+      <button class="create-btn" onclick="openCreateModal()">
+        <div class="cb-icon">🏪</div>
+        <div class="cb-content">
+          <div class="cb-title" data-i18n="create_btn">분양몰 생성</div>
+          <div class="cb-sub" data-i18n="create_sub">무제한 생성 가능</div>
+        </div>
+        <div class="cb-plus">＋</div>
+      </button>
+    </div>
+
+    <div class="sb-scroll">
+      <!-- 분양몰 관리 아코디언 -->
+      <div class="acc-group">
+        <div class="acc-header">
+          <span class="acc-h-icon">🐾</span>
+          <span class="acc-h-label" data-i18n="acc_adopt">분양몰 관리</span>
+          <span class="acc-h-badge c">17</span>
+          <span class="acc-h-chev">▼</span>
+        </div>
+        <div class="acc-body">
+          <div class="nav-item active" data-page="p1"><span class="ni-ico">🏷️</span><span class="ni-lbl" data-i18n="nav_p1">분양 상품 관리</span><span class="ni-badge c">12</span></div>
+          <div class="nav-item" data-page="p2"><span class="ni-ico">📋</span><span class="ni-lbl" data-i18n="nav_p2">분양 신청 현황</span><span class="ni-badge p">5</span></div>
+          <div class="nav-item" data-page="p3"><span class="ni-ico">👥</span><span class="ni-lbl" data-i18n="nav_p3">입양자 관리</span></div>
+          <div class="nav-item" data-page="p4"><span class="ni-ico">📅</span><span class="ni-lbl" data-i18n="nav_p4">분양 일정</span></div>
+          <div class="nav-item" data-page="p5"><span class="ni-ico">📜</span><span class="ni-lbl" data-i18n="nav_p5">분양 계약서</span></div>
+          <div class="nav-item" data-page="p6"><span class="ni-ico">📣</span><span class="ni-lbl" data-i18n="nav_p6">분양 공지</span></div>
+        </div>
+      </div>
+
+      <!-- 쇼핑몰 관리 아코디언 -->
+      <div class="acc-group">
+        <div class="acc-header">
+          <span class="acc-h-icon">🛒</span>
+          <span class="acc-h-label" data-i18n="acc_shop">쇼핑몰 관리</span>
+          <span class="acc-h-badge p">11</span>
+          <span class="acc-h-chev">▼</span>
+        </div>
+        <div class="acc-body">
+          <div class="nav-item sp" data-page="shop-preview"><span class="ni-ico">🛍️</span><span class="ni-lbl" data-i18n="nav_s1">쇼핑몰 미리보기</span></div>
+          <div class="nav-item sp" data-page="s2"><span class="ni-ico">📦</span><span class="ni-lbl" data-i18n="nav_s2">상품 등록/관리</span></div>
+          <div class="nav-item sp" data-page="s3"><span class="ni-ico">🛒</span><span class="ni-lbl" data-i18n="nav_s3">주문 관리</span><span class="ni-badge g">8</span></div>
+          <div class="nav-item sp" data-page="s4"><span class="ni-ico">🚚</span><span class="ni-lbl" data-i18n="nav_s4">배송 관리</span></div>
+          <div class="nav-item sp" data-page="s5"><span class="ni-ico">💳</span><span class="ni-lbl" data-i18n="nav_s5">입금 확인</span><span class="ni-badge p">3</span></div>
+          <div class="nav-item sp" data-page="s6"><span class="ni-ico">🗃️</span><span class="ni-lbl" data-i18n="nav_s6">재고 관리</span></div>
+          <div class="nav-item sp" data-page="s7"><span class="ni-ico">↩️</span><span class="ni-lbl" data-i18n="nav_s7">반품/교환</span></div>
+          <div class="nav-item sp" data-page="s8"><span class="ni-ico">🎫</span><span class="ni-lbl" data-i18n="nav_s8">쿠폰/이벤트</span></div>
+          <div class="nav-item sp" data-page="s9"><span class="ni-ico">⭐</span><span class="ni-lbl" data-i18n="nav_s9">리뷰 관리</span></div>
+          <div class="nav-item sp" data-page="s10"><span class="ni-ico">🎯</span><span class="ni-lbl" data-i18n="nav_s10">광고/배너</span></div>
+        </div>
+      </div>
+
+      <!-- 시스템 아코디언 -->
+      <div class="acc-group">
+        <div class="acc-header">
+          <span class="acc-h-icon">⚙️</span>
+          <span class="acc-h-label" data-i18n="acc_sys">시스템</span>
+          <span class="acc-h-badge p">2</span>
+          <span class="acc-h-chev">▼</span>
+        </div>
+        <div class="acc-body">
+          <div class="nav-item" data-page="y1"><span class="ni-ico">🙋</span><span class="ni-lbl" data-i18n="nav_y1">회원 관리</span></div>
+          <div class="nav-item" data-page="y2"><span class="ni-ico">💬</span><span class="ni-lbl" data-i18n="nav_y2">고객 문의</span><span class="ni-badge p">2</span></div>
+          <div class="nav-item" data-page="y3"><span class="ni-ico">📊</span><span class="ni-lbl" data-i18n="nav_y3">통계/분석</span></div>
+          <div class="nav-item" data-page="y4"><span class="ni-ico">⚙️</span><span class="ni-lbl" data-i18n="nav_y4">설정</span></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="sb-footer">
+      <div class="sb-user">
+        <div class="user-av">관</div>
+        <div>
+          <div class="user-name" data-i18n="user_name">최고관리자</div>
+          <div class="user-role"><span class="live-dot"></span><span data-i18n="user_online">온라인</span></div>
+        </div>
+      </div>
+    </div>
+  </aside>
+
+  <!-- ══ MAIN ══ -->
+  <div class="main-wrap" id="mainWrap">
+
+    <!-- TOPBAR -->
+    <header class="topbar">
+      <button class="hamburger" onclick="toggleMobileSidebar()">☰</button>
+      <button class="back-btn" onclick="goBack()">← 대문</button>
+      <div class="tb-title" id="topbarTitle">분양 상품 관리</div>
+      <div class="search-box">
+        <span class="s-icon">🔍</span>
+        <input class="search-input" id="searchInput" type="text" placeholder="상품명, 주문번호, 회원명 검색...">
+      </div>
+      <div class="tb-right">
+        <span class="live-clock" id="liveClock"></span>
+        <!-- 언어 -->
+        <div class="lang-wrap" id="langWrap">
+          <button class="lang-btn" onclick="toggleLang()">
+            <span class="lang-flag" id="curFlag">🇰🇷</span>
+            <span id="curLangName">한국어</span>
+            <span class="lang-chev">▼</span>
+          </button>
+          <div class="lang-drop">
+            <div class="lang-grp">🌏 동아시아</div>
+            <div class="lang-opt sel" data-code="ko" onclick="setLang('ko')"><span>🇰🇷</span> 한국어</div>
+            <div class="lang-opt" data-code="ja" onclick="setLang('ja')"><span>🇯🇵</span> 日本語</div>
+            <div class="lang-div"></div>
+            <div class="lang-grp">🌐 영어권</div>
+            <div class="lang-opt" data-code="en" onclick="setLang('en')"><span>🇺🇸</span> English (US)</div>
+            <div class="lang-div"></div>
+            <div class="lang-grp">🌺 동남아시아</div>
+            <div class="lang-opt" data-code="vi" onclick="setLang('vi')"><span>🇻🇳</span> Tiếng Việt</div>
+            <div class="lang-opt" data-code="th" onclick="setLang('th')"><span>🇹🇭</span> ภาษาไทย</div>
+            <div class="lang-opt" data-code="id" onclick="setLang('id')"><span>🇮🇩</span> Bahasa Indonesia</div>
+          </div>
+        </div>
+        <!-- 테마 -->
+        <div class="theme-toggle" onclick="toggleTheme()">
+          <span class="t-icon" id="themeIcon">🌙</span>
+          <div class="t-track"><div class="t-thumb"></div></div>
+          <span class="t-txt" id="themeTxt">밤 모드</span>
+        </div>
+        <div class="ib">🔔<span class="dot"></span></div>
+        <div class="ib">📩<span class="dot"></span></div>
+        <div class="ib">👤</div>
+      </div>
+    </header>
+
+    <!-- CONTENT -->
+    <main class="content">
+
+      <!-- 모바일 퀵액션 -->
+      <div class="quick-actions">
+        <div class="qa-btn" onclick="openCreateModal()"><span class="qa-ico">🏪</span><span class="qa-lbl">몰생성</span></div>
+        <div class="qa-btn"><span class="qa-ico">➕</span><span class="qa-lbl">상품등록</span></div>
+        <div class="qa-btn"><span class="qa-ico">📋</span><span class="qa-lbl">신청확인</span></div>
+        <div class="qa-btn"><span class="qa-ico">💳</span><span class="qa-lbl">입금확인</span></div>
+        <div class="qa-btn"><span class="qa-ico">🚚</span><span class="qa-lbl">배송처리</span></div>
+        <div class="qa-btn"><span class="qa-ico">💬</span><span class="qa-lbl">문의답변</span></div>
+      </div>
+
+      <!-- 통계 -->
+      <div class="stat-grid">
+        <div class="stat-card s1 anim"><div class="stat-ico">🐾</div><div class="stat-val">248</div><div class="stat-lbl" data-i18n="stat1">분양 대기 중</div><div class="stat-delta up">+12%</div></div>
+        <div class="stat-card s2 anim"><div class="stat-ico">🛒</div><div class="stat-val">1,392</div><div class="stat-lbl" data-i18n="stat2">이번 달 주문</div><div class="stat-delta up">+8%</div></div>
+        <div class="stat-card s3 anim"><div class="stat-ico">💰</div><div class="stat-val">₩4.7M</div><div class="stat-lbl" data-i18n="stat3">오늘 매출</div><div class="stat-delta dn">-3%</div></div>
+        <div class="stat-card s4 anim"><div class="stat-ico">😊</div><div class="stat-val">3,841</div><div class="stat-lbl" data-i18n="stat4">총 회원 수</div><div class="stat-delta up">+24</div></div>
+      </div>
+
+      <!-- 분양몰 -->
+      <div class="sec-hd"><div class="sec-ttl" style="color:var(--c)" data-i18n="sec_adopt">분양몰 관리</div><div class="sec-line"></div><div class="sec-tag st-c">ADOPTION</div></div>
+      <div class="feat-grid">
+        <div class="fc fc-c anim"><div class="fi fi-c">🏷️</div><div class="fi-info"><div class="fi-t" data-i18n="nav_p1">분양 상품 관리</div><div class="fi-s" data-i18n="sub_p1">등록·수정·삭제</div></div><div class="f-cnt">12</div><span class="f-arr">›</span></div>
+        <div class="fc fc-p anim"><div class="fi fi-p">📋</div><div class="fi-info"><div class="fi-t" data-i18n="nav_p2">분양 신청 현황</div><div class="fi-s" data-i18n="sub_p2">신청·승인·거절</div></div><div class="f-cnt">5</div><span class="f-arr">›</span></div>
+        <div class="fc fc-c anim"><div class="fi fi-c">👥</div><div class="fi-info"><div class="fi-t" data-i18n="nav_p3">입양자 관리</div><div class="fi-s" data-i18n="sub_p3">계약·이력·연락</div></div><div class="f-cnt">89</div><span class="f-arr">›</span></div>
+        <div class="fc fc-g anim"><div class="fi fi-g">📅</div><div class="fi-info"><div class="fi-t" data-i18n="nav_p4">분양 일정</div><div class="fi-s">캘린더·예약</div></div><span class="chip chip-g" style="margin-left:auto">3건</span><span class="f-arr">›</span></div>
+        <div class="fc fc-pu anim"><div class="fi fi-pu">📜</div><div class="fi-info"><div class="fi-t" data-i18n="nav_p5">분양 계약서</div><div class="fi-s">생성·서명·보관</div></div><span class="f-arr">›</span></div>
+        <div class="fc fc-gr anim"><div class="fi fi-gr">📣</div><div class="fi-info"><div class="fi-t" data-i18n="nav_p6">분양 공지</div><div class="fi-s">게시·알림발송</div></div><span class="f-arr">›</span></div>
+      </div>
+
+      <!-- 쇼핑몰 -->
+      <div class="sec-hd">
+        <div class="sec-ttl" style="color:var(--p)" data-i18n="sec_shop">쇼핑몰 관리</div>
+        <div class="sec-line"></div>
+        <button onclick="openShopPanel()" style="background:linear-gradient(135deg,var(--p),var(--pu));border:none;color:#fff;font-size:11px;font-weight:700;padding:5px 14px;border-radius:99px;cursor:pointer;font-family:'DM Sans',sans-serif;flex-shrink:0;">🛍️ 쇼핑몰 미리보기 →</button>
+      </div>
+      <div class="feat-grid">
+        <div class="fc fc-p anim" onclick="openShopPanel()"><div class="fi fi-p">📦</div><div class="fi-info"><div class="fi-t" data-i18n="nav_s2">상품 등록/관리</div><div class="fi-s" data-i18n="sub_s2">옵션·이미지·가격</div></div><div class="f-cnt">156</div><span class="f-arr">›</span></div>
+        <div class="fc fc-g anim"><div class="fi fi-g">🛒</div><div class="fi-info"><div class="fi-t" data-i18n="nav_s3">주문 관리</div><div class="fi-s" data-i18n="sub_s3">신규·처리·완료</div></div><div class="f-cnt">8</div><span class="f-arr">›</span></div>
+        <div class="fc fc-c anim"><div class="fi fi-c">🚚</div><div class="fi-info"><div class="fi-t" data-i18n="nav_s4">배송 관리</div><div class="fi-s" data-i18n="sub_s4">운송장·상태추적</div></div><div class="f-cnt">23</div><span class="f-arr">›</span></div>
+        <div class="fc fc-p anim"><div class="fi fi-p">💳</div><div class="fi-info"><div class="fi-t" data-i18n="nav_s5">입금 확인</div><div class="fi-s" data-i18n="sub_s5">무통장·가상계좌</div></div><div class="f-cnt">3</div><span class="f-arr">›</span></div>
+        <div class="fc fc-g anim"><div class="fi fi-g">🗃️</div><div class="fi-info"><div class="fi-t" data-i18n="nav_s6">재고 관리</div><div class="fi-s" data-i18n="sub_s6">수량·입출고·알림</div></div><span class="chip chip-p" style="margin-left:auto">부족 2</span><span class="f-arr">›</span></div>
+        <div class="fc fc-pu anim"><div class="fi fi-pu">↩️</div><div class="fi-info"><div class="fi-t" data-i18n="nav_s7">반품/교환</div><div class="fi-s" data-i18n="sub_s7">요청·처리·환불</div></div><span class="f-arr">›</span></div>
+        <div class="fc fc-c anim"><div class="fi fi-c">🎫</div><div class="fi-info"><div class="fi-t" data-i18n="nav_s8">쿠폰/이벤트</div><div class="fi-s">발급·기간·대상</div></div><span class="f-arr">›</span></div>
+        <div class="fc fc-gr anim"><div class="fi fi-gr">⭐</div><div class="fi-info"><div class="fi-t" data-i18n="nav_s9">리뷰 관리</div><div class="fi-s">승인·답글·신고</div></div><span class="f-arr">›</span></div>
+        <div class="fc fc-g anim"><div class="fi fi-g">🎯</div><div class="fi-info"><div class="fi-t" data-i18n="nav_s10">광고/배너</div><div class="fi-s">메인·팝업·기간</div></div><span class="f-arr">›</span></div>
+      </div>
+
+      <!-- 공통 -->
+      <div class="sec-hd"><div class="sec-ttl" style="color:var(--g)" data-i18n="sec_sys">공통 관리</div><div class="sec-line"></div><div class="sec-tag st-g">SYSTEM</div></div>
+      <div class="feat-grid g2">
+        <div class="fc fc-c anim"><div class="fi fi-c">🙋</div><div class="fi-info"><div class="fi-t" data-i18n="nav_y1">회원 관리</div><div class="fi-s">가입·등급·차단</div></div><div class="f-cnt" style="font-size:13px">3,841</div><span class="f-arr">›</span></div>
+        <div class="fc fc-p anim"><div class="fi fi-p">💬</div><div class="fi-info"><div class="fi-t" data-i18n="nav_y2">고객 문의</div><div class="fi-s">답변대기·완료</div></div><div class="f-cnt">2</div><span class="f-arr">›</span></div>
+        <div class="fc fc-g anim"><div class="fi fi-g">📊</div><div class="fi-info"><div class="fi-t" data-i18n="nav_y3">통계/분석</div><div class="fi-s">매출·방문·전환</div></div><span class="f-arr">›</span></div>
+        <div class="fc fc-pu anim"><div class="fi fi-pu">⚙️</div><div class="fi-info"><div class="fi-t" data-i18n="nav_y4">시스템 설정</div><div class="fi-s">배송비·약관·권한</div></div><span class="f-arr">›</span></div>
+      </div>
+
+      <!-- 라이브 패널 -->
+      <div class="dual-panel">
+        <div class="panel">
+          <div class="p-head"><div class="p-ttl">🐾 최근 분양 신청</div><div class="p-act">전체 보기</div></div>
+          <div class="p-row"><span class="p-dot pd-c"></span><div class="p-txt"><strong>골든 리트리버 ♂</strong><span>김민준 · 오늘 14:23</span></div><span class="chip chip-c">검토중</span></div>
+          <div class="p-row"><span class="p-dot pd-g"></span><div class="p-txt"><strong>말티즈 ♀</strong><span>이서연 · 오늘 11:05</span></div><span class="chip chip-g">승인</span></div>
+          <div class="p-row"><span class="p-dot pd-p"></span><div class="p-txt"><strong>포메라니안 ♂</strong><span>박지훈 · 어제</span></div><span class="chip chip-p">대기</span></div>
+          <div class="p-row"><span class="p-dot pd-gr"></span><div class="p-txt"><strong>비숑 ♀</strong><span>최수아 · 어제</span></div><span class="chip chip-gr">완료</span></div>
+        </div>
+        <div class="panel">
+          <div class="p-head"><div class="p-ttl">🛒 최근 주문</div><div class="p-act">전체 보기</div></div>
+          <div class="p-row"><span class="p-dot pd-g"></span><div class="p-txt"><strong>#ORD-2847 프리미엄 사료 2kg</strong><span>오늘 · 입금완료</span></div><span class="p-val pv-g">₩42,000</span></div>
+          <div class="p-row"><span class="p-dot pd-c"></span><div class="p-txt"><strong>#ORD-2846 강아지 하우스</strong><span>오늘 · 배송중</span></div><span class="p-val pv-c">₩89,000</span></div>
+          <div class="p-row"><span class="p-dot pd-p"></span><div class="p-txt"><strong>#ORD-2845 간식 세트</strong><span>어제 · 미입금</span></div><span class="chip chip-p">미입금</span></div>
+          <div class="p-row"><span class="p-dot pd-gr"></span><div class="p-txt"><strong>#ORD-2844 목줄 세트</strong><span>어제 · 완료</span></div><span class="p-val pv-gr">₩35,000</span></div>
+        </div>
+      </div>
+
+    </main>
+  </div>
+</div>
+
+<!-- ══ 쇼핑몰 슬라이드 패널 ══ -->
+<div class="shop-ov" id="shopOv" onclick="closeShopPanel()"></div>
+<div class="shop-panel" id="shopPanel">
+  <div class="sp-hd">
+    <div class="sp-ttl">🛍️ KONEXA SHOPPING MALL</div>
+    <div class="sp-close" onclick="closeShopPanel()">✕</div>
+  </div>
+  <div class="skin-bar">
+    <span class="skin-lbl">SKIN</span>
+    <div class="skin-chip sk-cyber active" data-skin="cyber" onclick="setSkin('cyber')">🌌 Cyber Dark</div>
+    <div class="skin-chip sk-rose" data-skin="rose" onclick="setSkin('rose')">🌸 Rose Gold</div>
+    <div class="skin-chip sk-ocean" data-skin="ocean" onclick="setSkin('ocean')">🌊 Ocean Blue</div>
+    <div class="skin-chip sk-forest" data-skin="forest" onclick="setSkin('forest')">🌿 Forest Green</div>
+    <div class="skin-chip sk-sunset" data-skin="sunset" onclick="setSkin('sunset')">🌅 Sunset Warm</div>
+    <div class="skin-chip sk-mono" data-skin="mono" onclick="setSkin('mono')">⬜ Mono Clean</div>
+  </div>
+  <div class="sp-body">
+    <div class="mall-list-ttl">📋 내 분양몰 목록</div>
+    <div id="mallListItems"></div>
+    <button class="sp-add-btn" onclick="openCreateModal()">＋ 새 분양몰 생성하기</button>
+    <div id="shopPreviewArea"></div>
+  </div>
+</div>
+
+<!-- ══ 분양몰 생성 모달 ══ -->
+<div class="modal-ov" id="createModal" onclick="if(event.target===this)closeCreateModal()">
+  <div class="modal">
+    <div class="modal-hd">
+      <div class="modal-ico">🏪</div>
+      <div><div class="modal-ttl">새 분양몰 생성</div><div class="modal-sub">무제한으로 분양몰을 만들 수 있습니다</div></div>
+      <div class="modal-x" onclick="closeCreateModal()">✕</div>
+    </div>
+    <div class="modal-body">
+      <label class="f-lbl">분양몰 이름</label>
+      <input class="f-inp" id="mallNameInput" type="text" placeholder="예: 럭키펫 분양몰">
+      <label class="f-lbl">스킨 선택</label>
+      <div class="skin-sel">
+        <div class="skin-opt sel" data-skin="cyber" onclick="selectSkinOpt(this)"><div class="so-icon">🌌</div><div class="so-name">Cyber Dark</div></div>
+        <div class="skin-opt" data-skin="rose" onclick="selectSkinOpt(this)"><div class="so-icon">🌸</div><div class="so-name">Rose Gold</div></div>
+        <div class="skin-opt" data-skin="ocean" onclick="selectSkinOpt(this)"><div class="so-icon">🌊</div><div class="so-name">Ocean Blue</div></div>
+        <div class="skin-opt" data-skin="forest" onclick="selectSkinOpt(this)"><div class="so-icon">🌿</div><div class="so-name">Forest</div></div>
+        <div class="skin-opt" data-skin="sunset" onclick="selectSkinOpt(this)"><div class="so-icon">🌅</div><div class="so-name">Sunset</div></div>
+        <div class="skin-opt" data-skin="mono" onclick="selectSkinOpt(this)"><div class="so-icon">⬜</div><div class="so-name">Mono</div></div>
+      </div>
+    </div>
+    <div class="modal-ft">
+      <button class="btn btn-cancel" onclick="closeCreateModal()">취소</button>
+      <button class="btn btn-primary" onclick="createMall()">🏪 분양몰 생성하기</button>
+    </div>
+  </div>
+</div>
+
+<!-- ══ 모바일 하단 컨트롤러 ══ -->
+<nav class="bottom-nav">
+  <div class="bn-item active" data-page="home"><span class="bn-ico">🏠</span><span class="bn-lbl">홈</span></div>
+  <div class="bn-item" data-page="adopt"><span class="bn-ico">🐾</span><span class="bn-lbl">분양몰</span><span class="bn-bdg">5</span></div>
+  <div class="bn-item" data-page="shop"><span class="bn-ico">🛍️</span><span class="bn-lbl">쇼핑몰</span><span class="bn-bdg">8</span></div>
+  <div class="bn-item" data-page="stats"><span class="bn-ico">📊</span><span class="bn-lbl">통계</span></div>
+  <div class="bn-item" data-page="create"><span class="bn-ico">🏪</span><span class="bn-lbl">몰생성</span></div>
+</nav>
+<div class="fab" id="fab">＋</div>
+
+<script src="js/app.js"></script>
+</body>
+</html>
