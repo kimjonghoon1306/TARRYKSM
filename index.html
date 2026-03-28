@@ -1,0 +1,533 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<!--
+  ╔══════════════════════════════════════════════╗
+  ║   INFINITE MALL ADMIN — FILE TREE            ║
+  ║                                              ║
+  ║   admin-portal/                              ║
+  ║   ├── index.html          ← 현재 파일        ║
+  ║   ├── css/                                   ║
+  ║   │   └── style.css       ← 전체 디자인      ║
+  ║   └── js/                                    ║
+  ║       └── app.js          ← 인터랙션         ║
+  ╚══════════════════════════════════════════════╝
+-->
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<title>KONEXA — Admin Portal</title>
+<link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+<!-- ── BACKGROUND FX ── -->
+<div class="bg-grid"></div>
+<div class="bg-glow bg-glow-1"></div>
+<div class="bg-glow bg-glow-2"></div>
+<div class="bg-glow bg-glow-3"></div>
+
+<div class="app">
+
+  <!-- ════════════════════════════
+       SIDEBAR (DESKTOP ONLY)
+  ════════════════════════════ -->
+  <aside class="sidebar" id="sidebar">
+    <button class="collapse-btn" id="collapseBtn">◀</button>
+
+    <!-- Logo -->
+    <div class="sidebar-logo">
+      <div class="logo-icon">K</div>
+      <div class="logo-text">
+        KONEXA
+        <span>ADOPTION MALL · ADMIN</span>
+      </div>
+    </div>
+
+    <!-- 분양몰 -->
+    <div class="sidebar-section">
+      <div class="sidebar-section-label">🐾 분양몰 관리</div>
+
+      <div class="nav-item active" data-section="분양 상품 관리">
+        <span class="nav-icon">🏷️</span>
+        <span class="nav-label">분양 상품 관리</span>
+        <span class="nav-badge cyan">12</span>
+      </div>
+      <div class="nav-item" data-section="분양 신청 현황">
+        <span class="nav-icon">📋</span>
+        <span class="nav-label">분양 신청 현황</span>
+        <span class="nav-badge pink">5</span>
+      </div>
+      <div class="nav-item" data-section="입양자 관리">
+        <span class="nav-icon">👥</span>
+        <span class="nav-label">입양자 관리</span>
+      </div>
+      <div class="nav-item" data-section="분양 일정">
+        <span class="nav-icon">📅</span>
+        <span class="nav-label">분양 일정</span>
+      </div>
+      <div class="nav-item" data-section="분양 계약서">
+        <span class="nav-icon">📜</span>
+        <span class="nav-label">분양 계약서</span>
+      </div>
+    </div>
+
+    <!-- 쇼핑몰 -->
+    <div class="sidebar-section">
+      <div class="sidebar-section-label">🛒 쇼핑몰 관리</div>
+
+      <div class="nav-item pink" data-section="상품 등록/관리">
+        <span class="nav-icon">📦</span>
+        <span class="nav-label">상품 등록 / 관리</span>
+      </div>
+      <div class="nav-item pink" data-section="주문 관리">
+        <span class="nav-icon">🛒</span>
+        <span class="nav-label">주문 관리</span>
+        <span class="nav-badge gold">8</span>
+      </div>
+      <div class="nav-item pink" data-section="배송 관리">
+        <span class="nav-icon">🚚</span>
+        <span class="nav-label">배송 관리</span>
+      </div>
+      <div class="nav-item pink" data-section="입금 확인">
+        <span class="nav-icon">💳</span>
+        <span class="nav-label">입금 확인</span>
+        <span class="nav-badge pink">3</span>
+      </div>
+      <div class="nav-item pink" data-section="재고 관리">
+        <span class="nav-icon">🗃️</span>
+        <span class="nav-label">재고 관리</span>
+      </div>
+      <div class="nav-item pink" data-section="반품/교환">
+        <span class="nav-icon">↩️</span>
+        <span class="nav-label">반품 / 교환</span>
+      </div>
+      <div class="nav-item pink" data-section="쿠폰/이벤트">
+        <span class="nav-icon">🎫</span>
+        <span class="nav-label">쿠폰 / 이벤트</span>
+      </div>
+    </div>
+
+    <!-- 공통 -->
+    <div class="sidebar-section">
+      <div class="sidebar-section-label">⚙️ 공통 관리</div>
+
+      <div class="nav-item" data-section="회원 관리">
+        <span class="nav-icon">🙋</span>
+        <span class="nav-label">회원 관리</span>
+      </div>
+      <div class="nav-item" data-section="고객 문의">
+        <span class="nav-icon">💬</span>
+        <span class="nav-label">고객 문의</span>
+        <span class="nav-badge pink">2</span>
+      </div>
+      <div class="nav-item" data-section="통계 / 분석">
+        <span class="nav-icon">📊</span>
+        <span class="nav-label">통계 / 분석</span>
+      </div>
+      <div class="nav-item" data-section="설정">
+        <span class="nav-icon">⚙️</span>
+        <span class="nav-label">설정</span>
+      </div>
+    </div>
+
+    <!-- User -->
+    <div class="sidebar-footer">
+      <div class="sidebar-user">
+        <div class="user-avatar">관</div>
+        <div class="user-info">
+          <div class="user-name">최고관리자</div>
+          <div class="user-role"><span class="live-dot"></span>온라인</div>
+        </div>
+      </div>
+    </div>
+  </aside>
+
+  <!-- ════════════════════════════
+       MAIN WRAP
+  ════════════════════════════ -->
+  <div class="main-wrap" id="mainWrap">
+
+    <!-- ── TOPBAR ── -->
+    <header class="topbar">
+      <div class="topbar-title" id="topbarTitle">분양 상품 관리</div>
+
+      <div class="search-box">
+        <span class="search-icon">🔍</span>
+        <input class="search-input" type="text" placeholder="상품명, 주문번호, 회원명 검색...">
+      </div>
+
+      <div class="topbar-actions">
+        <span id="liveClock" style="font-family:'Syncopate',monospace;font-size:11px;color:var(--cyan);letter-spacing:1px;"></span>
+        <div class="icon-btn">🔔<span class="dot"></span></div>
+        <div class="icon-btn">📩<span class="dot"></span></div>
+        <div class="icon-btn">👤</div>
+      </div>
+    </header>
+
+    <!-- ── DASHBOARD CONTENT ── -->
+    <main class="content">
+
+      <!-- ── MOBILE QUICK ACTIONS ── -->
+      <div class="quick-actions">
+        <div class="qa-btn cyan">
+          <span class="qa-icon">➕</span>
+          <span class="qa-label">상품등록</span>
+        </div>
+        <div class="qa-btn pink">
+          <span class="qa-icon">📋</span>
+          <span class="qa-label">신청확인</span>
+        </div>
+        <div class="qa-btn gold">
+          <span class="qa-icon">💳</span>
+          <span class="qa-label">입금확인</span>
+        </div>
+        <div class="qa-btn cyan">
+          <span class="qa-icon">🚚</span>
+          <span class="qa-label">배송처리</span>
+        </div>
+        <div class="qa-btn pink">
+          <span class="qa-icon">💬</span>
+          <span class="qa-label">문의답변</span>
+        </div>
+        <div class="qa-btn gold">
+          <span class="qa-icon">📊</span>
+          <span class="qa-label">통계보기</span>
+        </div>
+      </div>
+
+      <!-- ── STAT CARDS ── -->
+      <div class="stat-ribbon">
+        <div class="stat-card c1 anim">
+          <div class="stat-icon">🐾</div>
+          <div class="stat-value"><span data-count="248">0</span></div>
+          <div class="stat-label">분양 대기 중</div>
+          <div class="stat-delta up">+12%</div>
+        </div>
+        <div class="stat-card c2 anim">
+          <div class="stat-icon">🛒</div>
+          <div class="stat-value"><span data-count="1392">0</span></div>
+          <div class="stat-label">이번 달 주문</div>
+          <div class="stat-delta up">+8%</div>
+        </div>
+        <div class="stat-card c3 anim">
+          <div class="stat-icon">💰</div>
+          <div class="stat-value">₩<span data-count="4.7">0</span>M</div>
+          <div class="stat-label">오늘 매출</div>
+          <div class="stat-delta dn">-3%</div>
+        </div>
+        <div class="stat-card c4 anim">
+          <div class="stat-icon">😊</div>
+          <div class="stat-value"><span data-count="3841">0</span></div>
+          <div class="stat-label">총 회원 수</div>
+          <div class="stat-delta up">+24</div>
+        </div>
+      </div>
+
+      <!-- ── 분양몰 섹션 ── -->
+      <div class="section-header">
+        <div class="section-title" style="color:var(--cyan)">🐾 분양몰 관리</div>
+        <div class="section-line"></div>
+        <div class="section-tag cyan">ADOPTION</div>
+      </div>
+
+      <div class="feature-grid">
+        <div class="feat-card cyan anim">
+          <div class="feat-icon-wrap cyan">🏷️</div>
+          <div class="feat-info">
+            <div class="feat-title">분양 상품 관리</div>
+            <div class="feat-sub">등록 · 수정 · 삭제</div>
+          </div>
+          <div class="feat-count cyan">12</div>
+          <span class="feat-arrow">›</span>
+        </div>
+        <div class="feat-card pink anim">
+          <div class="feat-icon-wrap pink">📋</div>
+          <div class="feat-info">
+            <div class="feat-title">분양 신청 현황</div>
+            <div class="feat-sub">신청 · 승인 · 거절</div>
+          </div>
+          <div class="feat-count pink">5</div>
+          <span class="feat-arrow">›</span>
+        </div>
+        <div class="feat-card cyan anim">
+          <div class="feat-icon-wrap cyan">👥</div>
+          <div class="feat-info">
+            <div class="feat-title">입양자 관리</div>
+            <div class="feat-sub">계약 · 이력 · 연락</div>
+          </div>
+          <div class="feat-count cyan">89</div>
+          <span class="feat-arrow">›</span>
+        </div>
+        <div class="feat-card gold anim">
+          <div class="feat-icon-wrap gold">📅</div>
+          <div class="feat-info">
+            <div class="feat-title">분양 일정</div>
+            <div class="feat-sub">캘린더 · 예약</div>
+          </div>
+          <span class="chip gold" style="margin-left:auto">3건</span>
+          <span class="feat-arrow">›</span>
+        </div>
+        <div class="feat-card purple anim">
+          <div class="feat-icon-wrap purple">📜</div>
+          <div class="feat-info">
+            <div class="feat-title">분양 계약서</div>
+            <div class="feat-sub">생성 · 서명 · 보관</div>
+          </div>
+          <span class="feat-arrow">›</span>
+        </div>
+        <div class="feat-card green anim">
+          <div class="feat-icon-wrap green">📣</div>
+          <div class="feat-info">
+            <div class="feat-title">분양 공지</div>
+            <div class="feat-sub">게시 · 알림 발송</div>
+          </div>
+          <span class="feat-arrow">›</span>
+        </div>
+      </div>
+
+      <!-- ── 쇼핑몰 섹션 ── -->
+      <div class="section-header">
+        <div class="section-title" style="color:var(--pink)">🛒 쇼핑몰 관리</div>
+        <div class="section-line"></div>
+        <div class="section-tag pink">SHOPPING</div>
+      </div>
+
+      <div class="feature-grid">
+        <div class="feat-card pink anim">
+          <div class="feat-icon-wrap pink">📦</div>
+          <div class="feat-info">
+            <div class="feat-title">상품 등록 / 관리</div>
+            <div class="feat-sub">옵션 · 이미지 · 가격</div>
+          </div>
+          <div class="feat-count pink">156</div>
+          <span class="feat-arrow">›</span>
+        </div>
+        <div class="feat-card gold anim">
+          <div class="feat-icon-wrap gold">🛒</div>
+          <div class="feat-info">
+            <div class="feat-title">주문 관리</div>
+            <div class="feat-sub">신규 · 처리 · 완료</div>
+          </div>
+          <div class="feat-count gold">8</div>
+          <span class="feat-arrow">›</span>
+        </div>
+        <div class="feat-card cyan anim">
+          <div class="feat-icon-wrap cyan">🚚</div>
+          <div class="feat-info">
+            <div class="feat-title">배송 관리</div>
+            <div class="feat-sub">운송장 · 상태 추적</div>
+          </div>
+          <div class="feat-count cyan">23</div>
+          <span class="feat-arrow">›</span>
+        </div>
+        <div class="feat-card pink anim">
+          <div class="feat-icon-wrap pink">💳</div>
+          <div class="feat-info">
+            <div class="feat-title">입금 확인</div>
+            <div class="feat-sub">무통장 · 가상계좌</div>
+          </div>
+          <div class="feat-count pink">3</div>
+          <span class="feat-arrow">›</span>
+        </div>
+        <div class="feat-card gold anim">
+          <div class="feat-icon-wrap gold">🗃️</div>
+          <div class="feat-info">
+            <div class="feat-title">재고 관리</div>
+            <div class="feat-sub">수량 · 입출고 · 알림</div>
+          </div>
+          <span class="chip gold" style="margin-left:auto">부족 2</span>
+          <span class="feat-arrow">›</span>
+        </div>
+        <div class="feat-card purple anim">
+          <div class="feat-icon-wrap purple">↩️</div>
+          <div class="feat-info">
+            <div class="feat-title">반품 / 교환</div>
+            <div class="feat-sub">요청 · 처리 · 환불</div>
+          </div>
+          <span class="feat-arrow">›</span>
+        </div>
+        <div class="feat-card cyan anim">
+          <div class="feat-icon-wrap cyan">🎫</div>
+          <div class="feat-info">
+            <div class="feat-title">쿠폰 / 이벤트</div>
+            <div class="feat-sub">발급 · 기간 · 대상</div>
+          </div>
+          <span class="feat-arrow">›</span>
+        </div>
+        <div class="feat-card green anim">
+          <div class="feat-icon-wrap green">⭐</div>
+          <div class="feat-info">
+            <div class="feat-title">리뷰 관리</div>
+            <div class="feat-sub">승인 · 답글 · 신고</div>
+          </div>
+          <span class="feat-arrow">›</span>
+        </div>
+        <div class="feat-card gold anim">
+          <div class="feat-icon-wrap gold">🎯</div>
+          <div class="feat-info">
+            <div class="feat-title">광고 / 배너</div>
+            <div class="feat-sub">메인 · 팝업 · 기간</div>
+          </div>
+          <span class="feat-arrow">›</span>
+        </div>
+      </div>
+
+      <!-- ── 공통 관리 섹션 ── -->
+      <div class="section-header">
+        <div class="section-title" style="color:var(--gold)">⚙️ 공통 관리</div>
+        <div class="section-line"></div>
+        <div class="section-tag gold" style="background:var(--gold-dim);color:var(--gold);border-color:rgba(255,184,0,0.25)">SYSTEM</div>
+      </div>
+
+      <div class="feature-grid two-col">
+        <div class="feat-card cyan anim">
+          <div class="feat-icon-wrap cyan">🙋</div>
+          <div class="feat-info">
+            <div class="feat-title">회원 관리</div>
+            <div class="feat-sub">가입 · 등급 · 차단</div>
+          </div>
+          <div class="feat-count cyan" style="font-size:14px">3,841</div>
+          <span class="feat-arrow">›</span>
+        </div>
+        <div class="feat-card pink anim">
+          <div class="feat-icon-wrap pink">💬</div>
+          <div class="feat-info">
+            <div class="feat-title">고객 문의</div>
+            <div class="feat-sub">답변 대기 · 처리 완료</div>
+          </div>
+          <div class="feat-count pink">2</div>
+          <span class="feat-arrow">›</span>
+        </div>
+        <div class="feat-card gold anim">
+          <div class="feat-icon-wrap gold">📊</div>
+          <div class="feat-info">
+            <div class="feat-title">통계 / 분석</div>
+            <div class="feat-sub">매출 · 방문 · 전환</div>
+          </div>
+          <span class="feat-arrow">›</span>
+        </div>
+        <div class="feat-card purple anim">
+          <div class="feat-icon-wrap purple">⚙️</div>
+          <div class="feat-info">
+            <div class="feat-title">시스템 설정</div>
+            <div class="feat-sub">배송비 · 약관 · 권한</div>
+          </div>
+          <span class="feat-arrow">›</span>
+        </div>
+      </div>
+
+      <!-- ── DUAL LIVE PANELS ── -->
+      <div class="dual-panel">
+        <!-- 최근 분양 신청 -->
+        <div class="panel">
+          <div class="panel-head">
+            <div class="panel-title">🐾 최근 분양 신청</div>
+            <div class="panel-action">전체 보기</div>
+          </div>
+          <div class="panel-body">
+            <div class="row-item">
+              <span class="row-dot cyan"></span>
+              <div class="row-text"><strong>골든 리트리버 ♂</strong>김민준 · 오늘 14:23</div>
+              <span class="row-val cyan chip">검토중</span>
+            </div>
+            <div class="row-item">
+              <span class="row-dot gold"></span>
+              <div class="row-text"><strong>말티즈 ♀</strong>이서연 · 오늘 11:05</div>
+              <span class="row-val gold chip">승인</span>
+            </div>
+            <div class="row-item">
+              <span class="row-dot pink"></span>
+              <div class="row-text"><strong>포메라니안 ♂</strong>박지훈 · 어제</div>
+              <span class="row-val pink chip">대기</span>
+            </div>
+            <div class="row-item">
+              <span class="row-dot green"></span>
+              <div class="row-text"><strong>비숑 ♀</strong>최수아 · 어제</div>
+              <span class="row-val green chip">완료</span>
+            </div>
+            <div class="row-item">
+              <span class="row-dot cyan"></span>
+              <div class="row-text"><strong>시바이누 ♂</strong>정우진 · 2일 전</div>
+              <span class="row-val cyan chip">검토중</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- 최근 주문 -->
+        <div class="panel">
+          <div class="panel-head">
+            <div class="panel-title">🛒 최근 주문</div>
+            <div class="panel-action">전체 보기</div>
+          </div>
+          <div class="panel-body">
+            <div class="row-item">
+              <span class="row-dot gold"></span>
+              <div class="row-text"><strong>#ORD-2847</strong>프리미엄 사료 2kg · 오늘</div>
+              <span class="row-val gold">₩42,000</span>
+            </div>
+            <div class="row-item">
+              <span class="row-dot cyan"></span>
+              <div class="row-text"><strong>#ORD-2846</strong>강아지 하우스 · 오늘</div>
+              <span class="row-val cyan">₩89,000</span>
+            </div>
+            <div class="row-item">
+              <span class="row-dot pink"></span>
+              <div class="row-text"><strong>#ORD-2845</strong>간식 세트 · 어제</div>
+              <span class="row-val pink">미입금</span>
+            </div>
+            <div class="row-item">
+              <span class="row-dot green"></span>
+              <div class="row-text"><strong>#ORD-2844</strong>목줄 · 하네스 세트</div>
+              <span class="row-val green">₩35,000</span>
+            </div>
+            <div class="row-item">
+              <span class="row-dot gold"></span>
+              <div class="row-text"><strong>#ORD-2843</strong>배변패드 100매</div>
+              <span class="row-val gold">₩28,000</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </main><!-- /content -->
+  </div><!-- /main-wrap -->
+</div><!-- /app -->
+
+<!-- ── MOBILE BOTTOM NAV (CONTROLLER) ── -->
+<nav class="bottom-nav">
+  <div class="bn-item active" onclick="bnActivate(this)">
+    <span class="bn-icon">🏠</span>
+    <span class="bn-label">홈</span>
+  </div>
+  <div class="bn-item" onclick="bnActivate(this)">
+    <span class="bn-icon">🐾</span>
+    <span class="bn-label">분양몰</span>
+    <span class="bn-badge">5</span>
+  </div>
+  <div class="bn-item" onclick="bnActivate(this)">
+    <span class="bn-icon">🛒</span>
+    <span class="bn-label">쇼핑몰</span>
+    <span class="bn-badge">8</span>
+  </div>
+  <div class="bn-item" onclick="bnActivate(this)">
+    <span class="bn-icon">📊</span>
+    <span class="bn-label">통계</span>
+  </div>
+  <div class="bn-item" onclick="bnActivate(this)">
+    <span class="bn-icon">⚙️</span>
+    <span class="bn-label">설정</span>
+  </div>
+</nav>
+
+<!-- ── FAB (MOBILE) ── -->
+<div class="fab" id="fab">➕</div>
+
+<script src="js/app.js"></script>
+<script>
+  function bnActivate(el) {
+    document.querySelectorAll('.bn-item').forEach(i => i.classList.remove('active'));
+    el.classList.add('active');
+  }
+</script>
+</body>
+</html>
