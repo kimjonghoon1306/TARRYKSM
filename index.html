@@ -11,6 +11,7 @@
 <!-- ── 스타일 트리 ── -->
 <link rel="stylesheet" href="css/tokens.css">
 <link rel="stylesheet" href="css/base.css">
+<link rel="stylesheet" href="css/cinema.css">
 <link rel="stylesheet" href="css/shell.css">
 <link rel="stylesheet" href="css/components.css">
 <link rel="stylesheet" href="css/studio.css">
@@ -23,22 +24,78 @@
 <body>
 
 <!-- ════════════════════════════════════════
-     INTRO — 진입 화면
+     INTRO — 시네마틱 대문 (6씬 모션그래픽)
 ════════════════════════════════════════ -->
 <section id="intro">
-  <button class="intro-theme" onclick="toggleTheme()" aria-label="테마 전환"><span id="introThemeIco">🌙</span></button>
-  <div class="intro-aura a1"></div>
-  <div class="intro-aura a2"></div>
-  <div class="intro-inner">
-    <div class="intro-logo">
-      <span class="intro-mark">O</span>
-      <span class="intro-word">ONJONGIL</span>
+  <div class="cine-bg">
+    <span class="cine-aura a1"></span><span class="cine-aura a2"></span><span class="cine-aura a3"></span>
+    <span class="cine-grid"></span>
+  </div>
+
+  <!-- 상단: 로고 · 진행바 · 테마 · 스킵 -->
+  <div class="cine-top">
+    <div class="cine-logo-sm"><span class="cls-mark">O</span><span>ONJONGIL</span></div>
+    <div class="cine-prog" id="cineProg"></div>
+    <button class="cine-theme" onclick="toggleTheme()" aria-label="테마 전환"><span id="introThemeIco">🌙</span></button>
+    <button class="cine-skip" onclick="cineEnter()">건너뛰기 <span>→</span></button>
+  </div>
+
+  <!-- 지속 빌드 스테이지 (씬1~3 공유) -->
+  <div class="cine-store-stage" id="cineStore">
+    <div class="cine-glow"></div>
+    <div class="cine-store">
+      <div class="cs-bar"><span class="cs-logo">OBJECT</span><span class="cs-cart"></span></div>
+      <div class="cs-hero">
+        <span class="cs-badge"></span><span class="cs-line w1"></span><span class="cs-line w2"></span><span class="cs-cta"></span>
+      </div>
+      <div class="cs-grid">
+        <div class="cs-tile"><b>🕯️</b></div><div class="cs-tile"><b>👟</b></div><div class="cs-tile"><b>🧴</b></div>
+        <div class="cs-tile"><b>👜</b></div><div class="cs-tile"><b>⌚</b></div><div class="cs-tile"><b>🎧</b></div>
+      </div>
     </div>
-    <div class="intro-pill"><span class="pill-dot"></span> VERTICAL COMMERCE BUILDER · v2.0</div>
-    <h1 class="intro-title">하나의 브랜드를<br><em>무한히</em> 분양하다</h1>
-    <p class="intro-desc">쇼핑몰을 무제한으로 찍어내고, 클릭 한 번으로 스킨을 갈아입히세요.<br>서로 다른 상품을 올려도 한 브랜드처럼 — 그게 ONJONGIL의 방식입니다.</p>
-    <div class="intro-skins" id="introSkins"></div>
-    <button class="intro-cta" onclick="enterApp()">스튜디오 입장 <span>→</span></button>
+  </div>
+
+  <!-- 씬 -->
+  <div class="cine-scenes" id="cineScenes">
+    <!-- 0 로고 -->
+    <div class="scene sc-logo">
+      <div class="sc-eyebrow">AN ONJONGIL PRODUCTION</div>
+      <h1 class="sc-word"><span>O</span><span>N</span><span>J</span><span>O</span><span>N</span><span>G</span><span>I</span><span>L</span></h1>
+      <div class="sc-tag">하나의 브랜드를 — <em>무한히</em> 분양하다</div>
+    </div>
+    <!-- 1 골격 -->
+    <div class="scene sc-cap">
+      <div class="cap-no">01</div>
+      <div class="cap-ttl">골격을 세우다</div>
+      <div class="cap-sub">빈 매장의 뼈대부터. 레이아웃이 잡힙니다.</div>
+    </div>
+    <!-- 2 상품 -->
+    <div class="scene sc-cap">
+      <div class="cap-no">02</div>
+      <div class="cap-ttl">상품을 채우다</div>
+      <div class="cap-sub">서로 다른 상품도 하나의 규격으로 — 이질감 없이.</div>
+    </div>
+    <!-- 3 스킨 360 -->
+    <div class="scene sc-cap">
+      <div class="cap-no">03</div>
+      <div class="cap-ttl">스킨을 입다<span class="cap-360">360°</span></div>
+      <div class="cap-sub">클릭 한 번에 색·서체·무드가 통째로 바뀝니다.</div>
+    </div>
+    <!-- 4 무한분양 -->
+    <div class="scene sc-multiply">
+      <div class="cine-mall-grid" id="cineMalls"></div>
+      <div class="mul-cap"><div class="cap-no">04</div><div class="cap-ttl">무한히 분양하다</div></div>
+    </div>
+    <!-- 5 피날레 -->
+    <div class="scene sc-finale">
+      <div class="fin-logo"><span class="fin-mark">O</span> ONJONGIL</div>
+      <h2 class="fin-title">당신의 브랜드를,<br><em>무한히</em></h2>
+      <button class="fin-cta" onclick="cineEnter()">스튜디오 입장 <span>→</span></button>
+      <div class="fin-auto">
+        <svg class="cine-ring" viewBox="0 0 48 48"><circle class="ring-bg" cx="24" cy="24" r="21"/><circle class="ring-fg" cx="24" cy="24" r="21"/></svg>
+        자동 입장
+      </div>
+    </div>
   </div>
 </section>
 
@@ -169,6 +226,7 @@
 <script src="js/store.js"></script>
 <script src="js/studio.js"></script>
 <script src="js/shell.js"></script>
+<script src="js/cinema.js"></script>
 <script src="js/app.js"></script>
 </body>
 </html>

@@ -10,4 +10,6 @@
 
   tickClock();
   setInterval(tickClock, 30000);
+
+  startCinema();        // 시네마틱 대문 시퀀스 시작
 })();
