@@ -44,14 +44,24 @@ export async function proxy(request: NextRequest) {
     response = NextResponse.next({ request });
   }
 
-  // ── Supabase 세션 갱신(쿠키 동기화) + user ──
-  const user = await updateSession(request, response);
+  // ── 인증이 필요한 경로에서만 Supabase 세션 검증(네트워크 왕복) ──
+  // 대문·스토어프런트·정적은 건너뛰어 전환 속도 대폭 개선.
+  const p = url.pathname;
+  const needsAuth =
+    p.startsWith("/dashboard") ||
+    p === "/login" ||
+    p === "/signup" ||
+    p.startsWith("/reset-password") ||
+    p.startsWith("/find-email");
 
-  // ── 관리자 컨트롤타워(/dashboard)는 로그인 필요 (플랫폼 호스트에서만) ──
-  if (isPlatformHost && !subdomain && url.pathname.startsWith("/dashboard") && !user) {
-    const redirectRes = NextResponse.redirect(new URL("/login", request.url));
-    response.cookies.getAll().forEach((c) => redirectRes.cookies.set(c));
-    return redirectRes;
+  if (needsAuth) {
+    const user = await updateSession(request, response);
+    // 관리자 컨트롤타워(/dashboard)는 로그인 필요 (플랫폼 호스트에서만)
+    if (isPlatformHost && !subdomain && p.startsWith("/dashboard") && !user) {
+      const redirectRes = NextResponse.redirect(new URL("/login", request.url));
+      response.cookies.getAll().forEach((c) => redirectRes.cookies.set(c));
+      return redirectRes;
+    }
   }
 
   return response;

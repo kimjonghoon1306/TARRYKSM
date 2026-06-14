@@ -13,14 +13,12 @@ export default async function Overview({
 }) {
   const { smsg, serr } = await searchParams;
   const supabase = await createClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
-
-  const { data: stores } = await supabase
-    .from("stores")
-    .select("id,name,skin,slug")
-    .order("created_at", { ascending: false });
+  // 인증 확인과 목록 조회를 병렬로 (전환 속도 개선)
+  const [{ data: userData }, { data: stores }] = await Promise.all([
+    supabase.auth.getUser(),
+    supabase.from("stores").select("id,name,skin,slug").order("created_at", { ascending: false }),
+  ]);
+  const user = userData.user;
   const list = (stores ?? []) as Store[];
 
   const storeIds = list.map((s) => s.id);
