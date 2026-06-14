@@ -11,6 +11,15 @@ body{
   overflow-x:hidden;
   transition:background .4s var(--ease),color .4s var(--ease);
 }
+/* 다크 모드: 셸 전체에 은은한 오로라 글로우(고정) — 밋밋한 평면 방지 */
+:root[data-theme="dark"] body{
+  background:
+    radial-gradient(1000px 560px at 8% -10%, rgba(109,94,252,.12), transparent 60%),
+    radial-gradient(900px 520px at 100% 0%, rgba(255,110,199,.07), transparent 55%),
+    radial-gradient(700px 600px at 50% 120%, rgba(45,212,191,.05), transparent 60%),
+    var(--bg);
+  background-attachment:fixed;
+}
 a{cursor:pointer;text-decoration:none;color:inherit}
 button{font-family:inherit;cursor:pointer;border:none;background:none;color:inherit}
 input{font-family:inherit}

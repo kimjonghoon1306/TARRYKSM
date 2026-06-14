@@ -22,19 +22,20 @@
   --font-body:'Inter','Plus Jakarta Sans',sans-serif;
 }
 
-/* ── 다크(기본) ── */
+/* ── 다크(기본) — 미드나잇 인디고: 순수 검정 대신 보라빛 잉크 톤 ── */
 :root[data-theme="dark"]{
-  --bg:#08080d;
-  --bg-2:#0e0e16;
-  --surf:#14141e;
-  --surf-2:#1b1b28;
-  --surf-3:#23232f;
-  --line:rgba(255,255,255,.08);
-  --line-2:rgba(255,255,255,.14);
-  --txt:#f3f3f8;
-  --txt-2:#b6b6c6;
-  --sub:#7e7e92;
+  --bg:#0f1018;
+  --bg-2:#161827;
+  --surf:#1b1d2e;
+  --surf-2:#23263b;
+  --surf-3:#2e3149;
+  --line:rgba(163,165,224,.10);
+  --line-2:rgba(163,165,224,.19);
+  --txt:#f3f3fb;
+  --txt-2:#c1c2da;
+  --sub:#868aab;
   --glow:rgba(109,94,252,.45);
+  --shadow:0 22px 60px -24px rgba(0,0,0,.7);
 }
 
 /* ── 라이트 ── */
