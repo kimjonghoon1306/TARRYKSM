@@ -1,11 +1,12 @@
 import Link from "next/link";
 import { createStoreOpen } from "../../actions";
 import { SKIN_BY_ID, SKIN_IDS } from "@/lib/skins";
+import { PRIMARY_DOMAIN } from "@/lib/domains";
 
 export default async function NewStorePage({
   searchParams,
 }: {
-  searchParams: Promise<{ skin?: string; err?: string }>;
+  searchParams: Promise<{ skin?: string; err?: string; name?: string; slug?: string }>;
 }) {
   const sp = await searchParams;
   const skin = sp.skin && SKIN_IDS.includes(sp.skin) ? sp.skin : "mono";
@@ -43,11 +44,11 @@ export default async function NewStorePage({
 
         {sp.err && (
           <p className="mb-3 rounded-lg bg-rose-500/10 px-3 py-2 text-sm text-rose-600 dark:text-rose-400">
-            쇼핑몰 이름을 입력해 주세요.
+            {sp.err}
           </p>
         )}
 
-        <form action={createStoreOpen} className="space-y-3">
+        <form action={createStoreOpen} className="space-y-4">
           <input type="hidden" name="skin" value={skin} />
           <label className="block">
             <span className="mb-1.5 block text-xs font-semibold text-neutral-500">쇼핑몰 이름</span>
@@ -55,10 +56,35 @@ export default async function NewStorePage({
               name="name"
               required
               autoFocus
+              defaultValue={sp.name || ""}
               placeholder="예: OBJECT, ZEST, 오늘의가게"
               className="w-full rounded-xl border border-black/10 bg-white px-4 py-2.5 text-sm outline-none focus:border-violet-500 focus:ring-2 focus:ring-violet-500/25 dark:border-white/10 dark:bg-white/[0.04]"
             />
           </label>
+
+          {/* 주소(슬러그) 직접 지정 */}
+          <label className="block">
+            <span className="mb-1.5 block text-xs font-semibold text-neutral-500">
+              쇼핑몰 주소 <span className="text-neutral-400">(영문, 변경 불가)</span>
+            </span>
+            <div className="flex items-stretch overflow-hidden rounded-xl border border-black/10 focus-within:border-violet-500 focus-within:ring-2 focus-within:ring-violet-500/25 dark:border-white/10">
+              <span className="flex items-center whitespace-nowrap bg-black/[0.04] px-3 text-xs text-neutral-500 dark:bg-white/[0.06]">
+                {PRIMARY_DOMAIN}/
+              </span>
+              <input
+                name="slug"
+                required
+                defaultValue={sp.slug || ""}
+                pattern="[a-z0-9][a-z0-9\-]{1,29}"
+                placeholder="myshop"
+                className="flex-1 bg-white px-3 py-2.5 text-sm outline-none dark:bg-white/[0.04]"
+              />
+            </div>
+            <span className="mt-1 block text-xs text-neutral-400">
+              영문 소문자·숫자·하이픈(-) 2~30자. 예: myshop → {PRIMARY_DOMAIN}/myshop
+            </span>
+          </label>
+
           <button className="press-glow w-full rounded-xl bg-gradient-to-r from-violet-500 to-pink-500 py-3 text-sm font-semibold text-white shadow-lg shadow-violet-500/25 transition hover:brightness-105 active:scale-[.98]">
             🚀 이 스킨으로 만들기
           </button>

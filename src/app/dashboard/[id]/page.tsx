@@ -4,6 +4,7 @@ import { domainToUnicode } from "node:url";
 import { createClient } from "@/lib/supabase/server";
 import { setStoreDomain, togglePublish } from "../actions";
 import { PRIMARY_DOMAIN } from "@/lib/domains";
+import DomainHelp from "@/components/DomainHelp";
 
 type Store = {
   id: string;
@@ -110,7 +111,10 @@ export default async function StoreAdmin({
 
       {/* 커스텀 도메인 */}
       <section className={card + " mt-4"}>
-        <h2 className="mb-1 font-semibold">🌐 내 도메인 연결</h2>
+        <div className="mb-1 flex items-center gap-2">
+          <h2 className="font-semibold">🌐 내 도메인 연결</h2>
+          <DomainHelp />
+        </div>
         <p className="mb-4 text-xs text-neutral-500">
           보유한 도메인을 이 쇼핑몰에 연결하세요. (예: shop.mybrand.com 또는 mybrand.com)
         </p>

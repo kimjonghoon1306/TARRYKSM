@@ -1,8 +1,7 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
-import { setStoreSkin } from "../../actions";
-import { SKINS } from "@/lib/skins";
+import SkinPicker from "@/components/SkinPicker";
 
 type Store = { id: string; name: string; skin: string; slug: string };
 
@@ -49,45 +48,8 @@ export default async function DesignPage({
         </p>
       )}
 
-      <div className="mt-6 grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-4">
-        {SKINS.map((sk) => {
-          const active = sk.id === s.skin;
-          return (
-            <form key={sk.id} action={setStoreSkin}>
-              <input type="hidden" name="id" value={s.id} />
-              <input type="hidden" name="skin" value={sk.id} />
-              <button
-                type="submit"
-                className={
-                  "lift w-full rounded-2xl border bg-white p-4 text-left shadow-sm transition dark:bg-white/[0.03] " +
-                  (active
-                    ? "border-violet-500 ring-2 ring-violet-500/30"
-                    : "border-black/5 hover:border-violet-400 dark:border-white/10")
-                }
-              >
-                {/* 스킨 미리보기 스와치 (실제 스킨 색) */}
-                <div
-                  className="mb-3 flex h-16 w-full items-center justify-center rounded-xl"
-                  style={{ background: sk.bg }}
-                >
-                  <span
-                    className="h-7 w-7 rounded-full"
-                    style={{ background: sk.color, boxShadow: `0 4px 12px -2px ${sk.color}` }}
-                  />
-                </div>
-                <div className="flex items-center justify-between">
-                  <b className="text-sm">{sk.name}</b>
-                  {active && (
-                    <span className="rounded-full bg-violet-500/15 px-2 py-0.5 text-[10px] font-bold text-violet-500 dark:text-violet-300">
-                      현재
-                    </span>
-                  )}
-                </div>
-                <div className="text-xs text-neutral-400">{sk.vibe}</div>
-              </button>
-            </form>
-          );
-        })}
+      <div className="mt-6">
+        <SkinPicker storeId={s.id} currentSkin={s.skin} />
       </div>
     </div>
   );

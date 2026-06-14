@@ -43,21 +43,36 @@ export async function createStoreOpen(formData: FormData) {
   const name = String(formData.get("name") || "").trim();
   let skin = String(formData.get("skin") || "mono");
   if (!SKIN_IDS.includes(skin)) skin = "mono";
-  if (!name) redirect(`/dashboard/stores/new?skin=${skin}&err=1`);
 
-  const base = slugify(name) || "store";
-  let slug = base;
-  for (let i = 0; i < 6; i++) {
-    const { data } = await supabase.from("stores").select("id").eq("slug", slug).maybeSingle();
-    if (!data) break;
-    slug = `${base}-${Math.random().toString(36).slice(2, 6)}`;
+  // 창업자가 직접 정한 영문 주소(슬러그). 없으면 이름에서 생성 시도.
+  const slugRaw = String(formData.get("slug") || "").trim().toLowerCase();
+  const slug = slugify(slugRaw) || slugify(name);
+
+  const back = (msg: string) =>
+    redirect(
+      `/dashboard/stores/new?skin=${skin}&name=${encodeURIComponent(name)}` +
+        `&slug=${encodeURIComponent(slugRaw)}&err=${encodeURIComponent(msg)}`
+    );
+
+  if (!name) back("쇼핑몰 이름을 입력하세요");
+  // 주소 형식: 영문 소문자/숫자/하이픈, 2~30자
+  if (!slug || !/^[a-z0-9][a-z0-9-]{1,29}$/.test(slug)) {
+    back("주소는 영문 소문자·숫자·하이픈 2~30자로 입력하세요 (예: myshop)");
   }
+  // 예약어 차단 (앱 라우트와 충돌 방지)
+  const reserved = ["dashboard", "login", "signup", "s", "find-email", "reset-password", "landing", "api", "auth", "_next"];
+  if (reserved.includes(slug)) back("사용할 수 없는 주소예요");
 
-  const { data: created } = await supabase
+  // 중복 확인
+  const { data: dup } = await supabase.from("stores").select("id").eq("slug", slug).maybeSingle();
+  if (dup) back("이미 사용 중인 주소예요. 다른 주소를 입력하세요");
+
+  const { data: created, error } = await supabase
     .from("stores")
     .insert({ name, skin, slug })
     .select("id")
     .single();
+  if (error) back(/duplicate|unique/i.test(error.message) ? "이미 사용 중인 주소예요" : "생성 실패");
   revalidatePath("/dashboard");
   redirect(created?.id ? `/dashboard/${created.id}` : "/dashboard/stores");
 }
