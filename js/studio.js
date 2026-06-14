@@ -85,7 +85,14 @@ function setDevice(mode){
 function renderMalls(){
   const view = document.getElementById('view');
   let body;
-  if(malls.length === 0){
+  if(SB_ENABLED && !currentUserObj){
+    body = `<div class="empty">
+      <div class="empty-ico">🔑</div>
+      <h3>로그인하고 내 쇼핑몰을 만들어보세요</h3>
+      <p>로그인하면 만든 쇼핑몰이 저장돼 어디서든 이어집니다</p>
+      <button class="btn solid" style="margin-top:16px" onclick="openAuth('login')">로그인 / 회원가입</button>
+    </div>`;
+  } else if(malls.length === 0){
     body = `<div class="empty">
       <div class="empty-ico">🏬</div>
       <h3>${T('ml_empty_t')}</h3>

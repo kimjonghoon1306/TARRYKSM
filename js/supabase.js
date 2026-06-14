@@ -29,7 +29,17 @@ async function sbUser(){
 }
 function sbOnAuth(cb){
   if(!SB_ENABLED) return;
-  sb.auth.onAuthStateChange((_e, session)=> cb(session ? session.user : null));
+  sb.auth.onAuthStateChange((event, session)=> cb(event, session ? session.user : null));
+}
+/* 비밀번호 재설정 메일 발송 (현재 페이지로 복귀) */
+async function sbResetPassword(email){
+  return sb.auth.resetPasswordForEmail(email, {
+    redirectTo: window.location.origin + window.location.pathname,
+  });
+}
+/* 복구 링크 진입 후 새 비밀번호 설정 */
+async function sbUpdatePassword(newPassword){
+  return sb.auth.updateUser({ password: newPassword });
 }
 
 /* ── 스토어(쇼핑몰) 데이터 레이어 ──
