@@ -22,20 +22,20 @@
   --font-body:'Inter','Plus Jakarta Sans',sans-serif;
 }
 
-/* ── 다크(기본) — 미드나잇 인디고: 순수 검정 대신 보라빛 잉크 톤 ── */
+/* ── 다크(기본) — 미드나잇 인디고: 순수 검정 대신 또렷한 보라빛 인디고 ── */
 :root[data-theme="dark"]{
-  --bg:#0f1018;
-  --bg-2:#161827;
-  --surf:#1b1d2e;
-  --surf-2:#23263b;
-  --surf-3:#2e3149;
-  --line:rgba(163,165,224,.10);
-  --line-2:rgba(163,165,224,.19);
-  --txt:#f3f3fb;
-  --txt-2:#c1c2da;
-  --sub:#868aab;
-  --glow:rgba(109,94,252,.45);
-  --shadow:0 22px 60px -24px rgba(0,0,0,.7);
+  --bg:#121327;
+  --bg-2:#1a1c38;
+  --surf:#1e2142;
+  --surf-2:#282c52;
+  --surf-3:#343a66;
+  --line:rgba(180,184,255,.13);
+  --line-2:rgba(180,184,255,.22);
+  --txt:#f4f4fc;
+  --txt-2:#c8caea;
+  --sub:#9094bf;
+  --glow:rgba(124,109,255,.5);
+  --shadow:0 24px 64px -22px rgba(0,0,0,.72);
 }
 
 /* ── 라이트 ── */
