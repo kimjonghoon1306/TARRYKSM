@@ -8,14 +8,12 @@
 window.SB_ENABLED = false;      // 인페이지 백엔드 비활성 (데모/구경 모드)
 window.currentUserObj = null;
 
-/* 인증/관리자 동작 → 진짜 Next.js 라우트로 이동 */
-window.openAuth = function (mode) {
-  location.href = (mode === 'signup') ? '/signup' : '/login';
-};
+/* 관리자 전용 컨트롤타워 — 모든 진입은 관리자 로그인으로 */
+window.openAuth = function () { location.href = '/login'; };
 window.openAdmin = function () { location.href = '/dashboard'; };
 
-/* 새 쇼핑몰 만들기 / 스킨 사용하기 → 가입 유도 (구경만, 만들려면 가입) */
-window.openCreate = function () { location.href = '/signup'; };
+/* 새 쇼핑몰 만들기 / 스킨 사용하기 → 관리자 로그인 (구경만, 관리는 로그인 후) */
+window.openCreate = function () { location.href = '/login'; };
 
 /* app.js init이 호출 — 인페이지 인증 없음 */
 window.initAuth = function () {};

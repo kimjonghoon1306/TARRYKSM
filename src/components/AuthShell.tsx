@@ -10,7 +10,7 @@ export default function AuthShell({
   title: string;
   subtitle: string;
   children: React.ReactNode;
-  footer: React.ReactNode;
+  footer?: React.ReactNode;
 }) {
   return (
     <main className="relative flex min-h-screen items-center justify-center overflow-hidden bg-gradient-to-b from-violet-50 via-white to-pink-50 px-4 py-10 dark:from-[#0b0c14] dark:via-[#0d0e1a] dark:to-[#0b0c14]">
@@ -20,6 +20,14 @@ export default function AuthShell({
         <div className="absolute -bottom-24 -right-16 h-80 w-80 rounded-full bg-pink-400/30 blur-3xl dark:bg-pink-600/20" />
         <div className="absolute left-1/2 top-1/3 h-72 w-72 -translate-x-1/2 rounded-full bg-teal-300/20 blur-3xl dark:bg-teal-500/10" />
       </div>
+
+      {/* 대문 가기 (좌상단) */}
+      <Link
+        href="/"
+        className="absolute left-5 top-5 z-10 inline-flex h-10 items-center gap-1.5 rounded-full border border-black/10 bg-white/70 px-4 text-sm font-semibold text-neutral-700 shadow-sm backdrop-blur transition hover:scale-105 dark:border-white/15 dark:bg-white/10 dark:text-neutral-200"
+      >
+        <span aria-hidden>←</span> 대문
+      </Link>
 
       {/* 테마 버튼 (우상단) */}
       <div className="absolute right-5 top-5 z-10">
@@ -46,9 +54,11 @@ export default function AuthShell({
 
         {children}
 
-        <div className="mt-6 text-center text-sm text-neutral-500 dark:text-neutral-400">
-          {footer}
-        </div>
+        {footer && (
+          <div className="mt-6 text-center text-sm text-neutral-500 dark:text-neutral-400">
+            {footer}
+          </div>
+        )}
       </div>
     </main>
   );

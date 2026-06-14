@@ -1,4 +1,3 @@
-import Link from "next/link";
 import { login } from "@/app/auth/actions";
 import AuthShell from "@/components/AuthShell";
 import Field from "@/components/Field";
@@ -11,16 +10,8 @@ export default async function LoginPage({
   const sp = await searchParams;
   return (
     <AuthShell
-      title="로그인"
-      subtitle="내 쇼핑몰을 관리하세요"
-      footer={
-        <>
-          계정이 없으세요?{" "}
-          <Link href="/signup" className="font-semibold text-violet-500 hover:text-violet-400">
-            회원가입
-          </Link>
-        </>
-      }
+      title="관리자 로그인"
+      subtitle="사용자 · 프로그램 관리 컨트롤타워"
     >
       {sp.msg && (
         <p className="mb-4 rounded-lg bg-emerald-500/10 px-3 py-2 text-sm text-emerald-600 dark:text-emerald-400">

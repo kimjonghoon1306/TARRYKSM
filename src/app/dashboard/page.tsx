@@ -1,6 +1,5 @@
 import Link from "next/link";
 import { createClient } from "@/lib/supabase/server";
-import { signout } from "@/app/auth/actions";
 import { createStore, deleteStore } from "./actions";
 import { SKINS } from "@/lib/skins";
 
@@ -17,95 +16,114 @@ export default async function Dashboard() {
     .order("created_at", { ascending: false });
 
   const list = (stores ?? []) as Store[];
-  const name =
-    (user?.user_metadata?.display_name as string) ||
-    user?.email?.split("@")[0] ||
-    "창업자";
   const root = process.env.NEXT_PUBLIC_ROOT_DOMAIN || "localhost:3000";
 
+  const card =
+    "rounded-2xl border border-black/5 bg-white p-5 shadow-sm dark:border-white/10 dark:bg-white/[0.03]";
+
   return (
-    <main className="min-h-screen bg-neutral-950 text-neutral-100">
-      <header className="flex items-center justify-between px-6 py-4 border-b border-neutral-800">
-        <div className="flex items-center gap-2">
-          <span className="w-8 h-8 rounded-lg bg-gradient-to-br from-violet-500 to-pink-500 grid place-items-center font-bold text-sm">O</span>
-          <b className="tracking-tight">ONJONGIL</b>
-          <span className="text-neutral-500 text-sm">Studio</span>
-        </div>
-        <div className="flex items-center gap-3 text-sm">
-          <span className="text-neutral-400">{name}</span>
-          <form action={signout}>
-            <button className="rounded-lg border border-neutral-800 px-3 py-1.5 hover:border-rose-500 hover:text-rose-400">
-              로그아웃
-            </button>
-          </form>
-        </div>
-      </header>
+    <div className="mx-auto max-w-5xl">
+      <h1 className="text-2xl font-bold sm:text-3xl">대시보드</h1>
+      <p className="mt-1 text-sm text-neutral-500">사용자 · 프로그램을 한 곳에서 관리하세요</p>
 
-      <div className="max-w-5xl mx-auto px-6 py-10">
-        <h1 className="text-3xl font-bold mb-1">내 쇼핑몰</h1>
-        <p className="text-neutral-400 mb-8">운영 중인 매장을 한눈에</p>
+      {!user && (
+        <div className="mt-5 rounded-xl border border-amber-400/40 bg-amber-400/10 px-4 py-3 text-sm text-amber-700 dark:text-amber-300">
+          둘러보기 모드예요. 쇼핑몰을 만들거나 저장하려면{" "}
+          <Link href="/login" className="font-bold underline">관리자 로그인</Link>이 필요합니다.
+        </div>
+      )}
 
-        {/* 생성 폼 */}
-        <form
-          action={createStore}
-          className="flex flex-wrap gap-3 items-end bg-neutral-900 border border-neutral-800 rounded-2xl p-5 mb-10"
-        >
-          <div className="flex-1 min-w-50">
-            <label className="block text-xs text-neutral-400 mb-1.5">쇼핑몰 이름</label>
-            <input name="name" required placeholder="예: OBJECT, ZEST"
-              className="w-full rounded-xl bg-neutral-950 border border-neutral-800 px-4 py-2.5 text-sm outline-none focus:border-violet-500" />
+      {/* 요약 */}
+      <div className="mt-6 grid grid-cols-2 gap-3 sm:grid-cols-3">
+        <div className={card}>
+          <div className="text-3xl font-bold">{list.length}</div>
+          <div className="mt-1 text-xs text-neutral-500">운영 쇼핑몰</div>
+        </div>
+        <div className={card}>
+          <div className="text-3xl font-bold">{SKINS.length}</div>
+          <div className="mt-1 text-xs text-neutral-500">사용 가능 스킨</div>
+        </div>
+        <Link href="/" className={card + " transition hover:border-violet-400"}>
+          <div className="text-3xl">🎨</div>
+          <div className="mt-1 text-xs text-neutral-500">스튜디오 열기 →</div>
+        </Link>
+      </div>
+
+      {/* 새 쇼핑몰 */}
+      <section className={card + " mt-8"}>
+        <h2 className="mb-4 text-lg font-semibold">새 쇼핑몰 만들기</h2>
+        <form action={createStore} className="flex flex-wrap items-end gap-3">
+          <div className="min-w-[200px] flex-1">
+            <label className="mb-1.5 block text-xs font-semibold text-neutral-500">쇼핑몰 이름</label>
+            <input
+              name="name"
+              required
+              placeholder="예: OBJECT, ZEST"
+              className="w-full rounded-xl border border-black/10 bg-white px-4 py-2.5 text-sm outline-none focus:border-violet-500 focus:ring-2 focus:ring-violet-500/25 dark:border-white/10 dark:bg-white/[0.04]"
+            />
           </div>
-          <div className="min-w-40">
-            <label className="block text-xs text-neutral-400 mb-1.5">스킨</label>
-            <select name="skin" defaultValue="mono"
-              className="rounded-xl bg-neutral-950 border border-neutral-800 px-4 py-2.5 text-sm outline-none focus:border-violet-500">
+          <div className="min-w-[150px]">
+            <label className="mb-1.5 block text-xs font-semibold text-neutral-500">스킨</label>
+            <select
+              name="skin"
+              defaultValue="mono"
+              className="w-full rounded-xl border border-black/10 bg-white px-4 py-2.5 text-sm outline-none focus:border-violet-500 dark:border-white/10 dark:bg-white/[0.04]"
+            >
               {SKINS.map((s) => (
                 <option key={s.id} value={s.id}>{s.name}</option>
               ))}
             </select>
           </div>
-          <button className="rounded-xl bg-gradient-to-r from-violet-500 to-pink-500 px-5 py-2.5 font-semibold text-sm">
+          <button className="rounded-xl bg-gradient-to-r from-violet-500 to-pink-500 px-5 py-2.5 text-sm font-semibold text-white shadow-lg shadow-violet-500/25 transition hover:brightness-105">
             ＋ 만들기
           </button>
         </form>
+      </section>
 
-        {/* 목록 */}
-        {list.length === 0 ? (
-          <div className="text-center py-20 text-neutral-500">
-            아직 만든 쇼핑몰이 없어요. 위에서 1분 만에 시작하세요.
-          </div>
-        ) : (
-          <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-            {list.map((s) => (
-              <div key={s.id} className="rounded-2xl border border-neutral-800 bg-neutral-900 p-5">
-                <div className="flex items-center justify-between mb-3">
-                  <b className="text-lg">{s.name}</b>
-                  <span className="text-xs px-2 py-0.5 rounded-full bg-violet-500/15 text-violet-300">{s.skin}</span>
-                </div>
-                <div className="text-xs text-neutral-500 mb-4 break-all">
-                  {s.slug}.{root}
-                </div>
-                <div className="flex gap-2">
-                  <Link href={`/dashboard/${s.id}`}
-                    className="flex-1 text-center rounded-lg border border-neutral-700 px-3 py-2 text-sm hover:border-violet-500">
-                    관리
-                  </Link>
-                  <Link href={`/s/${s.slug}`} target="_blank"
-                    className="flex-1 text-center rounded-lg border border-neutral-700 px-3 py-2 text-sm hover:border-violet-500">
-                    보기 ↗
-                  </Link>
-                  <form action={deleteStore}>
-                    <input type="hidden" name="id" value={s.id} />
-                    <button className="rounded-lg border border-neutral-800 px-3 py-2 text-sm text-neutral-500 hover:border-rose-500 hover:text-rose-400">
-                      삭제
-                    </button>
-                  </form>
-                </div>
+      {/* 목록 */}
+      <h2 className="mb-4 mt-8 text-lg font-semibold">내 쇼핑몰</h2>
+      {list.length === 0 ? (
+        <div className="rounded-2xl border border-dashed border-black/10 py-16 text-center text-sm text-neutral-400 dark:border-white/10">
+          아직 만든 쇼핑몰이 없어요.
+        </div>
+      ) : (
+        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+          {list.map((s) => (
+            <div key={s.id} className={card}>
+              <div className="mb-3 flex items-center justify-between">
+                <b className="text-lg">{s.name}</b>
+                <span className="rounded-full bg-violet-500/15 px-2 py-0.5 text-xs text-violet-500 dark:text-violet-300">
+                  {s.skin}
+                </span>
               </div>
-            ))}
-          </div>
-        )}
-      </div>
-    </main>
+              <div className="mb-4 break-all text-xs text-neutral-400">
+                {s.slug}.{root}
+              </div>
+              <div className="flex gap-2">
+                <Link
+                  href={`/dashboard/${s.id}`}
+                  className="flex-1 rounded-lg border border-black/10 px-3 py-2 text-center text-sm transition hover:border-violet-500 dark:border-white/15"
+                >
+                  관리
+                </Link>
+                <Link
+                  href={`/s/${s.slug}`}
+                  target="_blank"
+                  className="flex-1 rounded-lg border border-black/10 px-3 py-2 text-center text-sm transition hover:border-violet-500 dark:border-white/15"
+                >
+                  보기 ↗
+                </Link>
+                <form action={deleteStore}>
+                  <input type="hidden" name="id" value={s.id} />
+                  <button className="rounded-lg border border-black/10 px-3 py-2 text-sm text-neutral-400 transition hover:border-rose-400 hover:text-rose-500 dark:border-white/10">
+                    삭제
+                  </button>
+                </form>
+              </div>
+            </div>
+          ))}
+        </div>
+      )}
+    </div>
   );
 }
