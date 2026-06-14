@@ -34,7 +34,7 @@ export default function AdminShell({
       </Link>
 
       <Link
-        href="/"
+        href="/?studio=1"
         className="mt-5 flex items-center gap-2 rounded-xl bg-gradient-to-r from-violet-500 to-pink-500 px-3.5 py-3 text-sm font-bold text-white shadow-lg shadow-violet-500/25 transition hover:brightness-105"
       >
         <span>🎨</span> 스튜디오 열기

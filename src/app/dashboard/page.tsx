@@ -43,7 +43,7 @@ export default async function Dashboard() {
           <div className="text-3xl font-bold">{SKINS.length}</div>
           <div className="mt-1 text-xs text-neutral-500">사용 가능 스킨</div>
         </div>
-        <Link href="/" className={card + " transition hover:border-violet-400"}>
+        <Link href="/?studio=1" className={card + " transition hover:border-violet-400"}>
           <div className="text-3xl">🎨</div>
           <div className="mt-1 text-xs text-neutral-500">스튜디오 열기 →</div>
         </Link>

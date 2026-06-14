@@ -12,5 +12,10 @@
   tickClock();
   setInterval(tickClock, 30000);
 
-  startCinema();        // 시네마틱 대문 시퀀스 시작
+  // ?studio 또는 #studio 로 들어오면 인트로 건너뛰고 바로 스튜디오로 (관리자 '스튜디오 열기')
+  if (/[?&]studio\b/.test(location.search) || location.hash === '#studio') {
+    enterApp();
+  } else {
+    startCinema();      // 시네마틱 대문 시퀀스 시작
+  }
 })();

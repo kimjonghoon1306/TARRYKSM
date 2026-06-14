@@ -23,10 +23,13 @@ export async function proxy(request: NextRequest) {
     response = NextResponse.next({ request });
   }
 
-  // ── Supabase 세션 갱신(쿠키 동기화) ──
-  // 주의: /dashboard는 강제 로그인 리다이렉트 안 함 — 테스트/관리 편의로 자유 열람.
-  //       실제 데이터 쓰기/저장은 Supabase RLS(소유자 한정)가 막아준다.
-  await updateSession(request, response);
+  // ── Supabase 세션 갱신(쿠키 동기화) + user ──
+  const user = await updateSession(request, response);
+
+  // ── 관리자 컨트롤타워(/dashboard)는 로그인 필요 (루트 도메인에서만) ──
+  if (!subdomain && url.pathname.startsWith("/dashboard") && !user) {
+    return NextResponse.redirect(new URL("/login", request.url));
+  }
 
   return response;
 }
