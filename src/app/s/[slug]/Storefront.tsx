@@ -138,7 +138,7 @@ export default function Storefront({
         )}
 
         <div className="sf-foot">
-          Powered by <b>ONJONGIL</b> · 무한분양
+          Powered by <b>ONJONGIL</b>
         </div>
       </div>
 
