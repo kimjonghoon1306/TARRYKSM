@@ -73,9 +73,17 @@ function cineGo(i){
   cineTimer = setTimeout(()=> (i < CINE.length-1 ? cineGo(i+1) : cineEnter()), dur);
 }
 
+/* 시네마틱 완전 정지 — 씬/스테이지 정리(앱 위에 레이어가 남아 클릭 가로채는 것 방지) */
+function stopCinema(){
+  clearTimeout(cineTimer);
+  document.querySelectorAll('#cineScenes .scene').forEach(s=> s.classList.remove('on'));
+  const stage = document.getElementById('cineStore');
+  if(stage) stage.className = 'cine-store-stage';
+}
+
 /* 스킵 / CTA / 자동입장 → 앱 진입 */
 function cineEnter(){
-  clearTimeout(cineTimer);
+  stopCinema();
   enterApp();
 }
 
