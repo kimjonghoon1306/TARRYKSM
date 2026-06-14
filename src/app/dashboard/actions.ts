@@ -29,7 +29,7 @@ export async function createStore(formData: FormData) {
   }
 
   await supabase.from("stores").insert({ name, skin, slug }); // owner = auth.uid() (DB default)
-  revalidatePath("/dashboard");
+  revalidatePath("/dashboard", "layout");
 }
 
 // 스튜디오에서 고른 스킨 + 이름으로 생성 후 그 몰 관리로 이동
@@ -73,7 +73,7 @@ export async function createStoreOpen(formData: FormData) {
     .select("id")
     .single();
   if (error) back(/duplicate|unique/i.test(error.message) ? "이미 사용 중인 주소예요" : "생성 실패");
-  revalidatePath("/dashboard");
+  revalidatePath("/dashboard", "layout");
   redirect(created?.id ? `/dashboard/${created.id}` : "/dashboard/stores");
 }
 
@@ -82,7 +82,38 @@ export async function deleteStore(formData: FormData) {
   const id = String(formData.get("id") || "");
   if (!id) return;
   await supabase.from("stores").delete().eq("id", id);
-  revalidatePath("/dashboard");
+  revalidatePath("/dashboard", "layout");
+}
+
+// 쇼핑몰 주소(슬러그) 변경 — 언제든지. 형식·예약어·중복 검증.
+export async function setStoreSlug(formData: FormData) {
+  const supabase = await createClient();
+  const id = String(formData.get("id") || "");
+  if (!id) return;
+  const slug = slugify(String(formData.get("slug") || "").trim().toLowerCase());
+
+  const back = (msg: string) =>
+    redirect(`/dashboard/${id}?serr=` + encodeURIComponent(msg));
+
+  if (!slug || !/^[a-z0-9][a-z0-9-]{1,29}$/.test(slug)) {
+    back("주소는 영문 소문자·숫자·하이픈 2~30자로 입력하세요 (예: myshop)");
+  }
+  const reserved = ["dashboard", "login", "signup", "s", "find-email", "reset-password", "landing", "api", "auth", "_next"];
+  if (reserved.includes(slug)) back("사용할 수 없는 주소예요");
+
+  // 다른 몰이 이미 쓰는지 (자기 자신 제외)
+  const { data: dup } = await supabase
+    .from("stores")
+    .select("id")
+    .eq("slug", slug)
+    .neq("id", id)
+    .maybeSingle();
+  if (dup) back("이미 사용 중인 주소예요. 다른 주소를 입력하세요");
+
+  const { error } = await supabase.from("stores").update({ slug }).eq("id", id);
+  if (error) back(/duplicate|unique/i.test(error.message) ? "이미 사용 중인 주소예요" : "변경 실패");
+  revalidatePath("/dashboard", "layout");
+  redirect(`/dashboard/${id}?smsg=` + encodeURIComponent("주소를 변경했어요"));
 }
 
 // 이미 만든 몰의 스킨 변경

@@ -2,7 +2,7 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { domainToUnicode } from "node:url";
 import { createClient } from "@/lib/supabase/server";
-import { setStoreDomain, togglePublish } from "../actions";
+import { setStoreDomain, togglePublish, setStoreSlug } from "../actions";
 import { PRIMARY_DOMAIN } from "@/lib/domains";
 import DomainHelp from "@/components/DomainHelp";
 
@@ -20,10 +20,10 @@ export default async function StoreAdmin({
   searchParams,
 }: {
   params: Promise<{ id: string }>;
-  searchParams: Promise<{ dmsg?: string; derr?: string }>;
+  searchParams: Promise<{ dmsg?: string; derr?: string; smsg?: string; serr?: string }>;
 }) {
   const { id } = await params;
-  const { dmsg, derr } = await searchParams;
+  const { dmsg, derr, smsg, serr } = await searchParams;
   const supabase = await createClient();
   const { data: store } = await supabase
     .from("stores")
@@ -103,10 +103,35 @@ export default async function StoreAdmin({
       </section>
 
       <section className={card + " mt-4"}>
-        <div className="mb-1 text-xs font-semibold text-neutral-500">기본 주소</div>
-        <div className="break-all font-mono text-sm">
-          {PRIMARY_DOMAIN}/{s.slug}
-        </div>
+        <div className="mb-2 text-xs font-semibold text-neutral-500">기본 주소 (언제든 변경 가능)</div>
+        {smsg && (
+          <p className="mb-2 rounded-lg bg-emerald-500/10 px-3 py-2 text-sm text-emerald-600 dark:text-emerald-400">{smsg}</p>
+        )}
+        {serr && (
+          <p className="mb-2 rounded-lg bg-rose-500/10 px-3 py-2 text-sm text-rose-600 dark:text-rose-400">{serr}</p>
+        )}
+        <form action={setStoreSlug} className="flex flex-wrap items-end gap-2">
+          <input type="hidden" name="id" value={s.id} />
+          <div className="min-w-[220px] flex-1">
+            <div className="flex items-stretch overflow-hidden rounded-xl border border-black/10 focus-within:border-violet-500 focus-within:ring-2 focus-within:ring-violet-500/25 dark:border-white/10">
+              <span className="flex items-center whitespace-nowrap bg-black/[0.04] px-3 text-xs text-neutral-500 dark:bg-white/[0.06]">
+                {PRIMARY_DOMAIN}/
+              </span>
+              <input
+                name="slug"
+                defaultValue={s.slug}
+                pattern="[a-z0-9][a-z0-9\-]{1,29}"
+                className="flex-1 bg-white px-3 py-2.5 font-mono text-sm outline-none dark:bg-white/[0.04]"
+              />
+            </div>
+          </div>
+          <button className="rounded-xl border border-black/10 px-4 py-2.5 text-sm font-semibold transition hover:border-violet-500 dark:border-white/15">
+            주소 변경
+          </button>
+        </form>
+        <p className="mt-1.5 text-xs text-neutral-400">
+          영문 소문자·숫자·하이픈. ⚠️ 변경하면 이전 주소로는 접속되지 않아요.
+        </p>
       </section>
 
       {/* 커스텀 도메인 */}
