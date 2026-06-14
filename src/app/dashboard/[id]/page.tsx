@@ -3,6 +3,7 @@ import { notFound } from "next/navigation";
 import { domainToUnicode } from "node:url";
 import { createClient } from "@/lib/supabase/server";
 import { setStoreDomain, togglePublish } from "../actions";
+import { PRIMARY_DOMAIN } from "@/lib/domains";
 
 type Store = {
   id: string;
@@ -36,7 +37,6 @@ export default async function StoreAdmin({
     .select("id", { count: "exact", head: true })
     .eq("store_id", id);
 
-  const root = process.env.NEXT_PUBLIC_ROOT_DOMAIN || "localhost:3000";
   const card =
     "rounded-2xl border border-black/5 bg-white p-5 shadow-sm dark:border-white/10 dark:bg-white/[0.03]";
 
@@ -51,7 +51,7 @@ export default async function StoreAdmin({
           {s.skin}
         </span>
         <Link
-          href={`/s/${s.slug}`}
+          href={`/${s.slug}`}
           target="_blank"
           className="ml-auto rounded-lg border border-black/10 px-3 py-1.5 text-sm transition hover:border-violet-500 dark:border-white/15"
         >
@@ -88,9 +88,9 @@ export default async function StoreAdmin({
       </section>
 
       <section className={card + " mt-4"}>
-        <div className="mb-1 text-xs font-semibold text-neutral-500">기본 주소 (서브도메인)</div>
+        <div className="mb-1 text-xs font-semibold text-neutral-500">기본 주소</div>
         <div className="break-all font-mono text-sm">
-          {s.slug}.{root}
+          {PRIMARY_DOMAIN}/{s.slug}
         </div>
       </section>
 

@@ -85,7 +85,7 @@ export default async function PlatformPage() {
                   </div>
                 </div>
                 <Link
-                  href={`/s/${s.slug}`}
+                  href={`/${s.slug}`}
                   target="_blank"
                   className="flex-none rounded-lg border border-black/10 px-3 py-1.5 text-xs transition hover:border-violet-500 dark:border-white/15"
                 >

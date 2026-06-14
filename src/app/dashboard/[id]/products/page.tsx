@@ -54,7 +54,7 @@ export default async function ProductsAdmin({
       <div className="mt-2 flex flex-wrap items-center gap-3">
         <h1 className="text-2xl font-bold sm:text-3xl">{s.name} · 상품</h1>
         <Link
-          href={`/s/${s.slug}`}
+          href={`/${s.slug}`}
           target="_blank"
           className="ml-auto rounded-lg border border-black/10 px-3 py-1.5 text-sm transition hover:border-violet-500 dark:border-white/15"
         >

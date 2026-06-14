@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { createClient } from "@/lib/supabase/server";
 import { deleteStore } from "../actions";
+import { PRIMARY_DOMAIN } from "@/lib/domains";
 
 type Store = { id: string; name: string; skin: string; slug: string };
 
@@ -11,7 +12,6 @@ export default async function StoresPage() {
     .select("id,name,skin,slug")
     .order("created_at", { ascending: false });
   const list = (stores ?? []) as Store[];
-  const root = process.env.NEXT_PUBLIC_ROOT_DOMAIN || "localhost:3000";
 
   const card =
     "rounded-2xl border border-black/5 bg-white p-5 shadow-sm dark:border-white/10 dark:bg-white/[0.03]";
@@ -57,7 +57,7 @@ export default async function StoresPage() {
                 </span>
               </div>
               <div className="mb-4 break-all text-xs text-neutral-400">
-                {s.slug}.{root}
+                {PRIMARY_DOMAIN}/{s.slug}
               </div>
               <div className="flex gap-2">
                 <Link
@@ -67,7 +67,7 @@ export default async function StoresPage() {
                   관리
                 </Link>
                 <Link
-                  href={`/s/${s.slug}`}
+                  href={`/${s.slug}`}
                   target="_blank"
                   className="flex-1 rounded-lg border border-black/10 px-3 py-2 text-center text-sm transition hover:border-violet-500 dark:border-white/15"
                 >
