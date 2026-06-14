@@ -53,7 +53,9 @@
 .sh-sort::-webkit-scrollbar{height:0}
 .sh-sort-b{flex-shrink:0;font-size:11.5px;font-weight:600;padding:6px 12px;border-radius:8px;border:1px solid var(--s-line);color:var(--s-sub);white-space:nowrap;transition:.16s}
 .sh-sort-b.on{background:var(--s-ink);color:var(--s-bg);border-color:transparent}
-.sh-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(158px,1fr));gap:16px}
+.sh-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:16px}
+/* 모바일 = 쿠팡식 2열 고정 (한 줄에 상품 2개씩). 데스크탑은 넓게 auto-fill 유지 */
+.device.mobile .sh-grid{grid-template-columns:repeat(2,1fr);gap:11px}
 
 /* 상품 카드 — 모든 상품 동일 규격 = 이질감 제거 */
 .pcard{cursor:pointer;border-radius:var(--s-r);overflow:hidden;background:var(--s-surf);border:1px solid var(--s-line);transition:transform .22s var(--ease),box-shadow .22s}
