@@ -6,6 +6,7 @@ import "./storefront.css";
 export type Product = {
   id: string;
   emoji: string | null;
+  image_url: string | null;
   name: string;
   brand: string | null;
   price: number;
@@ -109,7 +110,14 @@ export default function Storefront({
           <div className="sf-grid">
             {shown.map((p) => (
               <div key={p.id} className="sf-card" onClick={() => openDetail(p)}>
-                <div className="sf-thumb">{p.emoji || "📦"}</div>
+                <div className="sf-thumb">
+                  {p.image_url ? (
+                    // eslint-disable-next-line @next/next/no-img-element
+                    <img src={p.image_url} alt={p.name} className="sf-thumb-img" />
+                  ) : (
+                    p.emoji || "📦"
+                  )}
+                </div>
                 <div className="sf-meta">
                   {p.brand && <div className="sf-brand">{p.brand}</div>}
                   <div className="sf-name">{p.name}</div>
@@ -144,7 +152,14 @@ export default function Storefront({
           <button className="sf-x" onClick={() => setDetail(null)}>
             ✕
           </button>
-          <div className="sf-sheet-img">{detail.emoji || "📦"}</div>
+          <div className="sf-sheet-img">
+            {detail.image_url ? (
+              // eslint-disable-next-line @next/next/no-img-element
+              <img src={detail.image_url} alt={detail.name} className="sf-thumb-img" />
+            ) : (
+              detail.emoji || "📦"
+            )}
+          </div>
           <div className="sf-sheet-body">
             {detail.brand && <div className="sf-brand">{detail.brand}</div>}
             <h2>{detail.name}</h2>
@@ -201,7 +216,14 @@ export default function Storefront({
           ) : (
             cartLines.map((l) => (
               <div key={l.id} className="sf-citem">
-                <div className="ci-img">{l.emoji || "📦"}</div>
+                <div className="ci-img">
+                  {l.image_url ? (
+                    // eslint-disable-next-line @next/next/no-img-element
+                    <img src={l.image_url} alt={l.name} className="sf-thumb-img" />
+                  ) : (
+                    l.emoji || "📦"
+                  )}
+                </div>
                 <div className="ci-info">
                   <b>{l.name}</b>
                   <i>{won(l.price)}</i>

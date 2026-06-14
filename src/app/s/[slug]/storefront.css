@@ -74,7 +74,8 @@
 
 .sf-card { display: flex; flex-direction: column; background: var(--s-surf); border: 1px solid var(--s-line); border-radius: var(--s-r); overflow: hidden; cursor: pointer; transition: .22s var(--ease); }
 .sf-card:hover { transform: translateY(-4px); box-shadow: var(--s-shadow); }
-.sf-thumb { aspect-ratio: 1; display: grid; place-items: center; font-size: 52px; background: var(--s-brand-soft); }
+.sf-thumb { aspect-ratio: 1; display: grid; place-items: center; font-size: 52px; background: var(--s-brand-soft); overflow: hidden; }
+.sf-thumb-img { width: 100%; height: 100%; object-fit: cover; display: block; }
 .sf-meta { padding: 12px 13px 14px; display: flex; flex-direction: column; gap: 3px; }
 .sf-brand { font-size: 10px; font-weight: 800; letter-spacing: .08em; text-transform: uppercase; color: var(--s-sub); }
 .sf-name { font-size: 14px; font-weight: 600; line-height: 1.3; }
@@ -92,7 +93,7 @@
 
 .sf-sheet { position: fixed; z-index: 50; left: 50%; top: 50%; transform: translate(-50%, calc(-50% + 16px)); width: min(560px, 92vw); max-height: 88vh; overflow: auto; background: var(--s-surf); color: var(--s-ink); border: 1px solid var(--s-line); border-radius: calc(var(--s-r) + 6px); opacity: 0; pointer-events: none; transition: .28s var(--ease); }
 .sf-sheet.on { opacity: 1; pointer-events: auto; transform: translate(-50%, -50%); }
-.sf-sheet-img { aspect-ratio: 16/10; display: grid; place-items: center; font-size: 96px; background: var(--s-brand-soft); }
+.sf-sheet-img { aspect-ratio: 16/10; display: grid; place-items: center; font-size: 96px; background: var(--s-brand-soft); overflow: hidden; }
 .sf-sheet-body { padding: 22px 24px 26px; }
 .sf-sheet-body h2 { font-family: var(--s-fd); font-weight: var(--s-fw); font-size: 24px; letter-spacing: var(--s-hls); }
 .sf-sheet-desc { margin: 12px 0 18px; color: var(--s-sub); font-size: 14px; line-height: 1.6; }

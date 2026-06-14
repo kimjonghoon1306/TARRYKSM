@@ -5,6 +5,7 @@ type Row = {
   id: string;
   name: string;
   emoji: string | null;
+  image_url: string | null;
   price: number;
   category: string | null;
   brand: string | null;
@@ -24,7 +25,7 @@ export default async function AllProductsPage() {
   if (storeIds.length) {
     const { data } = await supabase
       .from("products")
-      .select("id,name,emoji,price,category,brand,store_id,stores(name,slug)")
+      .select("id,name,emoji,image_url,price,category,brand,store_id,stores(name,slug)")
       .in("store_id", storeIds)
       .order("created_at", { ascending: false });
     rows = (data ?? []) as unknown as Row[];
@@ -68,8 +69,13 @@ export default async function AllProductsPage() {
                   href={`/dashboard/${p.store_id}/products/${p.id}`}
                   className="flex min-w-0 items-center gap-3"
                 >
-                  <span className="grid h-10 w-10 flex-none place-items-center rounded-lg bg-black/[0.03] text-xl dark:bg-white/[0.05]">
-                    {p.emoji || "📦"}
+                  <span className="grid h-10 w-10 flex-none place-items-center overflow-hidden rounded-lg bg-black/[0.03] text-xl dark:bg-white/[0.05]">
+                    {p.image_url ? (
+                      // eslint-disable-next-line @next/next/no-img-element
+                      <img src={p.image_url} alt={p.name} className="h-full w-full object-cover" />
+                    ) : (
+                      p.emoji || "📦"
+                    )}
                   </span>
                   <span className="min-w-0">
                     {p.brand && (

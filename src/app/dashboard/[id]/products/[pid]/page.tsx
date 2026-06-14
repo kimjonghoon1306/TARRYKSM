@@ -6,6 +6,7 @@ import { updateProduct } from "../actions";
 type Product = {
   id: string;
   emoji: string | null;
+  image_url: string | null;
   name: string;
   brand: string | null;
   category: string | null;
@@ -26,7 +27,7 @@ export default async function EditProduct({
 
   const { data } = await supabase
     .from("products")
-    .select("id,emoji,name,brand,category,price,tag,description")
+    .select("id,emoji,image_url,name,brand,category,price,tag,description")
     .eq("id", pid)
     .eq("store_id", id)
     .maybeSingle();
@@ -51,7 +52,30 @@ export default async function EditProduct({
         <form action={save} className="grid gap-3 sm:grid-cols-2">
           <input type="hidden" name="store_id" value={id} />
           <input type="hidden" name="id" value={p.id} />
-          <Field label="이모지">
+          <div className="sm:col-span-2">
+            <Field label="상품 사진">
+              <div className="flex items-center gap-3">
+                <div className="w-16 h-16 grid place-items-center text-2xl rounded-lg bg-neutral-800 shrink-0 overflow-hidden">
+                  {p.image_url ? (
+                    // eslint-disable-next-line @next/next/no-img-element
+                    <img src={p.image_url} alt={p.name} className="w-full h-full object-cover" />
+                  ) : (
+                    p.emoji || "📦"
+                  )}
+                </div>
+                <div className="flex-1">
+                  <input name="image" type="file" accept="image/*"
+                    className="w-full rounded-lg bg-neutral-950 border border-neutral-800 px-3 py-2 text-sm text-neutral-300 outline-none file:mr-3 file:rounded-md file:border-0 file:bg-violet-500 file:px-3 file:py-1.5 file:text-sm file:font-semibold file:text-white" />
+                  {p.image_url && (
+                    <label className="mt-2 flex items-center gap-2 text-xs text-neutral-400">
+                      <input type="checkbox" name="remove_image" value="1" /> 현재 사진 제거(이모지로 대체)
+                    </label>
+                  )}
+                </div>
+              </div>
+            </Field>
+          </div>
+          <Field label="이모지(사진 없을 때 대체)">
             <input name="emoji" defaultValue={p.emoji || "📦"} maxLength={4}
               className="w-full rounded-lg bg-neutral-950 border border-neutral-800 px-3 py-2 text-sm outline-none focus:border-violet-500" />
           </Field>
