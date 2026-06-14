@@ -25,3 +25,86 @@ body {
   color: var(--foreground);
   font-family: var(--font-sans), system-ui, -apple-system, sans-serif;
 }
+
+/* ════════════════════════════════════════
+   전역 인터랙션 반응 — 모든 버튼·링크·카드에 촉감
+════════════════════════════════════════ */
+@layer base {
+  button:not(:disabled),
+  a,
+  [role="button"],
+  summary,
+  label[for],
+  select {
+    transition:
+      transform 0.14s cubic-bezier(0.22, 1, 0.36, 1),
+      filter 0.16s ease,
+      box-shadow 0.2s ease,
+      background-color 0.16s ease,
+      border-color 0.16s ease,
+      color 0.16s ease,
+      opacity 0.16s ease;
+  }
+
+  /* 누르는 순간 살짝 작아짐 = 눌린 느낌 */
+  button:not(:disabled):active,
+  [role="button"]:active {
+    transform: scale(0.95);
+  }
+  a:active {
+    transform: scale(0.985);
+  }
+
+  /* 키보드 포커스 링 (접근성) */
+  button:focus-visible,
+  a:focus-visible,
+  input:focus-visible,
+  select:focus-visible,
+  textarea:focus-visible {
+    outline: 2px solid color-mix(in srgb, #8b5cf6 70%, transparent);
+    outline-offset: 2px;
+  }
+
+  button:disabled {
+    cursor: not-allowed;
+    opacity: 0.55;
+  }
+}
+
+/* 카드 hover 떠오름 — .lift 클래스 붙은 요소 */
+@layer utilities {
+  .lift {
+    transition:
+      transform 0.2s cubic-bezier(0.22, 1, 0.36, 1),
+      box-shadow 0.2s ease,
+      border-color 0.16s ease;
+  }
+  .lift:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 16px 32px -16px rgba(99, 60, 235, 0.35);
+  }
+  .lift:active {
+    transform: translateY(-1px) scale(0.995);
+  }
+
+  /* 눌리는 버튼에 번지는 광택 (선택적으로 .press-glow) */
+  .press-glow {
+    position: relative;
+    overflow: hidden;
+  }
+  .press-glow::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: radial-gradient(circle at center, rgba(255, 255, 255, 0.4), transparent 60%);
+    opacity: 0;
+    transform: scale(0.4);
+    transition: opacity 0.4s ease, transform 0.4s ease;
+    pointer-events: none;
+  }
+  .press-glow:active::after {
+    opacity: 1;
+    transform: scale(1);
+    transition: 0s;
+  }
+}

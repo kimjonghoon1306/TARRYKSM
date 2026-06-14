@@ -31,6 +31,14 @@ export default async function SignupPage({
       <form action={signup} className="space-y-4">
         <Field name="name" type="text" label="이름" placeholder="홍길동" icon="user" autoComplete="name" />
         <Field
+          name="phone"
+          type="tel"
+          label="전화번호"
+          placeholder="010-1234-5678"
+          icon="phone"
+          autoComplete="tel"
+        />
+        <Field
           name="email"
           type="email"
           label="이메일"

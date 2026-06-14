@@ -25,15 +25,28 @@ export async function signup(formData: FormData) {
   const email = String(formData.get("email") || "");
   const password = String(formData.get("password") || "");
   const name = String(formData.get("name") || "");
+  // 전화번호는 숫자만 저장 (이메일 찾기 매칭용)
+  const phone = String(formData.get("phone") || "").replace(/[^0-9]/g, "");
   const { data, error } = await supabase.auth.signUp({
     email,
     password,
-    options: { data: { display_name: name || email.split("@")[0] } },
+    options: { data: { display_name: name || email.split("@")[0], phone } },
   });
   if (error) redirect("/signup?error=" + encodeURIComponent(authMsg(error.message)));
   if (!data.session)
     redirect("/login?msg=" + encodeURIComponent("확인 메일을 보냈어요. 인증 후 로그인하세요."));
   redirect("/dashboard");
+}
+
+// 전화번호로 가입 이메일 찾기 (마스킹된 이메일 반환). SECURITY DEFINER RPC 사용.
+export async function findEmailByPhone(formData: FormData) {
+  const phone = String(formData.get("phone") || "").replace(/[^0-9]/g, "");
+  if (!phone) redirect("/find-email?error=" + encodeURIComponent("전화번호를 입력하세요"));
+  const supabase = await createClient();
+  const { data, error } = await supabase.rpc("find_email_by_phone", { p: phone });
+  if (error) redirect("/find-email?error=" + encodeURIComponent("조회 중 오류가 발생했어요"));
+  if (!data) redirect("/find-email?notfound=1");
+  redirect("/find-email?found=" + encodeURIComponent(String(data)));
 }
 
 export async function resetPassword(formData: FormData) {

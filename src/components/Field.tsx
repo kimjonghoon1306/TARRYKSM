@@ -1,4 +1,4 @@
-type IconKey = "mail" | "lock" | "user";
+type IconKey = "mail" | "lock" | "user" | "phone";
 
 const icons: Record<IconKey, React.ReactNode> = {
   mail: (
@@ -22,6 +22,15 @@ const icons: Record<IconKey, React.ReactNode> = {
       <circle cx="12" cy="8" r="3.4" fill="none" stroke="currentColor" strokeWidth="1.6" />
       <path d="M5.5 19a6.5 6.5 0 0 1 13 0" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" />
     </>
+  ),
+  phone: (
+    <path
+      d="M7 3.5h3l1.5 4-2 1.5a11 11 0 0 0 4.5 4.5l1.5-2 4 1.5v3a2 2 0 0 1-2.2 2A16 16 0 0 1 5 5.7 2 2 0 0 1 7 3.5Z"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="1.6"
+      strokeLinejoin="round"
+    />
   ),
 };
 

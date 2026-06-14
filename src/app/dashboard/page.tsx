@@ -51,7 +51,7 @@ export default async function Overview() {
       {/* 요약 통계 */}
       <div className="mt-6 grid grid-cols-3 gap-3">
         {stats.map((s) => (
-          <Link key={s.label} href={s.href} className={card + " transition hover:border-violet-400"}>
+          <Link key={s.label} href={s.href} className={card + " lift transition hover:border-violet-400"}>
             <div className="text-2xl font-bold sm:text-3xl">{s.n}</div>
             <div className="mt-1 text-xs text-neutral-500">{s.label}</div>
           </Link>
@@ -61,22 +61,22 @@ export default async function Overview() {
       {/* 빠른 작업 */}
       <h2 className="mb-3 mt-8 text-lg font-semibold">빠른 작업</h2>
       <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
-        <Link href="/?studio=1" className={card + " transition hover:border-violet-400"}>
+        <Link href="/?studio=1" className={card + " lift transition hover:border-violet-400"}>
           <div className="text-2xl">🎨</div>
           <div className="mt-2 text-sm font-semibold">스튜디오 열기</div>
           <div className="text-xs text-neutral-500">스킨 디자인·미리보기</div>
         </Link>
-        <Link href="/dashboard/stores" className={card + " transition hover:border-violet-400"}>
+        <Link href="/dashboard/stores" className={card + " lift transition hover:border-violet-400"}>
           <div className="text-2xl">🏬</div>
           <div className="mt-2 text-sm font-semibold">쇼핑몰 만들기</div>
           <div className="text-xs text-neutral-500">새 매장 발급</div>
         </Link>
-        <Link href="/dashboard/products" className={card + " transition hover:border-violet-400"}>
+        <Link href="/dashboard/products" className={card + " lift transition hover:border-violet-400"}>
           <div className="text-2xl">📦</div>
           <div className="mt-2 text-sm font-semibold">상품 관리</div>
           <div className="text-xs text-neutral-500">전체 상품 보기</div>
         </Link>
-        <Link href="/dashboard/analytics" className={card + " transition hover:border-violet-400"}>
+        <Link href="/dashboard/analytics" className={card + " lift transition hover:border-violet-400"}>
           <div className="text-2xl">📈</div>
           <div className="mt-2 text-sm font-semibold">분석</div>
           <div className="text-xs text-neutral-500">현황 통계</div>

@@ -1,32 +1,65 @@
 import Link from "next/link";
+import { findEmailByPhone } from "@/app/auth/actions";
 import AuthShell from "@/components/AuthShell";
+import Field from "@/components/Field";
 
-export default function FindEmailPage() {
+export default async function FindEmailPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ found?: string; notfound?: string; error?: string }>;
+}) {
+  const sp = await searchParams;
   return (
     <AuthShell
       title="이메일 찾기"
-      subtitle="로그인에 사용하는 아이디는 이메일입니다"
+      subtitle="가입할 때 등록한 전화번호로 찾습니다"
       footer={
         <Link href="/login" className="font-semibold text-violet-500 hover:text-violet-400">
           ← 로그인으로
         </Link>
       }
     >
-      <div className="space-y-3 text-sm text-neutral-600 dark:text-neutral-300">
-        <p className="rounded-xl border border-black/5 bg-black/[0.02] p-4 dark:border-white/10 dark:bg-white/[0.03]">
-          가입할 때 입력한 <b>이메일 주소</b>로 로그인합니다. 메일함에서 ONJONGIL 가입/인증 메일을
-          검색하면 어떤 이메일로 가입했는지 확인할 수 있어요.
+      {sp.found && (
+        <div className="mb-4 rounded-xl border border-emerald-500/30 bg-emerald-500/10 px-4 py-3 text-sm">
+          <div className="text-neutral-500 dark:text-neutral-400">가입된 이메일</div>
+          <div className="mt-1 font-mono text-base font-bold text-emerald-600 dark:text-emerald-400">
+            {sp.found}
+          </div>
+          <Link href="/login" className="mt-2 inline-block text-xs font-semibold text-violet-500 hover:text-violet-400">
+            이 이메일로 로그인 →
+          </Link>
+        </div>
+      )}
+      {sp.notfound && (
+        <p className="mb-4 rounded-lg bg-amber-400/10 px-3 py-2 text-sm text-amber-600 dark:text-amber-300">
+          그 번호로 가입된 계정을 찾지 못했어요. 번호를 확인하거나 회원가입해 주세요.
         </p>
-        <p className="text-xs text-neutral-400">
-          이메일이 기억나지 않으면 새로 가입하거나, 비밀번호 찾기로 재설정 메일을 받아보세요.
+      )}
+      {sp.error && (
+        <p className="mb-4 rounded-lg bg-rose-500/10 px-3 py-2 text-sm text-rose-600 dark:text-rose-400">
+          {sp.error}
         </p>
-      </div>
-      <div className="mt-5 flex gap-2">
-        <Link href="/signup" className="flex-1 rounded-xl bg-gradient-to-r from-violet-500 to-pink-500 py-2.5 text-center text-sm font-semibold text-white">
+      )}
+
+      <form action={findEmailByPhone} className="space-y-4">
+        <Field
+          name="phone"
+          type="tel"
+          label="전화번호"
+          placeholder="010-1234-5678"
+          icon="phone"
+          required
+          autoComplete="tel"
+        />
+        <button className="press-glow mt-1 w-full rounded-xl bg-gradient-to-r from-violet-500 to-pink-500 py-3 text-sm font-semibold text-white shadow-lg shadow-violet-500/25 transition hover:brightness-105 active:scale-[.98]">
+          이메일 찾기
+        </button>
+      </form>
+
+      <div className="mt-5 text-center text-xs text-neutral-400">
+        계정이 없으세요?{" "}
+        <Link href="/signup" className="font-semibold text-violet-500 hover:text-violet-400">
           회원가입
-        </Link>
-        <Link href="/reset-password" className="flex-1 rounded-xl border border-black/10 py-2.5 text-center text-sm font-semibold dark:border-white/15">
-          비밀번호 찾기
         </Link>
       </div>
     </AuthShell>

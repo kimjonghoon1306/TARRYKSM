@@ -60,7 +60,7 @@ export default async function StoresPage() {
       ) : (
         <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
           {list.map((s) => (
-            <div key={s.id} className={card}>
+            <div key={s.id} className={card + " lift"}>
               <div className="mb-3 flex items-center justify-between">
                 <b className="text-lg">{s.name}</b>
                 <span className="rounded-full bg-violet-500/15 px-2 py-0.5 text-xs text-violet-500 dark:text-violet-300">
