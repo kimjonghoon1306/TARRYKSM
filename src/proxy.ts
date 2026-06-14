@@ -48,7 +48,11 @@ export async function proxy(request: NextRequest) {
   const user = await updateSession(request, response);
 
   // ── 관리자 컨트롤타워(/dashboard)는 로그인 필요 (플랫폼 호스트에서만) ──
-  /* TEMP gate off */
+  if (isPlatformHost && !subdomain && url.pathname.startsWith("/dashboard") && !user) {
+    const redirectRes = NextResponse.redirect(new URL("/login", request.url));
+    response.cookies.getAll().forEach((c) => redirectRes.cookies.set(c));
+    return redirectRes;
+  }
 
   return response;
 }
