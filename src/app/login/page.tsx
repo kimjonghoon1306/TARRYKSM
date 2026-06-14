@@ -1,5 +1,7 @@
 import Link from "next/link";
 import { login } from "@/app/auth/actions";
+import AuthShell from "@/components/AuthShell";
+import Field from "@/components/Field";
 
 export default async function LoginPage({
   searchParams,
@@ -8,33 +10,52 @@ export default async function LoginPage({
 }) {
   const sp = await searchParams;
   return (
-    <main className="min-h-screen flex items-center justify-center bg-neutral-950 text-neutral-100 px-4">
-      <div className="w-full max-w-sm">
-        <Link href="/" className="flex items-center gap-2 mb-8 justify-center">
-          <span className="w-9 h-9 rounded-xl bg-gradient-to-br from-violet-500 to-pink-500 grid place-items-center font-bold">O</span>
-          <span className="font-semibold tracking-tight">ONJONGIL</span>
-        </Link>
-        <h1 className="text-2xl font-bold mb-1">로그인</h1>
-        <p className="text-sm text-neutral-400 mb-6">내 쇼핑몰을 관리하세요</p>
-
-        {sp.msg && <p className="mb-4 text-sm text-emerald-400">{sp.msg}</p>}
-        {sp.error && <p className="mb-4 text-sm text-rose-400">{sp.error}</p>}
-
-        <form action={login} className="space-y-3">
-          <input name="email" type="email" required placeholder="이메일"
-            className="w-full rounded-xl bg-neutral-900 border border-neutral-800 px-4 py-3 text-sm outline-none focus:border-violet-500" />
-          <input name="password" type="password" required placeholder="비밀번호"
-            className="w-full rounded-xl bg-neutral-900 border border-neutral-800 px-4 py-3 text-sm outline-none focus:border-violet-500" />
-          <button className="w-full rounded-xl bg-gradient-to-r from-violet-500 to-pink-500 py-3 font-semibold text-sm">
-            로그인
-          </button>
-        </form>
-
-        <p className="text-sm text-neutral-400 mt-5">
+    <AuthShell
+      title="로그인"
+      subtitle="내 쇼핑몰을 관리하세요"
+      footer={
+        <>
           계정이 없으세요?{" "}
-          <Link href="/signup" className="text-violet-400 font-medium">회원가입</Link>
+          <Link href="/signup" className="font-semibold text-violet-500 hover:text-violet-400">
+            회원가입
+          </Link>
+        </>
+      }
+    >
+      {sp.msg && (
+        <p className="mb-4 rounded-lg bg-emerald-500/10 px-3 py-2 text-sm text-emerald-600 dark:text-emerald-400">
+          {sp.msg}
         </p>
-      </div>
-    </main>
+      )}
+      {sp.error && (
+        <p className="mb-4 rounded-lg bg-rose-500/10 px-3 py-2 text-sm text-rose-600 dark:text-rose-400">
+          {sp.error}
+        </p>
+      )}
+
+      <form action={login} className="space-y-4">
+        <Field
+          name="email"
+          type="email"
+          label="이메일"
+          placeholder="you@email.com"
+          icon="mail"
+          required
+          autoComplete="email"
+        />
+        <Field
+          name="password"
+          type="password"
+          label="비밀번호"
+          placeholder="비밀번호"
+          icon="lock"
+          required
+          autoComplete="current-password"
+        />
+        <button className="mt-1 w-full rounded-xl bg-gradient-to-r from-violet-500 to-pink-500 py-3 text-sm font-semibold text-white shadow-lg shadow-violet-500/25 transition hover:brightness-105 active:scale-[.99]">
+          로그인
+        </button>
+      </form>
+    </AuthShell>
   );
 }
