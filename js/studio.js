@@ -90,14 +90,14 @@ function renderMalls(){
       <p>${T('ml_empty_s')}</p>
     </div>`;
   } else {
-    body = `<div class="mall-grid">` + malls.map(m=>{
+    body = `<div class="mall-grid">` + malls.map((m,i)=>{
       const s = SKIN_BY_ID[m.skin] || SKINS[0];
-      return `<div class="mall-card">
+      return `<div class="mall-card" onclick="openEditor(${i})">
         <div class="sk-mini" data-skin="${m.skin}">${buildMini(m.skin)}</div>
         <div class="mc-foot">
           <span class="skm-em">${s.emoji}</span>
           <span class="mc-info"><b>${m.name}</b><i>${s.name} · ${s.vibe}</i></span>
-          <span class="mc-edit" onclick="editMall('${m.skin}')">${T('ml_edit')}</span>
+          <span class="mc-edit">${T('ml_edit')} ↗</span>
         </div>
       </div>`;
     }).join('') + `</div>`;
@@ -110,7 +110,53 @@ function renderMalls(){
     </div>${body}`;
 }
 
-function editMall(skin){ activeSkin = skin; switchView('studio'); }
+/* ── 쇼핑몰 편집기 (풀스크린 슬라이드업) ── */
+let editingIndex = -1;
+
+function openEditor(i){
+  editingIndex = i;
+  const m = malls[i];
+  if(!m) return;
+  document.getElementById('edName').value = m.name;
+  renderEditorSkins();
+  renderEditorPreview();
+  document.getElementById('editorScrim').classList.add('on');
+  document.body.style.overflow = 'hidden';
+}
+function closeEditor(){
+  document.getElementById('editorScrim').classList.remove('on');
+  document.body.style.overflow = '';
+  editingIndex = -1;
+}
+function renderEditorSkins(){
+  const m = malls[editingIndex];
+  document.getElementById('edSkinList').innerHTML = SKINS.map(s=>`
+    <button class="ed-skin ${s.id===m.skin?'on':''}" onclick="editorSetSkin('${s.id}')">
+      <span class="es-sw" data-skin="${s.id}" style="background:var(--s-brand)"></span>
+      <span class="es-meta"><b>${s.emoji} ${s.name}</b><i>${s.vibe}</i></span>
+    </button>`).join('');
+}
+function renderEditorPreview(){
+  const m = malls[editingIndex];
+  document.getElementById('edPreview').innerHTML = buildStore(m.skin, m.name);
+  document.getElementById('edPreview').scrollTop = 0;
+}
+function editorSetSkin(id){
+  if(!malls[editingIndex]) return;
+  malls[editingIndex].skin = id;   // 실시간 반영
+  renderEditorSkins();
+  renderEditorPreview();
+}
+function saveEditor(){
+  const m = malls[editingIndex];
+  if(m){
+    const nm = (document.getElementById('edName').value || '').trim();
+    if(nm) m.name = nm;
+  }
+  closeEditor();
+  renderMalls();
+  toast(`💾 ${T('toast_saved')}`);
+}
 
 /* ── 준비중 뷰 ── */
 function renderSoon(label){

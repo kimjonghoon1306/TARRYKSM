@@ -16,6 +16,8 @@
 <link rel="stylesheet" href="css/studio.css">
 <link rel="stylesheet" href="css/store.css">
 <link rel="stylesheet" href="css/skins.css">
+<link rel="stylesheet" href="css/skin-layouts.css">
+<link rel="stylesheet" href="css/editor.css">
 <link rel="stylesheet" href="css/responsive.css">
 </head>
 <body>
@@ -126,6 +128,28 @@
     <div class="modal-foot">
       <button class="btn ghost" onclick="closeCreate()" data-i18n="cm_cancel">취소</button>
       <button class="btn solid" onclick="createMall()" data-i18n="cm_create">＋ 생성하기</button>
+    </div>
+  </div>
+</div>
+
+<!-- ── 쇼핑몰 편집기 (풀스크린 슬라이드업) ── -->
+<div class="editor-scrim" id="editorScrim" onclick="if(event.target===this)closeEditor()">
+  <div class="editor" id="editor">
+    <div class="ed-grip"></div>
+    <div class="ed-head">
+      <span class="ed-badge">EDIT</span>
+      <input class="ed-name" id="edName" type="text" placeholder="쇼핑몰 이름">
+      <div class="ed-actions">
+        <button class="btn ghost" onclick="closeEditor()" data-i18n="ed_close">닫기</button>
+        <button class="btn solid" onclick="saveEditor()" data-i18n="ed_save">저장</button>
+      </div>
+    </div>
+    <div class="ed-body">
+      <div class="ed-skins">
+        <div class="ed-skins-cap" data-i18n="ed_skins">SKIN</div>
+        <div id="edSkinList"></div>
+      </div>
+      <div class="ed-preview" id="edPreview"></div>
     </div>
   </div>
 </div>

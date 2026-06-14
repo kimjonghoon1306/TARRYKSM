@@ -19,8 +19,9 @@ const I18N = {
     ml_title:'내 쇼핑몰', ml_sub:'운영 중인 매장을 한눈에',
     ml_empty_t:'아직 만든 쇼핑몰이 없어요', ml_empty_s:'좌측 상단 “새 쇼핑몰”으로 1분 만에 시작하세요',
     ml_edit:'편집', ml_live:'운영중',
+    ed_close:'닫기', ed_save:'저장', ed_skins:'스킨', ed_pick:'스킨을 눌러 실시간으로 바꿔보세요',
     soon_t:'준비 중인 기능이에요', soon_s:'스킨 스튜디오가 먼저 — 운영 기능은 순차 오픈됩니다',
-    toast_made:'쇼핑몰이 생성됐어요', toast_skin:'스킨 적용:',
+    toast_made:'쇼핑몰이 생성됐어요', toast_skin:'스킨 적용:', toast_saved:'저장됐어요',
   },
   en:{
     new_mall:'New Store', new_sub:'Unlimited',
@@ -38,8 +39,9 @@ const I18N = {
     ml_title:'My Stores', ml_sub:'All your shops at a glance',
     ml_empty_t:'No stores yet', ml_empty_s:'Hit “New Store” top-left to start in a minute',
     ml_edit:'Edit', ml_live:'Live',
+    ed_close:'Close', ed_save:'Save', ed_skins:'Skin', ed_pick:'Tap a skin to switch live',
     soon_t:'Coming soon', soon_s:'Skin Studio first — operations roll out next',
-    toast_made:'Store created', toast_skin:'Skin applied:',
+    toast_made:'Store created', toast_skin:'Skin applied:', toast_saved:'Saved',
   },
 };
 
