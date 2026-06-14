@@ -1,0 +1,83 @@
+/* ════════════════════════════════════════
+   skins.css — 8개 스킨 = --s-* 토큰 세트
+   클릭 한 번에 브랜드 전체(색·서체·라운드·무드)가 바뀜
+════════════════════════════════════════ */
+
+/* 공통 기본값 (스킨이 덮어쓰지 않는 토큰) */
+[data-skin]{
+  --ease:cubic-bezier(.22,1,.36,1);
+  --s-ls:0; --s-fw:700; --s-hls:-.02em;
+  --s-shadow:0 18px 38px -18px rgba(0,0,0,.35);
+  --s-art-op:.14; --s-radd:10px; --s-rpill:99px;
+}
+
+/* 1 · MONO — 흑백 미니멀 에디토리얼 */
+[data-skin="mono"]{
+  --s-bg:#f4f3ef;--s-surf:#fff;--s-ink:#15150f;--s-sub:#7a7a70;--s-line:#e2e0d7;
+  --s-brand:#15150f;--s-brand-ink:#fff;--s-brand-soft:#eceae3;
+  --s-hero:#ebe9e1;--s-r:4px;--s-radd:4px;--s-rpill:4px;--s-ls:.04em;
+  --s-fd:'Space Grotesk',sans-serif;--s-fb:'Inter',sans-serif;
+}
+[data-skin="mono"] .stb-logo,[data-skin="mono"] .sh-head h3,
+[data-skin="mono"] .stf-logo,[data-skin="mono"] .st-promo b{text-transform:uppercase}
+
+/* 2 · NOIR — 골드 포인트 다크 럭셔리 (세리프) */
+[data-skin="noir"]{
+  --s-bg:#0d0d11;--s-surf:#16161c;--s-ink:#f2efe5;--s-sub:#908b7d;--s-line:rgba(255,255,255,.09);
+  --s-brand:#c9a44f;--s-brand-ink:#15130b;--s-brand-soft:rgba(201,164,79,.15);
+  --s-hero:linear-gradient(160deg,#1a1922,#0d0d11);--s-r:6px;--s-fw:500;--s-hls:0;
+  --s-shadow:0 22px 44px -18px rgba(0,0,0,.7);
+  --s-fd:'Fraunces',serif;--s-fb:'Inter',sans-serif;
+}
+[data-skin="noir"] .sth-cta,[data-skin="noir"] .pc-add{box-shadow:0 0 18px rgba(201,164,79,.4)}
+
+/* 3 · BLOOM — 파스텔 소프트 큐트 (둥근) */
+[data-skin="bloom"]{
+  --s-bg:#fff5f7;--s-surf:#ffffff;--s-ink:#46303a;--s-sub:#b58a99;--s-line:#fbe2ea;
+  --s-brand:#ff5d8f;--s-brand-ink:#fff;--s-brand-soft:#ffe1ea;
+  --s-hero:linear-gradient(135deg,#ffe2ed,#fff0e7);--s-r:22px;--s-radd:14px;
+  --s-fd:'Plus Jakarta Sans',sans-serif;--s-fb:'Plus Jakarta Sans',sans-serif;
+}
+
+/* 4 · CITRUS — 비비드 Z세대 팝 (라임 + 잉크) */
+[data-skin="citrus"]{
+  --s-bg:#fbffe9;--s-surf:#ffffff;--s-ink:#15190a;--s-sub:#7d8255;--s-line:#e8eecd;
+  --s-brand:#c2ee00;--s-brand-ink:#15190a;--s-brand-soft:#edfbab;
+  --s-hero:linear-gradient(120deg,#e7ff8f,#fdffcf);--s-r:14px;--s-fw:800;--s-ls:-.01em;--s-hls:-.03em;
+  --s-fd:'Archivo',sans-serif;--s-fb:'Inter',sans-serif;
+}
+[data-skin="citrus"] .sth-title,[data-skin="citrus"] .stb-logo{text-transform:uppercase}
+
+/* 5 · AZURE — 청량 글래스 블루 */
+[data-skin="azure"]{
+  --s-bg:#eef4ff;--s-surf:#ffffff;--s-ink:#0f1c33;--s-sub:#6d80a0;--s-line:#dde6f7;
+  --s-brand:#2f6bff;--s-brand-ink:#fff;--s-brand-soft:#dbe7ff;
+  --s-hero:linear-gradient(135deg,#dae8ff,#eef5ff);--s-r:18px;
+  --s-fd:'Space Grotesk',sans-serif;--s-fb:'Inter',sans-serif;
+}
+
+/* 6 · MOCHA — 따뜻한 뉴트럴 우드 (세리프) */
+[data-skin="mocha"]{
+  --s-bg:#f3ece2;--s-surf:#fbf6ee;--s-ink:#2d2118;--s-sub:#9a8770;--s-line:#e6dbcb;
+  --s-brand:#9c6b43;--s-brand-ink:#fff;--s-brand-soft:#eaddc9;
+  --s-hero:linear-gradient(135deg,#ece0ce,#f6efe3);--s-r:10px;--s-fw:500;--s-hls:0;
+  --s-fd:'Fraunces',serif;--s-fb:'Inter',sans-serif;
+}
+
+/* 7 · GRAPE — 네온 사이버 퍼플 (다크) */
+[data-skin="grape"]{
+  --s-bg:#0f0a1c;--s-surf:#1a1230;--s-ink:#efe9ff;--s-sub:#9a8fc4;--s-line:rgba(255,255,255,.09);
+  --s-brand:#a855f7;--s-brand-ink:#fff;--s-brand-soft:rgba(168,85,247,.18);
+  --s-hero:radial-gradient(120% 100% at 80% 0,rgba(168,85,247,.42),#0f0a1c);--s-r:16px;
+  --s-shadow:0 20px 42px -16px rgba(168,85,247,.55);
+  --s-fd:'Space Grotesk',sans-serif;--s-fb:'Inter',sans-serif;
+}
+[data-skin="grape"] .sth-cta,[data-skin="grape"] .pc-add,[data-skin="grape"] .stb-cart{box-shadow:0 0 20px rgba(168,85,247,.55)}
+
+/* 8 · PINE — 차분한 내추럴 그린 */
+[data-skin="pine"]{
+  --s-bg:#eef3ec;--s-surf:#ffffff;--s-ink:#162a1d;--s-sub:#6f8473;--s-line:#dbe5d9;
+  --s-brand:#1f7a4d;--s-brand-ink:#fff;--s-brand-soft:#d6ecdd;
+  --s-hero:linear-gradient(135deg,#d9ebdd,#eef3ec);--s-r:10px;
+  --s-fd:'Space Grotesk',sans-serif;--s-fb:'Inter',sans-serif;
+}

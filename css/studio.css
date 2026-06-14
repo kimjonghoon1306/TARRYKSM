@@ -1,0 +1,76 @@
+/* ════════════════════════════════════════
+   studio.css — 스킨 스튜디오 (핵심) · 디바이스 프리뷰 · 내 쇼핑몰
+════════════════════════════════════════ */
+
+.view-head{margin-bottom:24px}
+.vh-eyebrow{display:inline-flex;align-items:center;gap:7px;font-size:11px;font-weight:700;letter-spacing:.16em;color:var(--brand-2);margin-bottom:12px}
+.vh-eyebrow::before{content:"";width:18px;height:2px;border-radius:2px;background:var(--brand-2)}
+.vh-title{font-family:var(--font-display);font-weight:700;font-size:clamp(24px,4vw,34px);letter-spacing:-.02em;line-height:1.1}
+.vh-title em{font-style:normal;background:linear-gradient(120deg,var(--brand),var(--brand-2));-webkit-background-clip:text;background-clip:text;color:transparent}
+.vh-desc{margin-top:10px;color:var(--txt-2);font-size:14px;max-width:560px;line-height:1.6}
+
+/* ── 라이브 프리뷰 스테이지 ── */
+.preview-stage{background:var(--surf);border:1px solid var(--line);border-radius:var(--r-lg);padding:18px;margin-bottom:26px}
+.ps-bar{display:flex;align-items:center;gap:14px;margin-bottom:18px;flex-wrap:wrap}
+.ps-now{display:flex;align-items:center;gap:11px}
+.ps-swatch{width:34px;height:34px;border-radius:10px;border:2px solid var(--line-2)}
+.ps-name{font-family:var(--font-display);font-weight:700;font-size:16px;line-height:1.15}
+.ps-vibe{font-size:11.5px;color:var(--sub)}
+.ps-tools{margin-left:auto;display:flex;align-items:center;gap:10px}
+.dev-toggle{display:flex;background:var(--surf-2);border:1px solid var(--line);border-radius:99px;padding:3px}
+.dev-toggle button{padding:7px 14px;border-radius:99px;font-size:12px;font-weight:600;color:var(--sub)}
+.dev-toggle button.on{background:var(--brand);color:#fff}
+
+/* 디바이스 프레임 */
+.device{margin:0 auto;transition:max-width .4s var(--ease)}
+.device-screen{
+  border:1px solid var(--line-2);border-radius:var(--r-md);overflow:hidden;
+  height:560px;overflow-y:auto;background:#000;box-shadow:var(--shadow);
+}
+.device.desktop{max-width:100%}
+.device.mobile{max-width:392px}
+.device.mobile .device-screen{border-radius:34px;border-width:9px;border-color:#1c1c24;height:600px}
+.device-screen::-webkit-scrollbar{width:0}
+
+/* ── 스킨 갤러리 ── */
+.gallery-head{display:flex;align-items:baseline;gap:12px;margin-bottom:14px}
+.gallery-head h3{font-family:var(--font-display);font-weight:700;font-size:17px}
+.gallery-head span{font-size:12.5px;color:var(--sub)}
+.skin-gallery{display:grid;grid-template-columns:repeat(4,1fr);gap:14px}
+.sk-card{cursor:pointer;border:1.5px solid var(--line);border-radius:var(--r-md);overflow:hidden;background:var(--surf);transition:.22s var(--ease);position:relative}
+.sk-card:hover{transform:translateY(-4px);border-color:var(--line-2);box-shadow:var(--shadow)}
+.sk-card.active{border-color:var(--brand)}
+.sk-card.active::after{content:"적용중";position:absolute;top:9px;right:9px;font-size:9.5px;font-weight:700;letter-spacing:.04em;padding:3px 9px;border-radius:99px;background:var(--brand);color:#fff;z-index:3}
+
+/* 미니 프리뷰 (스킨 토큰 그대로 사용) */
+.sk-mini{height:118px;padding:12px;background:var(--s-bg);color:var(--s-ink);font-family:var(--s-fb);position:relative;overflow:hidden}
+.skm-top{display:flex;align-items:center;justify-content:space-between;margin-bottom:9px}
+.skm-logo{font-family:var(--s-fd);font-weight:700;font-size:11px;letter-spacing:var(--s-ls,0)}
+.skm-dot{width:14px;height:14px;border-radius:50%;background:var(--s-brand)}
+.skm-hero{font-family:var(--s-fd);font-weight:var(--s-fw,700);font-size:14px;line-height:1.15;margin-bottom:10px;letter-spacing:-.01em}
+.skm-tiles{display:flex;gap:7px}
+.skm-tile{flex:1;height:40px;border-radius:calc(var(--s-r) * .5);background:var(--s-surf);border:1px solid var(--s-line);display:grid;place-items:center;font-size:16px}
+.skm-pill{position:absolute;bottom:12px;right:12px;font-size:8px;font-weight:700;padding:3px 8px;border-radius:99px;background:var(--s-brand);color:var(--s-brand-ink)}
+.sk-meta{display:flex;align-items:center;gap:9px;padding:11px 13px}
+.skm-em{font-size:17px}
+.sk-meta-t{flex:1;line-height:1.25}
+.sk-meta-t b{display:block;font-family:var(--font-display);font-weight:600;font-size:13px}
+.sk-meta-t i{font-style:normal;font-size:10.5px;color:var(--sub)}
+
+/* ── 내 쇼핑몰 뷰 ── */
+.mall-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}
+.mall-card{border:1px solid var(--line);border-radius:var(--r-md);overflow:hidden;background:var(--surf);transition:.22s var(--ease)}
+.mall-card:hover{transform:translateY(-3px);box-shadow:var(--shadow)}
+.mc-foot{display:flex;align-items:center;gap:11px;padding:13px 15px}
+.mc-foot .mc-info{flex:1;line-height:1.3}
+.mc-info b{display:block;font-family:var(--font-display);font-weight:600;font-size:14px}
+.mc-info i{font-style:normal;font-size:11px;color:var(--sub)}
+.mc-edit{font-size:11px;font-weight:600;color:var(--brand);padding:6px 12px;border-radius:99px;background:color-mix(in srgb,var(--brand) 12%,transparent)}
+.empty{text-align:center;padding:70px 20px;color:var(--sub)}
+.empty-ico{font-size:46px;margin-bottom:14px;opacity:.7}
+.empty h3{font-family:var(--font-display);font-size:18px;color:var(--txt);margin-bottom:7px}
+
+/* soon */
+.soon{display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:50vh;text-align:center;color:var(--sub)}
+.soon-ico{font-size:54px;margin-bottom:16px}
+.soon h2{font-family:var(--font-display);font-size:22px;color:var(--txt);margin-bottom:8px}
