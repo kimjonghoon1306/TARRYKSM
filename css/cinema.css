@@ -62,8 +62,8 @@
 .cs-tile:nth-child(5) b{transition-delay:.45s}.cs-tile:nth-child(6) b{transition-delay:.55s}
 
 /* 360° 회전 + 색 모핑 */
-.cine-store-stage.spin .cine-store{animation:cineSpin 4.6s cubic-bezier(.5,0,.18,1),cineHue 4.6s linear}
-@keyframes cineSpin{0%{transform:perspective(1300px) rotateY(0) scale(1)}55%{transform:perspective(1300px) rotateY(360deg) scale(1.04)}100%{transform:perspective(1300px) rotateY(360deg) scale(1)}}
+.cine-store-stage.spin .cine-store{animation:cineSpin 3.3s cubic-bezier(.5,0,.18,1),cineHue 3.3s linear}
+@keyframes cineSpin{0%{transform:perspective(1300px) rotateY(0) scale(1)}70%{transform:perspective(1300px) rotateY(360deg) scale(1.04)}100%{transform:perspective(1300px) rotateY(360deg) scale(1)}}
 @keyframes cineHue{0%{filter:hue-rotate(0deg)}100%{filter:hue-rotate(300deg)}}
 
 /* ── 씬 레이어 ── */
@@ -124,7 +124,7 @@
 .cine-ring{width:34px;height:34px}
 .ring-bg{fill:none;stroke:var(--line-2);stroke-width:3}
 .ring-fg{fill:none;stroke:var(--brand);stroke-width:3;stroke-linecap:round;stroke-dasharray:131.95;stroke-dashoffset:131.95;transform:rotate(-90deg);transform-origin:center}
-.sc-finale.on .ring-fg{animation:ringCount 6s linear forwards}
+.sc-finale.on .ring-fg{animation:ringCount 4.5s linear forwards}
 
 /* ── 키프레임 ── */
 @keyframes letterUp{to{opacity:1;transform:none}}

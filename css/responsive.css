@@ -41,3 +41,48 @@
   .vh-title{font-size:24px}
   .ps-tools{margin-left:0;width:100%}
 }
+
+/* ════════════════════════════════════════
+   모바일 정밀 최적화
+════════════════════════════════════════ */
+@media (max-width:760px){
+  .editor{height:96vh;border-radius:18px 18px 0 0}
+  .ed-head{flex-wrap:wrap;padding:12px 16px;gap:10px}
+  .ed-name{order:3;flex-basis:100%;font-size:17px}
+  .ed-actions{margin-left:auto}
+  .ed-actions .btn{padding:10px 16px;font-size:12.5px}
+}
+
+@media (max-width:640px){
+  .tb-search{display:none}                 /* 장식용 검색 → 모바일에선 숨겨 공간 확보 */
+  .topbar{gap:9px;padding:11px 14px}
+  .tb-tools{gap:7px}
+  .view{padding:20px 16px 110px}
+}
+
+@media (max-width:520px){
+  #langName{display:none}
+  .lang-btn{padding:9px 11px}
+  .tb-theme,.tb-ico{width:38px;height:38px}
+  .ps-bar{gap:10px}
+  .ps-tools{flex-wrap:wrap}
+  .dev-toggle button{padding:7px 11px;font-size:11.5px}
+  .ps-tools .btn.solid{flex:1;text-align:center;padding:11px 14px;font-size:12.5px}
+  .device-screen{height:60vh}
+  .device.mobile .device-screen{height:64vh}
+  .store .stb-nav{display:none}            /* 좁은 스토어 상단 링크 정리 */
+  .vh-desc{font-size:13px}
+  .preview-stage{padding:14px}
+  /* 시네마틱 */
+  .cine-top{padding:15px 15px;gap:10px}
+  .cine-skip{font-size:11.5px}
+  .sc-tag{font-size:14px;padding:0 18px}
+  .cap-sub{padding-right:20px}
+  .cine-mall-grid{gap:10px}
+}
+
+@media (max-width:400px){
+  .tbh-lbl{display:none}                   /* 대문 버튼 라벨 숨기고 아이콘만 */
+  .tb-home{padding:0 11px}
+  .skin-gallery{gap:10px}
+}

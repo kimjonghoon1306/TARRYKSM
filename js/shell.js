@@ -64,6 +64,17 @@ function enterApp(skin){
   switchView('studio');
 }
 
+/* 앱 → 대문(시네마틱 인트로) 복귀 */
+function backToLanding(){
+  document.getElementById('app').classList.remove('on');
+  document.getElementById('rail')?.classList.remove('open');
+  document.getElementById('navScrim')?.classList.remove('on');
+  document.body.style.overflow = '';
+  document.getElementById('intro').classList.remove('gone');
+  if(typeof replayCinema === 'function') replayCinema();
+  window.scrollTo(0,0);
+}
+
 /* 토스트 */
 let toastTimer;
 function toast(html){
