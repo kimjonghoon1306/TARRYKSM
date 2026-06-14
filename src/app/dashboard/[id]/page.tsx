@@ -57,7 +57,9 @@ export default async function StoreAdmin({
 
         <div className="grid gap-4 sm:grid-cols-3">
           <ManageCard title="🎨 디자인" desc={`스킨: ${s.skin}`} soon />
-          <ManageCard title="📦 상품" desc={`${count ?? 0}개 등록됨`} soon />
+          <Link href={`/dashboard/${s.id}/products`} className="block">
+            <ManageCard title="📦 상품" desc={`${count ?? 0}개 등록됨`} action="관리하기 →" />
+          </Link>
           <ManageCard title="🧾 주문" desc="결제 연동 후" soon />
         </div>
       </div>
@@ -65,12 +67,13 @@ export default async function StoreAdmin({
   );
 }
 
-function ManageCard({ title, desc, soon }: { title: string; desc: string; soon?: boolean }) {
+function ManageCard({ title, desc, soon, action }: { title: string; desc: string; soon?: boolean; action?: string }) {
   return (
-    <div className="rounded-2xl border border-neutral-800 bg-neutral-900 p-5">
+    <div className="rounded-2xl border border-neutral-800 bg-neutral-900 p-5 h-full hover:border-violet-500 transition-colors">
       <div className="font-semibold mb-1">{title}</div>
       <div className="text-sm text-neutral-400">{desc}</div>
       {soon && <div className="mt-3 text-xs text-neutral-600">준비중</div>}
+      {action && <div className="mt-3 text-xs text-violet-400">{action}</div>}
     </div>
   );
 }
