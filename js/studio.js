@@ -148,11 +148,15 @@ function editorSetSkin(id){
   renderEditorSkins();
   renderEditorPreview();
 }
-function saveEditor(){
+async function saveEditor(){
   const m = malls[editingIndex];
   if(m){
     const nm = (document.getElementById('edName').value || '').trim();
     if(nm) m.name = nm;
+    if(SB_ENABLED && m.id){
+      try{ await dbUpdateStore(m.id, { name:m.name, skin:m.skin }); }
+      catch(e){ toast('⚠️ 저장 실패: ' + (e.message || '')); }
+    }
   }
   closeEditor();
   renderMalls();
@@ -189,16 +193,38 @@ function openCreate(preset){
 }
 function closeCreate(){ document.getElementById('createModal').classList.remove('on'); }
 
-function createMall(){
+async function createMall(){
   const inp = document.getElementById('mallName');
   const name = (inp.value || '').trim();
   if(!name){ inp.style.borderColor = 'var(--danger)'; inp.focus(); return; }
-  malls.push({ name, skin: createSkin });
+
+  if(SB_ENABLED){
+    if(!currentUserObj){ closeCreate(); openAuth('login'); toast('🔑 로그인 후 쇼핑몰을 만들 수 있어요'); return; }
+    try{
+      const store = await dbCreateStore(name, createSkin);
+      malls.unshift(store);
+    }catch(e){ toast('⚠️ 저장 실패: ' + (e.message || '')); return; }
+  } else {
+    malls.push({ name, skin: createSkin });
+  }
+
   inp.value = ''; inp.style.borderColor = '';
   closeCreate();
   updateMallCount();
   switchView('malls');
   toast(`🏬 <b>${name}</b> ${T('toast_made')}`);
+}
+
+/* 로그인/로그아웃 시 호출 — DB에서 쇼핑몰 다시 로드 */
+async function reloadStores(){
+  if(!SB_ENABLED) return;
+  malls.length = 0;
+  if(currentUserObj){
+    try{ const list = await dbListStores(); malls.push(...list); }
+    catch(e){ console.error('stores load', e); }
+  }
+  updateMallCount();
+  if(currentView === 'malls') renderMalls();
 }
 
 function updateMallCount(){
