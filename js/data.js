@@ -45,6 +45,36 @@ const SKINS = [
     brand:'FOREST', badge:'NATURE INSIDE',
     heroTitle:'자연을 곁에 두다', heroSub:'숲에서 온 차분한 색. 비우고 채우는 균형 잡힌 라이프스타일.',
     cta:'구경하기', chips:['전체','플랜트','리빙','클린','웰니스'] },
+
+  { id:'midnight', name:'Midnight', emoji:'🌃', vibe:'딥 네이비 테크 다크',
+    brand:'NOVA', badge:'TECH DROP',
+    heroTitle:'Built for the night', heroSub:'깊은 네이비 위로 흐르는 사이안 라인. 테크 감성의 셀렉션.',
+    cta:'둘러보기', chips:['ALL','테크','가젯','오디오','액세서리'] },
+
+  { id:'coral',  name:'Coral',  emoji:'🪸', vibe:'코랄 선셋 웜',
+    brand:'SUNDAY', badge:'WARM PICKS',
+    heroTitle:'따뜻한 하루의 시작', heroSub:'노을빛 코랄로 물든 다정한 셀렉션. 보기만 해도 포근해요.',
+    cta:'쇼핑하기', chips:['전체','베스트','홈','웨어','기프트'] },
+
+  { id:'lavender', name:'Lavender', emoji:'💜', vibe:'라벤더 드리미 소프트',
+    brand:'lumi', badge:'DREAMY',
+    heroTitle:'부드럽게 스며드는', heroSub:'은은한 라벤더 톤의 무드. 포근한 일상을 위한 셀렉션.',
+    cta:'구경하기', chips:['전체','뷰티','패브릭','데일리','기프트'] },
+
+  { id:'slate',  name:'Slate',  emoji:'◾', vibe:'쿨 그레이 프리미엄',
+    brand:'GRID', badge:'ESSENTIALS',
+    heroTitle:'Quiet by design', heroSub:'차분한 무채색으로 정돈한 본질. 군더더기 없는 프리미엄.',
+    cta:'컬렉션 보기', chips:['ALL','오브젝트','웨어','테크','리빙'] },
+
+  { id:'berry',  name:'Berry',  emoji:'🫐', vibe:'비비드 베리 볼드',
+    brand:'POP', badge:'HOT NOW 🔥',
+    heroTitle:'Bold & juicy', heroSub:'쨍한 베리 컬러로 터뜨리는 무드. 눈에 띄는 게 좋아.',
+    cta:'지금 보기', chips:['ALL','HOT','한정','뷰티','굿즈'] },
+
+  { id:'crimson', name:'Crimson', emoji:'🔻', vibe:'스포티 크림슨 액티브',
+    brand:'BLAZE', badge:'GO HARD',
+    heroTitle:'Move faster', heroSub:'강렬한 레드로 밀어붙이는 액티브 셀렉션. 멈추지 않는 하루.',
+    cta:'GEAR UP', chips:['ALL','스포츠','액티브','슈즈','기어'] },
 ];
 
 const SKIN_BY_ID = Object.fromEntries(SKINS.map(s => [s.id, s]));
