@@ -27,6 +27,8 @@ input{font-family:inherit}
   overflow:hidden;transition:opacity .6s var(--ease),visibility .6s;
 }
 #intro.gone{opacity:0;visibility:hidden;pointer-events:none}
+.intro-theme{position:absolute;top:22px;right:22px;z-index:6;width:44px;height:44px;border-radius:13px;display:grid;place-items:center;font-size:18px;background:var(--surf);border:1px solid var(--line-2);transition:transform .2s var(--ease),border-color .2s}
+.intro-theme:hover{transform:translateY(-2px);border-color:var(--brand)}
 .intro-aura{position:absolute;border-radius:50%;filter:blur(90px);opacity:.5}
 .intro-aura.a1{width:520px;height:520px;background:var(--brand);top:-160px;left:-80px}
 .intro-aura.a2{width:480px;height:480px;background:var(--brand-2);bottom:-180px;right:-60px;opacity:.35}

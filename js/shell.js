@@ -52,7 +52,8 @@ function toggleTheme(){
   const cur = document.documentElement.getAttribute('data-theme');
   const next = cur === 'dark' ? 'light' : 'dark';
   document.documentElement.setAttribute('data-theme', next);
-  document.getElementById('themeIco').textContent = next === 'dark' ? '🌙' : '☀️';
+  const ico = next === 'dark' ? '🌙' : '☀️';
+  document.querySelectorAll('#themeIco, #introThemeIco').forEach(el => el.textContent = ico);
 }
 
 /* 인트로 → 앱 */
