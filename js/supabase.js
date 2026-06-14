@@ -7,8 +7,8 @@
    · anon : 같은 화면의 'anon public' 키  (service_role 절대 금지!)
 ════════════════════════════════════════ */
 const SB_CONFIG = {
-  url:  '',
-  anon: '',
+  url:  'https://nvswnasjtnbrmpdetcbv.supabase.co',
+  anon: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im52c3duYXNqdG5icm1wZGV0Y2J2Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODE0MTYzNjUsImV4cCI6MjA5Njk5MjM2NX0.1EJZgsAs-lYdy5-d8nHaI1iNZ2qSR3nNKMQLtFKBwRw',
 };
 
 const SB_ENABLED = !!(SB_CONFIG.url && SB_CONFIG.anon && window.supabase);
