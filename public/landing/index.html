@@ -4,6 +4,8 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1.0">
 <title>ONJONGIL — 무한분양 · 버티컬 커머스 빌더</title>
+<!-- 페인트 전에: ?studio 로 들어오면 인트로 깜빡임 없이 곧장 스튜디오 -->
+<script>if(/[?&]studio\b/.test(location.search)||location.hash==='#studio')document.documentElement.classList.add('go-studio');</script>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Inter:wght@400;500;600;700&family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600&family=Archivo:wght@500;700;800&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
@@ -35,6 +37,9 @@
     color:#fff; border:none;
   }
   .rf-login.rf-signup:hover{ filter:brightness(1.06); color:#fff; }
+  /* 스튜디오 직행: 인트로 숨기고 앱 즉시 표시 (대문 깜빡임 방지) */
+  html.go-studio #intro{ opacity:0; visibility:hidden; pointer-events:none; }
+  html.go-studio #app{ display:flex; }
 </style>
 </head>
 <body>
@@ -146,10 +151,8 @@
       <a class="rail-link" data-view="soon" data-soon="설정"><span class="rl-ico">⚙️</span><span class="rl-lbl" data-i18n="nav_settings">설정</span></a>
     </nav>
 
-    <!-- 좌하단: 관리자 전용 로그인 (Next.js 컨트롤타워) -->
-    <div class="rail-foot" id="railFoot">
-      <a class="rf-login rf-signup" href="/login">🔒 관리자 로그인</a>
-    </div>
+    <!-- 관리자 입구는 비밀공간 — 대문 스튜디오에 노출하지 않음 -->
+    <div class="rail-foot" id="railFoot" style="display:none"></div>
   </aside>
 
   <!-- ── 메인 ── -->
@@ -177,7 +180,7 @@
         </div>
         <button class="tb-theme" onclick="toggleTheme()"><span id="themeIco">🌙</span></button>
         <button class="tb-ico">🔔<i class="tb-dot"></i></button>
-        <button class="tb-ico tb-admin" onclick="openAdmin()" title="관리자 페이지">🎛️</button>
+        <!-- 관리자 입구는 비밀공간 — 대문에 노출하지 않음(직접 /login URL로만 접근) -->
         <div class="tb-clock" id="clock">00:00</div>
       </div>
     </header>
