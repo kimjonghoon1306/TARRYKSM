@@ -1,27 +1,32 @@
 import { NextResponse, type NextRequest } from "next/server";
 import { updateSession, resolveCustomDomain } from "@/lib/supabase/middleware";
+import { PLATFORM_ROOTS } from "@/lib/domains";
 
 // Next.js 16: 'middleware' 컨벤션이 'proxy'로 변경됨
 export async function proxy(request: NextRequest) {
   const url = request.nextUrl;
   const host = (request.headers.get("host") || "").toLowerCase().split(":")[0];
-  const root = (process.env.NEXT_PUBLIC_ROOT_DOMAIN || "localhost:3000")
+
+  // 플랫폼 루트 도메인 목록(코드 명시) + 환경변수 보조
+  const envRoot = (process.env.NEXT_PUBLIC_ROOT_DOMAIN || "")
     .toLowerCase()
     .split(":")[0];
+  const roots = [...PLATFORM_ROOTS, envRoot].filter(Boolean);
 
-  // ── 서브도메인 추출 (myshop.onjongil.com → "myshop") ──
+  // 이 host에 해당하는 루트 찾기 (host가 root이거나 *.root)
+  const matchedRoot = roots.find(
+    (r) => host === r || host.endsWith("." + r)
+  );
+
+  // ── 서브도메인 추출 (myshop.on.온종일.com → "myshop") ──
   let subdomain = "";
-  if (host && host !== root && host.endsWith("." + root)) {
-    subdomain = host.slice(0, -(root.length + 1));
+  if (matchedRoot && host !== matchedRoot && host.endsWith("." + matchedRoot)) {
+    subdomain = host.slice(0, -(matchedRoot.length + 1));
     if (subdomain === "www") subdomain = "";
   }
 
   // 플랫폼 자체 호스트 (루트/서브도메인/프리뷰/로컬) — 커스텀 도메인 아님
-  const isPlatformHost =
-    host === root ||
-    host.endsWith("." + root) ||
-    host.endsWith(".vercel.app") ||
-    host === "localhost";
+  const isPlatformHost = !!matchedRoot || host.endsWith(".vercel.app") || host === "localhost";
 
   // ── 라우팅 결정 ──
   let response: NextResponse;
