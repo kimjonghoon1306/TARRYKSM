@@ -161,8 +161,8 @@ export default async function StoreAdmin({
                 <div>유형 A · 이름 @ · 값 76.76.21.21</div>
               </div>
             </div>
-            <p className="mt-3 text-xs text-neutral-400">
-              ⚠️ DNS 추가 후, 플랫폼 관리자가 Vercel 프로젝트에 이 도메인을 등록해야 SSL이 발급됩니다.
+            <p className="mt-3 text-xs text-emerald-600 dark:text-emerald-400">
+              ✓ 이 도메인은 자동으로 등록됐어요. 위 DNS 레코드만 추가하면 SSL(https)까지 자동 발급됩니다.
             </p>
           </div>
         )}

@@ -4,6 +4,7 @@ import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { domainToASCII } from "node:url";
 import { createClient } from "@/lib/supabase/server";
+import { addDomainToVercel, removeDomainFromVercel } from "@/lib/vercel";
 import { slugify } from "@/lib/slug";
 import { SKIN_IDS } from "@/lib/skins";
 
@@ -103,6 +104,14 @@ export async function setStoreDomain(formData: FormData) {
     redirect(`/dashboard/${id}?derr=` + encodeURIComponent("도메인 형식이 올바르지 않아요 (예: shop.mybrand.com)"));
   }
 
+  // 기존 도메인 (변경/해제 시 Vercel에서 제거용)
+  const { data: prev } = await supabase
+    .from("stores")
+    .select("custom_domain")
+    .eq("id", id)
+    .maybeSingle();
+  const oldDomain = (prev?.custom_domain as string | null) || null;
+
   const { error } = await supabase
     .from("stores")
     .update({ custom_domain: value })
@@ -113,6 +122,25 @@ export async function setStoreDomain(formData: FormData) {
       : error.message;
     redirect(`/dashboard/${id}?derr=` + encodeURIComponent(msg));
   }
+
+  // ── Vercel 자동 등록/해제 ──
+  let note = value ? "도메인을 저장했어요" : "도메인 연결을 해제했어요";
+  if (oldDomain && oldDomain !== value) {
+    await removeDomainFromVercel(oldDomain);
+  }
+  if (value) {
+    const r = await addDomainToVercel(value);
+    if (r.ok) {
+      note = r.verified
+        ? "도메인 연결 완료! (Vercel 등록됨)"
+        : "도메인 저장됨. 안내된 DNS 레코드를 추가하면 자동 연결돼요";
+    } else if (r.error === "no-token") {
+      note = "도메인 저장됨 (Vercel 자동등록 미설정 — 수동 등록 필요)";
+    } else {
+      note = "도메인 저장됨. Vercel 등록 실패: " + r.error;
+    }
+  }
+
   revalidatePath(`/dashboard/${id}`);
-  redirect(`/dashboard/${id}?dmsg=` + encodeURIComponent(value ? "도메인을 저장했어요" : "도메인 연결을 해제했어요"));
+  redirect(`/dashboard/${id}?dmsg=` + encodeURIComponent(note));
 }
