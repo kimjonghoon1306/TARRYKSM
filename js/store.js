@@ -61,7 +61,7 @@ function buildStore(skinId, brandOverride){
     <div class="st-foot">
       <div class="stf-logo">${brand}</div>
       <div class="stf-links"><a>회사소개</a><a>이용약관</a><a>고객센터</a><a>인스타그램</a></div>
-      <div class="stf-copy">Powered by KONEXA · 무한분양 · ${s.name} skin</div>
+      <div class="stf-copy">Powered by 온종일 · 무한분양 · ${s.name} skin</div>
     </div>
   </div>`;
 }
