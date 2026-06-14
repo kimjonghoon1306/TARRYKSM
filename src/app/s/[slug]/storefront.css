@@ -153,5 +153,50 @@
 .sf-checkout { width: 100%; padding: 14px; border: 0; border-radius: var(--s-radd); background: var(--s-brand); color: var(--s-brand-ink); font-weight: 800; font-size: 15px; cursor: pointer; }
 .sf-cart-empty { text-align: center; color: var(--s-sub); padding: 60px 0; }
 
-.sf-toast { position: fixed; z-index: 60; left: 50%; bottom: 26px; transform: translateX(-50%); background: var(--s-brand); color: var(--s-brand-ink); padding: 12px 20px; border-radius: var(--s-rpill); font-weight: 700; font-size: 14px; box-shadow: var(--s-shadow); opacity: 0; transition: .25s var(--ease); }
-.sf-toast.on { opacity: 1; }
+.sf-toast { position: fixed; z-index: 60; left: 50%; bottom: 26px; transform: translateX(-50%) translateY(8px); background: var(--s-brand); color: var(--s-brand-ink); padding: 12px 20px; border-radius: var(--s-rpill); font-weight: 700; font-size: 14px; box-shadow: var(--s-shadow); opacity: 0; transition: .25s var(--ease); }
+.sf-toast.on { opacity: 1; transform: translateX(-50%) translateY(0); }
+
+/* ════════════════════════════════════════
+   재미 요소 — 등장 애니메이션·이미지 줌·모션
+════════════════════════════════════════ */
+@keyframes sf-fade { from { opacity: 0; } to { opacity: 1; } }
+@keyframes sf-rise { from { opacity: 0; transform: translateY(16px); } to { opacity: 1; transform: none; } }
+@keyframes sf-float { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-8px); } }
+@keyframes sf-hero-pan { from { background-position: 50% 48%; } to { background-position: 50% 52%; } }
+
+/* 카드 순차 등장 (opacity만 → hover transform과 충돌 X) */
+.sf-card { animation: sf-fade .5s var(--ease) both; }
+.sf-grid .sf-card:nth-child(1) { animation-delay: .03s; }
+.sf-grid .sf-card:nth-child(2) { animation-delay: .07s; }
+.sf-grid .sf-card:nth-child(3) { animation-delay: .11s; }
+.sf-grid .sf-card:nth-child(4) { animation-delay: .15s; }
+.sf-grid .sf-card:nth-child(5) { animation-delay: .19s; }
+.sf-grid .sf-card:nth-child(6) { animation-delay: .23s; }
+.sf-grid .sf-card:nth-child(7) { animation-delay: .27s; }
+.sf-grid .sf-card:nth-child(n+8) { animation-delay: .3s; }
+
+/* 카드 썸네일 hover 줌 */
+.sf-thumb { overflow: hidden; }
+.sf-thumb-img { transition: transform .5s var(--ease); }
+.sf-card:hover .sf-thumb-img { transform: scale(1.07); }
+/* 이모지 썸네일도 hover시 살짝 커짐 */
+.sf-card:hover .sf-thumb { letter-spacing: 0; }
+.sf-card .sf-thumb { transition: background .3s; }
+
+/* 히어로 텍스트 순차 등장 */
+.sf-hero .sf-eyebrow { animation: sf-rise .5s var(--ease) both; }
+.sf-hero h1 { animation: sf-rise .6s var(--ease) .08s both; }
+.sf-hero p { animation: sf-rise .6s var(--ease) .16s both; }
+/* 배너 이미지 미세 줌/팬 (살아있는 느낌) */
+.sf-hero.has-img { animation: sf-hero-pan 9s ease-in-out infinite alternate; }
+
+/* 빈 상태 아이콘 둥실 */
+.sf-empty-ico { animation: sf-float 2.6s ease-in-out infinite; }
+
+/* 카테고리/정렬/툴바 부드럽게 등장 */
+.sf-toolbar { animation: sf-fade .5s var(--ease) both; }
+
+@media (prefers-reduced-motion: reduce) {
+  .sf-card, .sf-hero .sf-eyebrow, .sf-hero h1, .sf-hero p, .sf-hero.has-img,
+  .sf-empty-ico, .sf-toolbar { animation: none; }
+}

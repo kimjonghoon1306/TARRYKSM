@@ -147,7 +147,6 @@ export async function setStoreBranding(formData: FormData) {
 
   await supabase.from("stores").update(patch).eq("id", id);
   revalidatePath(`/dashboard/${id}`);
-  revalidatePath("/", "layout"); // 스토어프런트 갱신
   redirect(`/dashboard/${id}?brmsg=` + encodeURIComponent("상단 꾸미기를 저장했어요"));
 }
 

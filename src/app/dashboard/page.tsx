@@ -74,13 +74,13 @@ export default async function Overview({
       <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
         <Link href="/?studio=1" className={card + " lift transition hover:border-violet-400"}>
           <div className="text-2xl">🎨</div>
-          <div className="mt-2 text-sm font-semibold">스튜디오 열기</div>
-          <div className="text-xs text-neutral-500">스킨 디자인·미리보기</div>
-        </Link>
-        <Link href="/?studio=1" className={card + " lift transition hover:border-violet-400"}>
-          <div className="text-2xl">🏬</div>
           <div className="mt-2 text-sm font-semibold">쇼핑몰 만들기</div>
-          <div className="text-xs text-neutral-500">스튜디오에서 미리보며</div>
+          <div className="text-xs text-neutral-500">스튜디오에서 스킨 고르고 생성</div>
+        </Link>
+        <Link href="/dashboard/stores" className={card + " lift transition hover:border-violet-400"}>
+          <div className="text-2xl">🏬</div>
+          <div className="mt-2 text-sm font-semibold">내 쇼핑몰</div>
+          <div className="text-xs text-neutral-500">만든 매장 목록·관리</div>
         </Link>
         <Link href="/dashboard/products" className={card + " lift transition hover:border-violet-400"}>
           <div className="text-2xl">📦</div>
