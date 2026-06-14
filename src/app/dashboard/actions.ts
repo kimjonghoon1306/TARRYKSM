@@ -5,7 +5,6 @@ import { redirect } from "next/navigation";
 import { domainToASCII } from "node:url";
 import { createClient } from "@/lib/supabase/server";
 import { addDomainToVercel, removeDomainFromVercel } from "@/lib/vercel";
-import { uploadImageFile } from "@/lib/upload";
 import { slugify } from "@/lib/slug";
 import { SKIN_IDS } from "@/lib/skins";
 
@@ -119,7 +118,8 @@ export async function setStoreSlug(formData: FormData) {
   redirect(`${ret}?smsg=` + encodeURIComponent("주소를 변경했어요"));
 }
 
-// 상단 꾸미기 — 로고·대문배너 이미지 업로드 + 제목/문구 + 각 이미지 제거
+// 상단 꾸미기 — 이미지는 브라우저에서 Supabase로 직접 업로드되고, 여기선 URL만 저장
+// (Vercel 서버함수 4.5MB 요청한도 우회)
 export async function setStoreBranding(formData: FormData) {
   const supabase = await createClient();
   const {
@@ -129,23 +129,20 @@ export async function setStoreBranding(formData: FormData) {
   const id = String(formData.get("id") || "");
   if (!id) return;
 
+  const logoUrl = String(formData.get("logo_url") || "").trim() || null;
+  const heroUrl = String(formData.get("hero_url") || "").trim() || null;
   const heroTitle = String(formData.get("hero_title") || "").trim() || null;
   const heroSubtitle = String(formData.get("hero_subtitle") || "").trim() || null;
 
-  const patch: Record<string, unknown> = {
-    hero_title: heroTitle,
-    hero_subtitle: heroSubtitle,
-  };
-
-  const logo = await uploadImageFile(supabase, user.id, `${id}/logo`, formData.get("logo"));
-  if (logo) patch.logo_url = logo;
-  else if (String(formData.get("remove_logo") || "") === "1") patch.logo_url = null;
-
-  const hero = await uploadImageFile(supabase, user.id, `${id}/hero`, formData.get("hero"));
-  if (hero) patch.hero_image_url = hero;
-  else if (String(formData.get("remove_hero") || "") === "1") patch.hero_image_url = null;
-
-  await supabase.from("stores").update(patch).eq("id", id);
+  await supabase
+    .from("stores")
+    .update({
+      logo_url: logoUrl,
+      hero_image_url: heroUrl,
+      hero_title: heroTitle,
+      hero_subtitle: heroSubtitle,
+    })
+    .eq("id", id);
   revalidatePath(`/dashboard/${id}`);
   redirect(`/dashboard/${id}?brmsg=` + encodeURIComponent("상단 꾸미기를 저장했어요"));
 }

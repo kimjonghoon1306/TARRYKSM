@@ -1,6 +1,36 @@
+import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import Storefront, { type Product } from "../s/[slug]/Storefront";
+
+// 각 쇼핑몰 링크 공유 시: 가게 이름·로고(파비콘)·배너(미리보기 이미지)
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ slug: string }>;
+}): Promise<Metadata> {
+  const { slug } = await params;
+  const supabase = await createClient();
+  const { data } = await supabase
+    .from("stores")
+    .select("name,logo_url,hero_image_url,hero_subtitle")
+    .eq("slug", slug)
+    .eq("published", true)
+    .maybeSingle();
+  if (!data) return { title: "쇼핑몰" };
+  const img = data.hero_image_url || data.logo_url || undefined;
+  const desc = data.hero_subtitle || `${data.name} — ONJONGIL로 만든 쇼핑몰`;
+  return {
+    title: data.name,
+    description: desc,
+    openGraph: {
+      title: data.name,
+      description: desc,
+      images: img ? [img] : undefined,
+    },
+    icons: data.logo_url ? { icon: data.logo_url } : undefined,
+  };
+}
 
 type Store = {
   id: string;
