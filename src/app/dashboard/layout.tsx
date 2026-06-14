@@ -1,14 +1,15 @@
 import AdminShell from "@/components/AdminShell";
-import { createClient } from "@/lib/supabase/server";
+import { getMe } from "@/lib/role";
 
 export default async function DashboardLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
-  const supabase = await createClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
-  return <AdminShell email={user?.email ?? null}>{children}</AdminShell>;
+  const me = await getMe();
+  return (
+    <AdminShell email={me.email} role={me.role}>
+      {children}
+    </AdminShell>
+  );
 }

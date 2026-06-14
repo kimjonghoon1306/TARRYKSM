@@ -6,6 +6,8 @@ import { useState } from "react";
 import ThemeToggle from "./ThemeToggle";
 import { signout } from "@/app/auth/actions";
 
+type Role = "admin" | "founder";
+
 const NAV = [
   { href: "/dashboard", label: "개요", icon: "📊" },
   { href: "/dashboard/stores", label: "쇼핑몰", icon: "🏬" },
@@ -18,13 +20,16 @@ const NAV = [
 
 export default function AdminShell({
   email,
+  role = "founder",
   children,
 }: {
   email: string | null;
+  role?: Role;
   children: React.ReactNode;
 }) {
   const path = usePathname();
   const [open, setOpen] = useState(false);
+  const isAdmin = role === "admin";
 
   const Side = (
     <>
@@ -34,9 +39,23 @@ export default function AdminShell({
         </span>
         <span className="leading-tight">
           <b className="block text-sm tracking-tight text-neutral-900 dark:text-white">ONJONGIL</b>
-          <i className="block text-[11px] not-italic text-neutral-400">CONTROL TOWER</i>
+          <i className="block text-[11px] not-italic text-neutral-400">
+            {isAdmin ? "CONTROL TOWER" : "STORE ADMIN"}
+          </i>
         </span>
       </Link>
+
+      {/* 역할 배지 */}
+      <div
+        className={
+          "mt-3 inline-flex w-fit items-center gap-1.5 rounded-full px-2.5 py-1 text-[11px] font-bold " +
+          (isAdmin
+            ? "bg-violet-500/15 text-violet-600 dark:text-violet-300"
+            : "bg-emerald-500/15 text-emerald-600 dark:text-emerald-300")
+        }
+      >
+        {isAdmin ? "👑 플랫폼 관리자" : "🏪 창업자"}
+      </div>
 
       <Link
         href="/?studio=1"
@@ -66,6 +85,27 @@ export default function AdminShell({
             </Link>
           );
         })}
+
+        {/* 플랫폼 관리자 전용 */}
+        {isAdmin && (
+          <>
+            <span className="mt-3 px-2 pb-1 text-[10px] font-bold tracking-widest text-neutral-400">
+              플랫폼
+            </span>
+            <Link
+              href="/dashboard/platform"
+              onClick={() => setOpen(false)}
+              className={
+                "flex items-center gap-2.5 rounded-xl px-3 py-2.5 text-sm font-medium transition " +
+                (path.startsWith("/dashboard/platform")
+                  ? "bg-violet-500/12 text-violet-600 dark:bg-violet-500/15 dark:text-violet-300"
+                  : "text-neutral-600 hover:bg-black/5 dark:text-neutral-300 dark:hover:bg-white/5")
+              }
+            >
+              <span>🛰️</span> 전체 관리
+            </Link>
+          </>
+        )}
       </nav>
 
       <div className="mt-auto space-y-2 pt-5">
