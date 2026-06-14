@@ -41,8 +41,11 @@
 /* 카테고리 레일 */
 .st-rail{display:flex;gap:9px;padding:18px 22px 4px;overflow-x:auto}
 .st-rail::-webkit-scrollbar{height:0}
-.rail-chip{flex-shrink:0;font-size:12px;font-weight:600;padding:8px 16px;border-radius:99px;border:1px solid var(--s-line);color:var(--s-sub);white-space:nowrap}
+.rail-chip{flex-shrink:0;font-size:12px;font-weight:600;padding:8px 16px;border-radius:99px;border:1px solid var(--s-line);color:var(--s-sub);white-space:nowrap;cursor:pointer;transition:transform .16s var(--ease),color .16s,border-color .16s,background .16s,box-shadow .16s}
+.rail-chip:hover{color:var(--s-ink);border-color:var(--s-brand);transform:translateY(-2px);box-shadow:0 6px 14px -8px var(--s-brand)}
+.rail-chip:active{transform:translateY(0) scale(.96)}
 .rail-chip.on{background:var(--s-brand);color:var(--s-brand-ink);border-color:transparent}
+.rail-chip.on:hover{filter:brightness(1.05)}
 
 /* 진열대 */
 .st-shelf{padding:18px 22px 26px}

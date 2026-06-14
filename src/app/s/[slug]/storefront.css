@@ -64,9 +64,11 @@
 
 .sf-wrap { max-width: 1080px; margin: 0 auto; padding: 8px 18px 80px; }
 .sf-cats { display: flex; flex-wrap: wrap; gap: 8px; padding: 14px 0 20px; }
-.sf-chip { padding: 8px 15px; border: 1px solid var(--s-line); border-radius: var(--s-rpill); background: var(--s-surf); color: var(--s-sub); font-size: 13px; font-weight: 600; cursor: pointer; transition: .18s var(--ease); }
-.sf-chip:hover { color: var(--s-ink); }
+.sf-chip { padding: 8px 15px; border: 1px solid var(--s-line); border-radius: var(--s-rpill); background: var(--s-surf); color: var(--s-sub); font-size: 13px; font-weight: 600; cursor: pointer; transition: transform .16s var(--ease), color .16s, border-color .16s, background .16s, box-shadow .16s; }
+.sf-chip:hover { color: var(--s-ink); border-color: var(--s-brand); transform: translateY(-2px); box-shadow: 0 6px 14px -8px var(--s-brand); }
+.sf-chip:active { transform: translateY(0) scale(.96); }
 .sf-chip.on { background: var(--s-brand); color: var(--s-brand-ink); border-color: var(--s-brand); }
+.sf-chip.on:hover { filter: brightness(1.05); }
 
 .sf-grid { display: grid; gap: 16px; grid-template-columns: repeat(2, 1fr); }
 @media (min-width: 640px) { .sf-grid { grid-template-columns: repeat(3, 1fr); } }
