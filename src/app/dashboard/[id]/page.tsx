@@ -1,6 +1,8 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
+import { domainToUnicode } from "node:url";
 import { createClient } from "@/lib/supabase/server";
+import { setStoreDomain } from "../actions";
 
 type Store = {
   id: string;
@@ -8,18 +10,22 @@ type Store = {
   skin: string;
   slug: string;
   published: boolean;
+  custom_domain: string | null;
 };
 
 export default async function StoreAdmin({
   params,
+  searchParams,
 }: {
   params: Promise<{ id: string }>;
+  searchParams: Promise<{ dmsg?: string; derr?: string }>;
 }) {
   const { id } = await params;
+  const { dmsg, derr } = await searchParams;
   const supabase = await createClient();
   const { data: store } = await supabase
     .from("stores")
-    .select("id,name,skin,slug,published")
+    .select("id,name,skin,slug,published,custom_domain")
     .eq("id", id)
     .maybeSingle();
   if (!store) notFound();
@@ -54,11 +60,70 @@ export default async function StoreAdmin({
       </div>
 
       <section className={card + " mt-6"}>
-        <div className="mb-1 text-xs font-semibold text-neutral-500">주소</div>
+        <div className="mb-1 text-xs font-semibold text-neutral-500">기본 주소 (서브도메인)</div>
         <div className="break-all font-mono text-sm">
           {s.slug}.{root}
         </div>
-        <div className="mt-1 text-xs text-neutral-400">본인 도메인 연결은 추후 지원 예정</div>
+      </section>
+
+      {/* 커스텀 도메인 */}
+      <section className={card + " mt-4"}>
+        <h2 className="mb-1 font-semibold">🌐 내 도메인 연결</h2>
+        <p className="mb-4 text-xs text-neutral-500">
+          보유한 도메인을 이 쇼핑몰에 연결하세요. (예: shop.mybrand.com 또는 mybrand.com)
+        </p>
+
+        {dmsg && (
+          <p className="mb-3 rounded-lg bg-emerald-500/10 px-3 py-2 text-sm text-emerald-600 dark:text-emerald-400">{dmsg}</p>
+        )}
+        {derr && (
+          <p className="mb-3 rounded-lg bg-rose-500/10 px-3 py-2 text-sm text-rose-600 dark:text-rose-400">{derr}</p>
+        )}
+
+        <form action={setStoreDomain} className="flex flex-wrap items-end gap-3">
+          <input type="hidden" name="id" value={s.id} />
+          <div className="min-w-[220px] flex-1">
+            <label className="mb-1.5 block text-xs font-semibold text-neutral-500">도메인</label>
+            <input
+              name="custom_domain"
+              defaultValue={s.custom_domain || ""}
+              placeholder="shop.mybrand.com"
+              className="w-full rounded-xl border border-black/10 bg-white px-4 py-2.5 text-sm outline-none focus:border-violet-500 focus:ring-2 focus:ring-violet-500/25 dark:border-white/10 dark:bg-white/[0.04]"
+            />
+          </div>
+          <button className="rounded-xl bg-gradient-to-r from-violet-500 to-pink-500 px-5 py-2.5 text-sm font-semibold text-white shadow-lg shadow-violet-500/25 transition hover:brightness-105">
+            저장
+          </button>
+        </form>
+
+        {s.custom_domain && (
+          <div className="mt-5 rounded-xl border border-black/5 bg-black/[0.02] p-4 text-sm dark:border-white/10 dark:bg-white/[0.03]">
+            <div className="mb-2 font-semibold">
+              연결됨:{" "}
+              <span className="font-mono text-violet-500">{domainToUnicode(s.custom_domain)}</span>
+              {domainToUnicode(s.custom_domain) !== s.custom_domain && (
+                <span className="ml-2 font-mono text-xs text-neutral-400">({s.custom_domain})</span>
+              )}
+            </div>
+            <p className="mb-3 text-xs text-neutral-500">
+              아래 DNS 레코드를 도메인 등록업체(가비아·후이즈·Cloudflare 등)에 추가하면 연결됩니다.
+              SSL(https)은 자동 발급돼요.
+            </p>
+            <div className="space-y-2 font-mono text-xs">
+              <div className="rounded-lg bg-black/[0.04] p-3 dark:bg-white/[0.05]">
+                <div className="text-neutral-400">서브도메인(shop.mybrand.com)인 경우 — CNAME</div>
+                <div>유형 CNAME · 이름 {hostLabel(s.custom_domain)} · 값 cname.vercel-dns.com</div>
+              </div>
+              <div className="rounded-lg bg-black/[0.04] p-3 dark:bg-white/[0.05]">
+                <div className="text-neutral-400">최상위 도메인(mybrand.com)인 경우 — A</div>
+                <div>유형 A · 이름 @ · 값 76.76.21.21</div>
+              </div>
+            </div>
+            <p className="mt-3 text-xs text-neutral-400">
+              ⚠️ DNS 추가 후, 플랫폼 관리자가 Vercel 프로젝트에 이 도메인을 등록해야 SSL이 발급됩니다.
+            </p>
+          </div>
+        )}
       </section>
 
       <div className="mt-4 grid gap-4 sm:grid-cols-3">
@@ -70,6 +135,12 @@ export default async function StoreAdmin({
       </div>
     </div>
   );
+}
+
+// CNAME 이름 칸에 넣을 라벨 (도메인의 첫 마디). 최상위 도메인이면 '@'.
+function hostLabel(domain: string) {
+  const parts = domain.split(".");
+  return parts.length > 2 ? parts[0] : "@";
 }
 
 function ManageCard({
