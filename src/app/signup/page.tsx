@@ -1,5 +1,7 @@
 import Link from "next/link";
+import { redirect } from "next/navigation";
 import { signup } from "@/app/auth/actions";
+import { createClient } from "@/lib/supabase/server";
 import AuthShell from "@/components/AuthShell";
 import Field from "@/components/Field";
 
@@ -9,6 +11,11 @@ export default async function SignupPage({
   searchParams: Promise<{ error?: string }>;
 }) {
   const sp = await searchParams;
+  const supabase = await createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+  if (user) redirect("/dashboard");
   return (
     <AuthShell
       title="회원가입"

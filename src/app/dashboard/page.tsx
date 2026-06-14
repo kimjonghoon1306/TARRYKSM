@@ -66,10 +66,10 @@ export default async function Overview() {
           <div className="mt-2 text-sm font-semibold">스튜디오 열기</div>
           <div className="text-xs text-neutral-500">스킨 디자인·미리보기</div>
         </Link>
-        <Link href="/dashboard/stores" className={card + " lift transition hover:border-violet-400"}>
+        <Link href="/?studio=1" className={card + " lift transition hover:border-violet-400"}>
           <div className="text-2xl">🏬</div>
           <div className="mt-2 text-sm font-semibold">쇼핑몰 만들기</div>
-          <div className="text-xs text-neutral-500">새 매장 발급</div>
+          <div className="text-xs text-neutral-500">스튜디오에서 미리보며</div>
         </Link>
         <Link href="/dashboard/products" className={card + " lift transition hover:border-violet-400"}>
           <div className="text-2xl">📦</div>
@@ -93,8 +93,8 @@ export default async function Overview() {
       {list.length === 0 ? (
         <div className="rounded-2xl border border-dashed border-black/10 py-16 text-center text-sm text-neutral-400 dark:border-white/10">
           아직 만든 쇼핑몰이 없어요.{" "}
-          <Link href="/dashboard/stores" className="font-semibold text-violet-500 underline">
-            지금 만들기
+          <Link href="/?studio=1" className="font-semibold text-violet-500 underline">
+            스튜디오에서 만들기
           </Link>
         </div>
       ) : (

@@ -31,6 +31,36 @@ export async function createStore(formData: FormData) {
   revalidatePath("/dashboard");
 }
 
+// 스튜디오에서 고른 스킨 + 이름으로 생성 후 그 몰 관리로 이동
+export async function createStoreOpen(formData: FormData) {
+  const supabase = await createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+  if (!user) redirect("/login");
+
+  const name = String(formData.get("name") || "").trim();
+  let skin = String(formData.get("skin") || "mono");
+  if (!SKIN_IDS.includes(skin)) skin = "mono";
+  if (!name) redirect(`/dashboard/stores/new?skin=${skin}&err=1`);
+
+  const base = slugify(name) || "store";
+  let slug = base;
+  for (let i = 0; i < 6; i++) {
+    const { data } = await supabase.from("stores").select("id").eq("slug", slug).maybeSingle();
+    if (!data) break;
+    slug = `${base}-${Math.random().toString(36).slice(2, 6)}`;
+  }
+
+  const { data: created } = await supabase
+    .from("stores")
+    .insert({ name, skin, slug })
+    .select("id")
+    .single();
+  revalidatePath("/dashboard");
+  redirect(created?.id ? `/dashboard/${created.id}` : "/dashboard/stores");
+}
+
 export async function deleteStore(formData: FormData) {
   const supabase = await createClient();
   const id = String(formData.get("id") || "");

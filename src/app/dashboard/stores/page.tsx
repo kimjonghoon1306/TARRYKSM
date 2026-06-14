@@ -1,7 +1,6 @@
 import Link from "next/link";
 import { createClient } from "@/lib/supabase/server";
-import { createStore, deleteStore } from "../actions";
-import { SKINS } from "@/lib/skins";
+import { deleteStore } from "../actions";
 
 type Store = { id: string; name: string; skin: string; slug: string };
 
@@ -22,35 +21,25 @@ export default async function StoresPage() {
       <h1 className="text-2xl font-bold sm:text-3xl">쇼핑몰</h1>
       <p className="mt-1 text-sm text-neutral-500">매장을 만들고 관리하세요</p>
 
-      <section className={card + " mt-6"}>
-        <h2 className="mb-4 text-lg font-semibold">새 쇼핑몰 만들기</h2>
-        <form action={createStore} className="flex flex-wrap items-end gap-3">
-          <div className="min-w-[200px] flex-1">
-            <label className="mb-1.5 block text-xs font-semibold text-neutral-500">쇼핑몰 이름</label>
-            <input
-              name="name"
-              required
-              placeholder="예: OBJECT, ZEST"
-              className="w-full rounded-xl border border-black/10 bg-white px-4 py-2.5 text-sm outline-none focus:border-violet-500 focus:ring-2 focus:ring-violet-500/25 dark:border-white/10 dark:bg-white/[0.04]"
-            />
+      {/* 생성은 스튜디오에서 (미리보기 보며 스킨 선택) */}
+      <Link
+        href="/?studio=1"
+        className={
+          card +
+          " lift mt-6 flex items-center gap-4 transition hover:border-violet-400"
+        }
+      >
+        <span className="grid h-12 w-12 flex-none place-items-center rounded-xl bg-gradient-to-br from-violet-500 to-pink-500 text-2xl">
+          🎨
+        </span>
+        <div>
+          <div className="font-semibold">＋ 새 쇼핑몰 만들기</div>
+          <div className="text-sm text-neutral-500">
+            스튜디오에서 14가지 스킨을 미리보며 고르고 만드세요
           </div>
-          <div className="min-w-[150px]">
-            <label className="mb-1.5 block text-xs font-semibold text-neutral-500">스킨</label>
-            <select
-              name="skin"
-              defaultValue="mono"
-              className="w-full rounded-xl border border-black/10 bg-white px-4 py-2.5 text-sm outline-none focus:border-violet-500 dark:border-white/10 dark:bg-white/[0.04]"
-            >
-              {SKINS.map((s) => (
-                <option key={s.id} value={s.id}>{s.name}</option>
-              ))}
-            </select>
-          </div>
-          <button className="rounded-xl bg-gradient-to-r from-violet-500 to-pink-500 px-5 py-2.5 text-sm font-semibold text-white shadow-lg shadow-violet-500/25 transition hover:brightness-105">
-            ＋ 만들기
-          </button>
-        </form>
-      </section>
+        </div>
+        <span className="ml-auto text-violet-500">→</span>
+      </Link>
 
       <h2 className="mb-4 mt-8 text-lg font-semibold">내 쇼핑몰 ({list.length})</h2>
       {list.length === 0 ? (

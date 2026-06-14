@@ -12,8 +12,17 @@ window.currentUserObj = null;
 window.openAuth = function () { location.href = '/login'; };
 window.openAdmin = function () { location.href = '/dashboard'; };
 
-/* 새 쇼핑몰 만들기 / 스킨 사용하기 → 관리자 로그인 (구경만, 관리는 로그인 후) */
-window.openCreate = function () { location.href = '/login'; };
+/* 새 쇼핑몰 만들기 / "이 스킨으로 제작하기" → 그 스킨으로 만들기 화면으로.
+   현재 미리보기 중인 스킨을 넘겨서 대시보드에서 이름만 입력하면 생성됨.
+   (로그인 안 했으면 /dashboard 게이트가 알아서 /login으로 보냄) */
+window.openCreate = function (skin) {
+  var s =
+    skin ||
+    (document.querySelector('.ps-swatch') &&
+      document.querySelector('.ps-swatch').getAttribute('data-skin')) ||
+    'mono';
+  location.href = '/dashboard/stores/new?skin=' + encodeURIComponent(s);
+};
 
 /* app.js init이 호출 — 인페이지 인증 없음 */
 window.initAuth = function () {};

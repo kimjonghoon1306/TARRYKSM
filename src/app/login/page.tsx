@@ -1,5 +1,7 @@
 import Link from "next/link";
+import { redirect } from "next/navigation";
 import { login } from "@/app/auth/actions";
+import { createClient } from "@/lib/supabase/server";
 import AuthShell from "@/components/AuthShell";
 import Field from "@/components/Field";
 
@@ -9,6 +11,12 @@ export default async function LoginPage({
   searchParams: Promise<{ error?: string; msg?: string }>;
 }) {
   const sp = await searchParams;
+  // 이미 로그인된 사용자는 대시보드로 (로그인 화면 재노출 방지)
+  const supabase = await createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+  if (user) redirect("/dashboard");
   return (
     <AuthShell
       title="로그인"
