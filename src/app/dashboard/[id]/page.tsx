@@ -2,7 +2,7 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { domainToUnicode } from "node:url";
 import { createClient } from "@/lib/supabase/server";
-import { setStoreDomain, togglePublish, setStoreSlug } from "../actions";
+import { setStoreDomain, togglePublish, setStoreSlug, setStoreBranding } from "../actions";
 import { PRIMARY_DOMAIN } from "@/lib/domains";
 import DomainHelp from "@/components/DomainHelp";
 
@@ -13,6 +13,10 @@ type Store = {
   slug: string;
   published: boolean;
   custom_domain: string | null;
+  logo_url: string | null;
+  hero_image_url: string | null;
+  hero_title: string | null;
+  hero_subtitle: string | null;
 };
 
 export default async function StoreAdmin({
@@ -20,14 +24,14 @@ export default async function StoreAdmin({
   searchParams,
 }: {
   params: Promise<{ id: string }>;
-  searchParams: Promise<{ dmsg?: string; derr?: string; smsg?: string; serr?: string }>;
+  searchParams: Promise<{ dmsg?: string; derr?: string; smsg?: string; serr?: string; brmsg?: string }>;
 }) {
   const { id } = await params;
-  const { dmsg, derr, smsg, serr } = await searchParams;
+  const { dmsg, derr, smsg, serr, brmsg } = await searchParams;
   const supabase = await createClient();
   const { data: store } = await supabase
     .from("stores")
-    .select("id,name,skin,slug,published,custom_domain")
+    .select("id,name,skin,slug,published,custom_domain,logo_url,hero_image_url,hero_title,hero_subtitle")
     .eq("id", id)
     .maybeSingle();
   if (!store) notFound();
@@ -99,6 +103,78 @@ export default async function StoreAdmin({
           >
             {s.published ? "비공개로 전환" : "🚀 발행하기"}
           </button>
+        </form>
+      </section>
+
+      {/* 상단 꾸미기 — 로고·대문배너·제목 */}
+      <section className={card + " mt-4"}>
+        <h2 className="mb-1 font-semibold">🎨 상단 꾸미기</h2>
+        <p className="mb-4 text-xs text-neutral-500">
+          내 로고와 대문 배너 이미지, 문구를 넣어 쇼핑몰 첫인상을 꾸미세요.
+        </p>
+        {brmsg && (
+          <p className="mb-3 rounded-lg bg-emerald-500/10 px-3 py-2 text-sm text-emerald-600 dark:text-emerald-400">{brmsg}</p>
+        )}
+        <form action={setStoreBranding} className="grid gap-4 sm:grid-cols-2">
+          <input type="hidden" name="id" value={s.id} />
+
+          {/* 로고 */}
+          <div>
+            <label className="mb-1.5 block text-xs font-semibold text-neutral-500">로고 (없으면 상호명 표시)</label>
+            <div className="flex items-center gap-3">
+              <div className="grid h-12 w-12 flex-none place-items-center overflow-hidden rounded-lg bg-black/[0.04] text-lg dark:bg-white/[0.06]">
+                {s.logo_url ? (
+                  // eslint-disable-next-line @next/next/no-img-element
+                  <img src={s.logo_url} alt="" className="h-full w-full object-contain" />
+                ) : "🏷️"}
+              </div>
+              <input name="logo" type="file" accept="image/*"
+                className="flex-1 rounded-lg border border-black/10 bg-white px-3 py-2 text-xs text-neutral-600 outline-none file:mr-2 file:rounded file:border-0 file:bg-violet-500 file:px-2 file:py-1 file:text-xs file:font-semibold file:text-white dark:border-white/10 dark:bg-white/[0.04] dark:text-neutral-300" />
+            </div>
+            {s.logo_url && (
+              <label className="mt-1.5 flex items-center gap-1.5 text-xs text-neutral-400">
+                <input type="checkbox" name="remove_logo" value="1" /> 로고 제거
+              </label>
+            )}
+          </div>
+
+          {/* 대문 배너 */}
+          <div>
+            <label className="mb-1.5 block text-xs font-semibold text-neutral-500">대문 배너 이미지</label>
+            <div className="flex items-center gap-3">
+              <div className="grid h-12 w-20 flex-none place-items-center overflow-hidden rounded-lg bg-black/[0.04] text-lg dark:bg-white/[0.06]">
+                {s.hero_image_url ? (
+                  // eslint-disable-next-line @next/next/no-img-element
+                  <img src={s.hero_image_url} alt="" className="h-full w-full object-cover" />
+                ) : "🖼️"}
+              </div>
+              <input name="hero" type="file" accept="image/*"
+                className="flex-1 rounded-lg border border-black/10 bg-white px-3 py-2 text-xs text-neutral-600 outline-none file:mr-2 file:rounded file:border-0 file:bg-violet-500 file:px-2 file:py-1 file:text-xs file:font-semibold file:text-white dark:border-white/10 dark:bg-white/[0.04] dark:text-neutral-300" />
+            </div>
+            {s.hero_image_url && (
+              <label className="mt-1.5 flex items-center gap-1.5 text-xs text-neutral-400">
+                <input type="checkbox" name="remove_hero" value="1" /> 배너 제거
+              </label>
+            )}
+          </div>
+
+          {/* 제목/문구 */}
+          <div className="sm:col-span-2">
+            <label className="mb-1.5 block text-xs font-semibold text-neutral-500">대문 제목</label>
+            <input name="hero_title" defaultValue={s.hero_title || ""} placeholder={s.name}
+              className="w-full rounded-xl border border-black/10 bg-white px-4 py-2.5 text-sm outline-none focus:border-violet-500 focus:ring-2 focus:ring-violet-500/25 dark:border-white/10 dark:bg-white/[0.04]" />
+          </div>
+          <div className="sm:col-span-2">
+            <label className="mb-1.5 block text-xs font-semibold text-neutral-500">대문 문구</label>
+            <input name="hero_subtitle" defaultValue={s.hero_subtitle || ""} placeholder="엄선한 상품을 한 곳에. 지금 둘러보세요."
+              className="w-full rounded-xl border border-black/10 bg-white px-4 py-2.5 text-sm outline-none focus:border-violet-500 focus:ring-2 focus:ring-violet-500/25 dark:border-white/10 dark:bg-white/[0.04]" />
+          </div>
+
+          <div className="sm:col-span-2">
+            <button className="press-glow rounded-xl bg-gradient-to-r from-violet-500 to-pink-500 px-5 py-2.5 text-sm font-semibold text-white shadow-lg shadow-violet-500/25 transition hover:brightness-105 active:scale-[.98]">
+              상단 꾸미기 저장
+            </button>
+          </div>
         </form>
       </section>
 

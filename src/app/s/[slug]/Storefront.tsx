@@ -12,10 +12,25 @@ export type Product = {
   price: number;
   category: string | null;
   description: string | null;
+  tag: string | null;
 };
-type Store = { name: string; skin: string };
+type Store = {
+  name: string;
+  skin: string;
+  logo_url?: string | null;
+  hero_image_url?: string | null;
+  hero_title?: string | null;
+  hero_subtitle?: string | null;
+};
 
 const won = (n: number) => "₩" + n.toLocaleString("ko-KR");
+
+const SORTS = [
+  { id: "recommend", label: "추천" },
+  { id: "low", label: "낮은가격" },
+  { id: "high", label: "높은가격" },
+  { id: "name", label: "이름순" },
+];
 
 export default function Storefront({
   store,
@@ -29,6 +44,9 @@ export default function Storefront({
   const [detailQty, setDetailQty] = useState(1);
   const [cartOpen, setCartOpen] = useState(false);
   const [activeCat, setActiveCat] = useState("전체");
+  const [sort, setSort] = useState("recommend");
+  const [q, setQ] = useState("");
+  const [searchOn, setSearchOn] = useState(false);
   const [toast, setToast] = useState("");
 
   const cats = useMemo(() => {
@@ -37,15 +55,23 @@ export default function Storefront({
     return ["전체", ...Array.from(set)];
   }, [products]);
 
-  const shown = useMemo(
-    () => (activeCat === "전체" ? products : products.filter((p) => p.category === activeCat)),
-    [products, activeCat]
-  );
+  const shown = useMemo(() => {
+    let list = activeCat === "전체" ? products : products.filter((p) => p.category === activeCat);
+    if (q.trim()) {
+      const k = q.trim().toLowerCase();
+      list = list.filter(
+        (p) => p.name.toLowerCase().includes(k) || (p.brand || "").toLowerCase().includes(k)
+      );
+    }
+    const arr = [...list];
+    if (sort === "low") arr.sort((a, b) => a.price - b.price);
+    else if (sort === "high") arr.sort((a, b) => b.price - a.price);
+    else if (sort === "name") arr.sort((a, b) => a.name.localeCompare(b.name, "ko"));
+    return arr;
+  }, [products, activeCat, q, sort]);
 
   const cartCount = Object.values(cart).reduce((a, b) => a + b, 0);
-  const cartLines = products
-    .filter((p) => cart[p.id])
-    .map((p) => ({ ...p, qty: cart[p.id] }));
+  const cartLines = products.filter((p) => cart[p.id]).map((p) => ({ ...p, qty: cart[p.id] }));
   const total = cartLines.reduce((sum, l) => sum + l.price * l.qty, 0);
 
   function flash(msg: string) {
@@ -69,48 +95,103 @@ export default function Storefront({
     setDetailQty(1);
   }
 
+  const heroTitle = store.hero_title || store.name;
+  const heroSub = store.hero_subtitle || "엄선한 상품을 한 곳에. 지금 둘러보세요.";
+
   return (
     <div className="sf" data-skin={store.skin}>
       {/* 헤더 */}
       <header className="sf-bar">
-        <span className="sf-logo">{store.name}</span>
-        <button className="sf-cart-btn" onClick={() => setCartOpen(true)}>
-          🛒 장바구니
-          {cartCount > 0 && <span className="sf-cart-badge">{cartCount}</span>}
-        </button>
+        {store.logo_url ? (
+          // eslint-disable-next-line @next/next/no-img-element
+          <img src={store.logo_url} alt={store.name} className="sf-logo-img" />
+        ) : (
+          <span className="sf-logo">{store.name}</span>
+        )}
+        <div className="sf-bar-tools">
+          <button className="sf-icon-btn" aria-label="검색" onClick={() => setSearchOn((v) => !v)}>
+            🔍
+          </button>
+          <button className="sf-cart-btn" onClick={() => setCartOpen(true)}>
+            🛒 장바구니
+            {cartCount > 0 && <span className="sf-cart-badge">{cartCount}</span>}
+          </button>
+        </div>
       </header>
 
-      {/* 히어로 */}
-      <section className="sf-hero">
-        <div className="sf-eyebrow">NEW ARRIVALS</div>
-        <h1>{store.name}</h1>
-        <p>엄선한 상품을 한 곳에. 지금 둘러보세요.</p>
+      {/* 검색바 */}
+      {searchOn && (
+        <div className="sf-searchbar">
+          <input
+            autoFocus
+            value={q}
+            onChange={(e) => setQ(e.target.value)}
+            placeholder="상품 검색…"
+          />
+          {q && <button onClick={() => setQ("")}>✕</button>}
+        </div>
+      )}
+
+      {/* 히어로 (배너 이미지 or 그라데이션) */}
+      <section
+        className={"sf-hero" + (store.hero_image_url ? " has-img" : "")}
+        style={store.hero_image_url ? { backgroundImage: `url(${store.hero_image_url})` } : undefined}
+      >
+        <div className="sf-hero-inner">
+          <div className="sf-eyebrow">NEW ARRIVALS</div>
+          <h1>{heroTitle}</h1>
+          <p>{heroSub}</p>
+        </div>
       </section>
 
       <div className="sf-wrap">
-        {/* 카테고리 */}
-        {products.length > 0 && cats.length > 1 && (
-          <div className="sf-cats">
-            {cats.map((c) => (
-              <button
-                key={c}
-                className={"sf-chip" + (c === activeCat ? " on" : "")}
-                onClick={() => setActiveCat(c)}
-              >
-                {c}
-              </button>
-            ))}
+        {/* 카테고리 + 정렬 */}
+        {products.length > 0 && (
+          <div className="sf-toolbar">
+            <div className="sf-cats">
+              {cats.map((c) => (
+                <button
+                  key={c}
+                  className={"sf-chip" + (c === activeCat ? " on" : "")}
+                  onClick={() => setActiveCat(c)}
+                >
+                  {c}
+                </button>
+              ))}
+            </div>
+            <div className="sf-sorts">
+              {SORTS.map((s) => (
+                <button
+                  key={s.id}
+                  className={"sf-sort" + (s.id === sort ? " on" : "")}
+                  onClick={() => setSort(s.id)}
+                >
+                  {s.label}
+                </button>
+              ))}
+            </div>
           </div>
         )}
 
         {/* 그리드 */}
         {products.length === 0 ? (
-          <div className="sf-empty">아직 등록된 상품이 없어요.</div>
+          <div className="sf-empty">
+            <div className="sf-empty-ico">🛍️</div>
+            <b>곧 만나요</b>
+            <span>상품을 준비 중이에요.</span>
+          </div>
+        ) : shown.length === 0 ? (
+          <div className="sf-empty">
+            <div className="sf-empty-ico">🔍</div>
+            <b>검색 결과가 없어요</b>
+            <span>다른 키워드로 찾아보세요.</span>
+          </div>
         ) : (
           <div className="sf-grid">
             {shown.map((p) => (
               <div key={p.id} className="sf-card" onClick={() => openDetail(p)}>
                 <div className="sf-thumb">
+                  {p.tag && <span className="sf-tag">{p.tag}</span>}
                   {p.image_url ? (
                     // eslint-disable-next-line @next/next/no-img-element
                     <img src={p.image_url} alt={p.name} className="sf-thumb-img" />
@@ -121,16 +202,18 @@ export default function Storefront({
                 <div className="sf-meta">
                   {p.brand && <div className="sf-brand">{p.brand}</div>}
                   <div className="sf-name">{p.name}</div>
-                  <div className="sf-price">{won(p.price)}</div>
-                  <button
-                    className="sf-add"
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      add(p);
-                    }}
-                  >
-                    담기
-                  </button>
+                  <div className="sf-bottom">
+                    <div className="sf-price">{won(p.price)}</div>
+                    <button
+                      className="sf-add"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        add(p);
+                      }}
+                    >
+                      담기
+                    </button>
+                  </div>
                 </div>
               </div>
             ))}
@@ -143,15 +226,10 @@ export default function Storefront({
       </div>
 
       {/* 상세 시트 */}
-      <div
-        className={"sf-scrim" + (detail ? " on" : "")}
-        onClick={() => setDetail(null)}
-      />
+      <div className={"sf-scrim" + (detail ? " on" : "")} onClick={() => setDetail(null)} />
       {detail && (
         <div className="sf-sheet on" role="dialog">
-          <button className="sf-x" onClick={() => setDetail(null)}>
-            ✕
-          </button>
+          <button className="sf-x" onClick={() => setDetail(null)}>✕</button>
           <div className="sf-sheet-img">
             {detail.image_url ? (
               // eslint-disable-next-line @next/next/no-img-element
@@ -163,26 +241,14 @@ export default function Storefront({
           <div className="sf-sheet-body">
             {detail.brand && <div className="sf-brand">{detail.brand}</div>}
             <h2>{detail.name}</h2>
-            <div className="sf-sheet-desc">
-              {detail.description || "정성껏 준비한 상품입니다."}
-            </div>
-            <div
-              style={{
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "space-between",
-                gap: 14,
-                flexWrap: "wrap",
-              }}
-            >
+            <div className="sf-sheet-desc">{detail.description || "정성껏 준비한 상품입니다."}</div>
+            <div className="sf-sheet-buy">
               <div className="sf-qty">
                 <button onClick={() => setDetailQty((q) => Math.max(1, q - 1))}>−</button>
                 <span>{detailQty}</span>
                 <button onClick={() => setDetailQty((q) => q + 1)}>+</button>
               </div>
-              <div className="sf-price" style={{ fontSize: 20 }}>
-                {won(detail.price * detailQty)}
-              </div>
+              <div className="sf-price" style={{ fontSize: 20 }}>{won(detail.price * detailQty)}</div>
             </div>
             <button
               className="sf-add"
@@ -199,16 +265,11 @@ export default function Storefront({
       )}
 
       {/* 카트 드로어 */}
-      <div
-        className={"sf-scrim" + (cartOpen ? " on" : "")}
-        onClick={() => setCartOpen(false)}
-      />
+      <div className={"sf-scrim" + (cartOpen ? " on" : "")} onClick={() => setCartOpen(false)} />
       <aside className={"sf-drawer" + (cartOpen ? " on" : "")}>
         <div className="sf-drawer-head">
           <b>장바구니</b>
-          <button className="sf-x" style={{ position: "static" }} onClick={() => setCartOpen(false)}>
-            ✕
-          </button>
+          <button className="sf-x" style={{ position: "static" }} onClick={() => setCartOpen(false)}>✕</button>
         </div>
         <div className="sf-drawer-body">
           {cartLines.length === 0 ? (
