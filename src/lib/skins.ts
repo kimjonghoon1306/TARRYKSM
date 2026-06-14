@@ -19,3 +19,7 @@ export const SKINS: Skin[] = [
 ];
 
 export const SKIN_IDS = SKINS.map((s) => s.id);
+
+export const SKIN_BY_ID: Record<string, Skin> = Object.fromEntries(
+  SKINS.map((s) => [s.id, s])
+);

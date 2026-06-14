@@ -7,7 +7,12 @@ import ThemeToggle from "./ThemeToggle";
 import { signout } from "@/app/auth/actions";
 
 const NAV = [
-  { href: "/dashboard", label: "쇼핑몰", icon: "🏬" },
+  { href: "/dashboard", label: "개요", icon: "📊" },
+  { href: "/dashboard/stores", label: "쇼핑몰", icon: "🏬" },
+  { href: "/dashboard/products", label: "상품", icon: "📦" },
+  { href: "/dashboard/orders", label: "주문", icon: "🧾" },
+  { href: "/dashboard/customers", label: "고객", icon: "👤" },
+  { href: "/dashboard/analytics", label: "분석", icon: "📈" },
   { href: "/dashboard/settings", label: "계정 설정", icon: "⚙️" },
 ];
 
@@ -43,7 +48,8 @@ export default function AdminShell({
       <nav className="mt-5 flex flex-col gap-1">
         <span className="px-2 pb-1 text-[10px] font-bold tracking-widest text-neutral-400">관리</span>
         {NAV.map((n) => {
-          const active = path === n.href;
+          const active =
+            n.href === "/dashboard" ? path === n.href : path.startsWith(n.href);
           return (
             <Link
               key={n.href}

@@ -1,94 +1,105 @@
 import Link from "next/link";
 import { createClient } from "@/lib/supabase/server";
-import { createStore, deleteStore } from "./actions";
 import { SKINS } from "@/lib/skins";
 
 type Store = { id: string; name: string; skin: string; slug: string };
 
-export default async function Dashboard() {
+export default async function Overview() {
   const supabase = await createClient();
   const {
     data: { user },
   } = await supabase.auth.getUser();
+
   const { data: stores } = await supabase
     .from("stores")
     .select("id,name,skin,slug")
     .order("created_at", { ascending: false });
-
   const list = (stores ?? []) as Store[];
-  const root = process.env.NEXT_PUBLIC_ROOT_DOMAIN || "localhost:3000";
 
+  const storeIds = list.map((s) => s.id);
+  let productCount = 0;
+  if (storeIds.length) {
+    const { count } = await supabase
+      .from("products")
+      .select("id", { count: "exact", head: true })
+      .in("store_id", storeIds);
+    productCount = count ?? 0;
+  }
+
+  const root = process.env.NEXT_PUBLIC_ROOT_DOMAIN || "localhost:3000";
   const card =
     "rounded-2xl border border-black/5 bg-white p-5 shadow-sm dark:border-white/10 dark:bg-white/[0.03]";
 
+  const stats = [
+    { n: list.length, label: "운영 쇼핑몰", href: "/dashboard/stores" },
+    { n: productCount, label: "전체 상품", href: "/dashboard/products" },
+    { n: SKINS.length, label: "사용 가능 스킨", href: "/?studio=1" },
+  ];
+
   return (
     <div className="mx-auto max-w-5xl">
-      <h1 className="text-2xl font-bold sm:text-3xl">대시보드</h1>
+      <h1 className="text-2xl font-bold sm:text-3xl">개요</h1>
       <p className="mt-1 text-sm text-neutral-500">사용자 · 프로그램을 한 곳에서 관리하세요</p>
 
       {!user && (
         <div className="mt-5 rounded-xl border border-amber-400/40 bg-amber-400/10 px-4 py-3 text-sm text-amber-700 dark:text-amber-300">
           둘러보기 모드예요. 쇼핑몰을 만들거나 저장하려면{" "}
-          <Link href="/login" className="font-bold underline">관리자 로그인</Link>이 필요합니다.
+          <Link href="/login" className="font-bold underline">로그인</Link>이 필요합니다.
         </div>
       )}
 
-      {/* 요약 */}
-      <div className="mt-6 grid grid-cols-2 gap-3 sm:grid-cols-3">
-        <div className={card}>
-          <div className="text-3xl font-bold">{list.length}</div>
-          <div className="mt-1 text-xs text-neutral-500">운영 쇼핑몰</div>
-        </div>
-        <div className={card}>
-          <div className="text-3xl font-bold">{SKINS.length}</div>
-          <div className="mt-1 text-xs text-neutral-500">사용 가능 스킨</div>
-        </div>
+      {/* 요약 통계 */}
+      <div className="mt-6 grid grid-cols-3 gap-3">
+        {stats.map((s) => (
+          <Link key={s.label} href={s.href} className={card + " transition hover:border-violet-400"}>
+            <div className="text-2xl font-bold sm:text-3xl">{s.n}</div>
+            <div className="mt-1 text-xs text-neutral-500">{s.label}</div>
+          </Link>
+        ))}
+      </div>
+
+      {/* 빠른 작업 */}
+      <h2 className="mb-3 mt-8 text-lg font-semibold">빠른 작업</h2>
+      <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
         <Link href="/?studio=1" className={card + " transition hover:border-violet-400"}>
-          <div className="text-3xl">🎨</div>
-          <div className="mt-1 text-xs text-neutral-500">스튜디오 열기 →</div>
+          <div className="text-2xl">🎨</div>
+          <div className="mt-2 text-sm font-semibold">스튜디오 열기</div>
+          <div className="text-xs text-neutral-500">스킨 디자인·미리보기</div>
+        </Link>
+        <Link href="/dashboard/stores" className={card + " transition hover:border-violet-400"}>
+          <div className="text-2xl">🏬</div>
+          <div className="mt-2 text-sm font-semibold">쇼핑몰 만들기</div>
+          <div className="text-xs text-neutral-500">새 매장 발급</div>
+        </Link>
+        <Link href="/dashboard/products" className={card + " transition hover:border-violet-400"}>
+          <div className="text-2xl">📦</div>
+          <div className="mt-2 text-sm font-semibold">상품 관리</div>
+          <div className="text-xs text-neutral-500">전체 상품 보기</div>
+        </Link>
+        <Link href="/dashboard/analytics" className={card + " transition hover:border-violet-400"}>
+          <div className="text-2xl">📈</div>
+          <div className="mt-2 text-sm font-semibold">분석</div>
+          <div className="text-xs text-neutral-500">현황 통계</div>
         </Link>
       </div>
 
-      {/* 새 쇼핑몰 */}
-      <section className={card + " mt-8"}>
-        <h2 className="mb-4 text-lg font-semibold">새 쇼핑몰 만들기</h2>
-        <form action={createStore} className="flex flex-wrap items-end gap-3">
-          <div className="min-w-[200px] flex-1">
-            <label className="mb-1.5 block text-xs font-semibold text-neutral-500">쇼핑몰 이름</label>
-            <input
-              name="name"
-              required
-              placeholder="예: OBJECT, ZEST"
-              className="w-full rounded-xl border border-black/10 bg-white px-4 py-2.5 text-sm outline-none focus:border-violet-500 focus:ring-2 focus:ring-violet-500/25 dark:border-white/10 dark:bg-white/[0.04]"
-            />
-          </div>
-          <div className="min-w-[150px]">
-            <label className="mb-1.5 block text-xs font-semibold text-neutral-500">스킨</label>
-            <select
-              name="skin"
-              defaultValue="mono"
-              className="w-full rounded-xl border border-black/10 bg-white px-4 py-2.5 text-sm outline-none focus:border-violet-500 dark:border-white/10 dark:bg-white/[0.04]"
-            >
-              {SKINS.map((s) => (
-                <option key={s.id} value={s.id}>{s.name}</option>
-              ))}
-            </select>
-          </div>
-          <button className="rounded-xl bg-gradient-to-r from-violet-500 to-pink-500 px-5 py-2.5 text-sm font-semibold text-white shadow-lg shadow-violet-500/25 transition hover:brightness-105">
-            ＋ 만들기
-          </button>
-        </form>
-      </section>
-
-      {/* 목록 */}
-      <h2 className="mb-4 mt-8 text-lg font-semibold">내 쇼핑몰</h2>
+      {/* 최근 쇼핑몰 */}
+      <div className="mb-3 mt-8 flex items-center justify-between">
+        <h2 className="text-lg font-semibold">최근 쇼핑몰</h2>
+        <Link href="/dashboard/stores" className="text-sm text-violet-500 hover:text-violet-400">
+          전체 보기 →
+        </Link>
+      </div>
       {list.length === 0 ? (
         <div className="rounded-2xl border border-dashed border-black/10 py-16 text-center text-sm text-neutral-400 dark:border-white/10">
-          아직 만든 쇼핑몰이 없어요.
+          아직 만든 쇼핑몰이 없어요.{" "}
+          <Link href="/dashboard/stores" className="font-semibold text-violet-500 underline">
+            지금 만들기
+          </Link>
         </div>
       ) : (
         <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-          {list.map((s) => (
+          {list.slice(0, 6).map((s) => (
             <div key={s.id} className={card}>
               <div className="mb-3 flex items-center justify-between">
                 <b className="text-lg">{s.name}</b>
@@ -113,12 +124,6 @@ export default async function Dashboard() {
                 >
                   보기 ↗
                 </Link>
-                <form action={deleteStore}>
-                  <input type="hidden" name="id" value={s.id} />
-                  <button className="rounded-lg border border-black/10 px-3 py-2 text-sm text-neutral-400 transition hover:border-rose-400 hover:text-rose-500 dark:border-white/10">
-                    삭제
-                  </button>
-                </form>
               </div>
             </div>
           ))}
