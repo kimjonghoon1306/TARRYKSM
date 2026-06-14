@@ -152,8 +152,11 @@
       <a class="rail-link" data-view="soon" data-soon="설정"><span class="rl-ico">⚙️</span><span class="rl-lbl" data-i18n="nav_settings">설정</span></a>
     </nav>
 
-    <!-- 관리자 입구는 비밀공간 — 대문 스튜디오에 노출하지 않음 -->
-    <div class="rail-foot" id="railFoot" style="display:none"></div>
+    <!-- 좌하단: 일반회원 로그인 / 회원가입 (관리자는 별개 비밀입구=로고 5번클릭) -->
+    <div class="rail-foot" id="railFoot">
+      <a class="rf-login" href="/login">🔑 로그인</a>
+      <a class="rf-login rf-signup" href="/signup">＋ 회원가입</a>
+    </div>
   </aside>
 
   <!-- ── 메인 ── -->

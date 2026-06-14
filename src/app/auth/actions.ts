@@ -36,6 +36,23 @@ export async function signup(formData: FormData) {
   redirect("/dashboard");
 }
 
+export async function resetPassword(formData: FormData) {
+  const supabase = await createClient();
+  const email = String(formData.get("email") || "").trim();
+  if (!email)
+    redirect("/reset-password?error=" + encodeURIComponent("이메일을 입력하세요"));
+  const root = process.env.NEXT_PUBLIC_ROOT_DOMAIN || "localhost:3000";
+  const proto = root.includes("localhost") ? "http" : "https";
+  const { error } = await supabase.auth.resetPasswordForEmail(email, {
+    redirectTo: `${proto}://${root}/dashboard/settings`,
+  });
+  if (error) redirect("/reset-password?error=" + encodeURIComponent(error.message));
+  redirect(
+    "/reset-password?msg=" +
+      encodeURIComponent("재설정 메일을 보냈어요. 메일의 링크를 눌러 비밀번호를 바꾸세요.")
+  );
+}
+
 export async function signout() {
   const supabase = await createClient();
   await supabase.auth.signOut();
