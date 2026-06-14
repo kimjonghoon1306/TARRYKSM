@@ -71,6 +71,8 @@
   .device-screen{height:60vh}
   .device.mobile .device-screen{height:64vh}
   .store .stb-nav{display:none}            /* 좁은 스토어 상단 링크 정리 */
+  /* 실제 폰 화면에선 미리보기(데스크탑/모바일 무관) 상품을 쿠팡식 2열로 */
+  .sh-grid{grid-template-columns:repeat(2,1fr)!important;gap:11px!important}
   .vh-desc{font-size:13px}
   .preview-stage{padding:14px}
   /* 시네마틱 */
