@@ -1,0 +1,201 @@
+/* ════════════════════════════════════════
+   store.css — 스토어프런트 구조 (100% 스킨 토큰 --s-* 구동)
+   서로 다른 상품도 동일한 카드 시스템으로 통일감 유지
+════════════════════════════════════════ */
+.store{
+  position:relative;overflow-x:clip;
+  background:var(--s-bg);color:var(--s-ink);font-family:var(--s-fb);
+  min-height:100%;
+}
+.store *{box-sizing:border-box}
+.store button{font-family:inherit;cursor:pointer;background:none;border:none;color:inherit}
+
+/* 상단 바 */
+.st-bar{
+  position:sticky;top:0;z-index:5;
+  display:flex;align-items:center;gap:18px;
+  padding:15px 22px;background:color-mix(in srgb,var(--s-bg) 86%,transparent);
+  backdrop-filter:blur(12px);border-bottom:1px solid var(--s-line);
+}
+.stb-logo{font-family:var(--s-fd);font-weight:700;font-size:18px;letter-spacing:var(--s-ls,0)}
+.stb-nav{display:flex;gap:18px;margin:0 auto}
+.stb-nav a{font-size:12.5px;font-weight:500;color:var(--s-sub)}
+.stb-nav a:hover{color:var(--s-ink)}
+.stb-actions{display:flex;align-items:center;gap:8px}
+.stb-cart{display:flex;align-items:center;gap:7px;font-size:12px;font-weight:600;padding:8px 15px;border-radius:99px;background:var(--s-brand);color:var(--s-brand-ink);transition:transform .2s}
+.stb-cart b{min-width:1ch;text-align:center}
+.stb-cart.bump{animation:cartBump .42s var(--ease)}
+@keyframes cartBump{0%{transform:scale(1)}30%{transform:scale(1.16)}60%{transform:scale(.94)}100%{transform:scale(1)}}
+.stb-ico{width:34px;height:34px;border-radius:99px;display:grid;place-items:center;border:1px solid var(--s-line);font-size:14px;transition:.18s}
+.stb-ico:hover{background:var(--s-brand-soft)}
+
+/* 히어로 */
+.st-hero{position:relative;overflow:hidden;padding:42px 26px;background:var(--s-hero)}
+.sth-badge{display:inline-flex;align-items:center;gap:7px;font-size:10.5px;font-weight:700;letter-spacing:.1em;padding:6px 13px;border-radius:99px;background:var(--s-brand-soft);color:var(--s-brand);margin-bottom:16px}
+.sth-title{font-family:var(--s-fd);font-weight:var(--s-fw,700);font-size:clamp(26px,5vw,40px);line-height:1.06;letter-spacing:var(--s-hls,-.02em);max-width:9em}
+.sth-sub{margin:14px 0 22px;font-size:14px;color:var(--s-sub);max-width:24em;line-height:1.6}
+.sth-cta{display:inline-flex;align-items:center;gap:9px;font-family:var(--s-fd);font-weight:600;font-size:13.5px;padding:13px 26px;border-radius:var(--s-rpill,99px);background:var(--s-brand);color:var(--s-brand-ink);transition:transform .2s}
+.sth-cta:hover{transform:translateX(4px)}
+.sth-art{position:absolute;right:-10px;bottom:-20px;font-size:170px;line-height:1;opacity:var(--s-art-op,.16);pointer-events:none;transform:rotate(-8deg)}
+
+/* 카테고리 레일 */
+.st-rail{display:flex;gap:9px;padding:18px 22px 4px;overflow-x:auto}
+.st-rail::-webkit-scrollbar{height:0}
+.rail-chip{flex-shrink:0;font-size:12px;font-weight:600;padding:8px 16px;border-radius:99px;border:1px solid var(--s-line);color:var(--s-sub);white-space:nowrap}
+.rail-chip.on{background:var(--s-brand);color:var(--s-brand-ink);border-color:transparent}
+
+/* 진열대 */
+.st-shelf{padding:18px 22px 26px}
+.sh-head{display:flex;align-items:baseline;gap:10px;margin-bottom:16px}
+.sh-head h3{font-family:var(--s-fd);font-weight:var(--s-fw,700);font-size:19px;letter-spacing:var(--s-ls,0)}
+.sh-head a{margin-left:auto;font-size:12px;font-weight:600;color:var(--s-brand);cursor:pointer}
+.sh-sort{display:flex;gap:7px;margin-bottom:16px;overflow-x:auto;scrollbar-width:none}
+.sh-sort::-webkit-scrollbar{height:0}
+.sh-sort-b{flex-shrink:0;font-size:11.5px;font-weight:600;padding:6px 12px;border-radius:8px;border:1px solid var(--s-line);color:var(--s-sub);white-space:nowrap;transition:.16s}
+.sh-sort-b.on{background:var(--s-ink);color:var(--s-bg);border-color:transparent}
+.sh-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(158px,1fr));gap:16px}
+
+/* 상품 카드 — 모든 상품 동일 규격 = 이질감 제거 */
+.pcard{cursor:pointer;border-radius:var(--s-r);overflow:hidden;background:var(--s-surf);border:1px solid var(--s-line);transition:transform .22s var(--ease),box-shadow .22s}
+.pcard:hover{transform:translateY(-5px);box-shadow:var(--s-shadow)}
+.pc-media{position:relative;aspect-ratio:1/1;display:grid;place-items:center;font-size:54px;background:var(--s-brand-soft)}
+.pc-emoji{font-size:54px;line-height:1}
+.pc-fav{position:absolute;top:9px;right:9px;width:28px;height:28px;border-radius:99px;display:grid;place-items:center;font-size:13px;color:var(--s-sub);background:color-mix(in srgb,var(--s-bg) 80%,transparent);backdrop-filter:blur(4px);transition:.18s;z-index:1}
+.pc-fav:hover{transform:scale(1.12)}
+.pc-fav.on{color:#ff4d6d}
+.pc-add{transition:transform .15s}
+.pc-add:active{transform:scale(.85)}
+.pc-badge{position:absolute;top:9px;left:9px;font-size:9.5px;font-weight:700;letter-spacing:.04em;padding:3px 9px;border-radius:99px;background:var(--s-brand);color:var(--s-brand-ink)}
+.pc-body{padding:13px 14px 15px}
+.pc-brand{font-size:10px;font-weight:700;letter-spacing:.08em;color:var(--s-sub);text-transform:uppercase;margin-bottom:5px}
+.pc-name{font-family:var(--s-fnt-name,var(--s-fb));font-weight:600;font-size:13.5px;line-height:1.35;min-height:2.6em}
+.pc-rating{display:flex;align-items:center;gap:5px;margin-top:7px;font-size:10.5px;color:var(--s-sub)}
+.pc-rating i{font-style:normal;opacity:.8}
+.pc-stars{color:#ffb400;letter-spacing:1px;font-size:10px}
+.pc-bottom{display:flex;align-items:center;margin-top:9px}
+.pc-price{font-family:var(--s-fd);font-weight:700;font-size:15px;letter-spacing:var(--s-ls,0)}
+.pc-add{margin-left:auto;width:32px;height:32px;border-radius:var(--s-radd,10px);display:grid;place-items:center;font-size:16px;background:var(--s-brand);color:var(--s-brand-ink)}
+
+/* 프로모 배너 */
+.st-promo{margin:8px 22px 26px;padding:26px;border-radius:var(--s-r);background:var(--s-hero);border:1px solid var(--s-line);text-align:center}
+.st-promo b{display:block;font-family:var(--s-fd);font-weight:var(--s-fw,700);font-size:20px;margin-bottom:6px;letter-spacing:var(--s-ls,0)}
+.st-promo span{font-size:13px;color:var(--s-sub)}
+
+/* 푸터 */
+.st-foot{padding:24px 22px 34px;border-top:1px solid var(--s-line);text-align:center}
+.stf-logo{font-family:var(--s-fd);font-weight:700;font-size:15px;letter-spacing:var(--s-ls,0);margin-bottom:8px}
+.stf-links{display:flex;gap:16px;justify-content:center;flex-wrap:wrap;margin-bottom:12px}
+.stf-links a{font-size:11.5px;color:var(--s-sub);cursor:pointer}
+.stf-copy{font-size:10.5px;color:var(--s-sub);opacity:.7}
+
+/* ── 검색 바 (토글) ── */
+.st-searchbar{display:flex;align-items:center;gap:10px;max-height:0;overflow:hidden;padding:0 22px;
+  background:var(--s-surf);border-bottom:1px solid transparent;transition:max-height .28s var(--ease),padding .28s var(--ease)}
+.store.search-on .st-searchbar{max-height:64px;padding:14px 22px;border-bottom-color:var(--s-line)}
+.st-searchbar input{flex:1;background:none;border:none;outline:none;color:var(--s-ink);font-size:14px;font-family:inherit}
+.st-searchbar input::placeholder{color:var(--s-sub)}
+.st-searchbar .ssb-x{color:var(--s-sub);font-size:13px}
+
+/* ── 검색결과 없음 ── */
+.st-empty-grid{grid-column:1/-1;text-align:center;padding:48px 12px;color:var(--s-sub)}
+.st-empty-grid span{font-size:40px;display:block;margin-bottom:12px}
+.st-empty-grid b{display:block;font-size:15px;color:var(--s-ink);margin-bottom:5px;font-family:var(--s-fd)}
+.st-empty-grid i{font-size:12.5px;font-style:normal}
+
+/* ════════════════════════════════════════
+   오버레이 — 스크림 · 장바구니 드로어 · 상품 상세
+   (.store 기준 absolute, lockFrame이 top/height 지정)
+════════════════════════════════════════ */
+.st-overlay{position:absolute;left:0;right:0;z-index:8;background:rgba(8,8,16,.42);
+  opacity:0;visibility:hidden;transition:.26s var(--ease)}
+.store.cart-on .st-overlay,.store.detail-on .st-overlay{opacity:1;visibility:visible}
+
+/* 장바구니 드로어 (우측) */
+.st-cart-panel{position:absolute;right:0;z-index:9;width:min(340px,86%);
+  display:flex;flex-direction:column;background:var(--s-bg);border-left:1px solid var(--s-line);
+  box-shadow:-20px 0 50px -24px rgba(0,0,0,.5);
+  transform:translateX(102%);visibility:hidden;transition:transform .3s var(--ease),visibility .3s}
+.store.cart-on .st-cart-panel{transform:none;visibility:visible}
+.cp-head{display:flex;align-items:center;justify-content:space-between;padding:18px 20px;border-bottom:1px solid var(--s-line)}
+.cp-head b{font-family:var(--s-fd);font-size:16px}
+.cp-head b i{font-style:normal;color:var(--s-sub);font-weight:500}
+.cp-x{width:30px;height:30px;border-radius:8px;font-size:13px;color:var(--s-sub)}
+.cp-x:hover{background:var(--s-surf)}
+.cp-body{flex:1;overflow-y:auto;padding:8px 12px}
+.cp-row{display:flex;align-items:center;gap:11px;padding:11px 8px;border-bottom:1px solid var(--s-line)}
+.cp-thumb{width:46px;height:46px;flex-shrink:0;border-radius:11px;display:grid;place-items:center;font-size:24px;background:var(--s-brand-soft)}
+.cp-info{flex:1;min-width:0}
+.cp-info b{display:block;font-size:12.5px;font-weight:600;line-height:1.3;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.cp-info span{font-size:12px;color:var(--s-sub)}
+.cp-qty{display:flex;align-items:center;gap:6px}
+.cp-qty button{width:24px;height:24px;border-radius:7px;border:1px solid var(--s-line);font-size:14px;line-height:1;color:var(--s-ink)}
+.cp-qty button:hover{background:var(--s-brand);color:var(--s-brand-ink);border-color:transparent}
+.cp-qty em{font-style:normal;font-size:12.5px;font-weight:700;min-width:1.4ch;text-align:center}
+.cp-del{color:var(--s-sub);font-size:12px;width:22px;height:22px}
+.cp-del:hover{color:#ff4d6d}
+.cp-foot{padding:16px 20px;border-top:1px solid var(--s-line)}
+.cp-sum{display:flex;align-items:baseline;justify-content:space-between;margin-bottom:13px}
+.cp-sum span{font-size:13px;color:var(--s-sub)}
+.cp-sum b{font-family:var(--s-fd);font-size:21px;font-weight:700}
+.cp-checkout{width:100%;padding:14px;border-radius:var(--s-rpill,12px);background:var(--s-brand);color:var(--s-brand-ink);font-family:var(--s-fd);font-weight:700;font-size:14px;transition:.18s}
+.cp-checkout:hover{filter:brightness(1.05)}
+.cp-empty,.cp-done{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:30px 22px;gap:6px}
+.cp-empty span{font-size:46px}
+.cp-empty b,.cp-done b{font-family:var(--s-fd);font-size:16px}
+.cp-empty,.cp-done{color:var(--s-sub)}
+.cp-done span{font-size:48px}
+.cp-done i{font-style:normal;font-size:14px;font-weight:700;color:var(--s-ink)}
+.cp-done p{font-size:12px;line-height:1.6;margin-top:4px}
+.cp-shop{margin-top:14px;padding:11px 22px;border-radius:99px;border:1px solid var(--s-line);font-weight:600;font-size:13px;color:var(--s-ink)}
+.cp-shop:hover{background:var(--s-brand);color:var(--s-brand-ink);border-color:transparent}
+
+/* 상품 상세 (전면 슬라이드업) */
+.st-detail-panel{position:absolute;left:0;right:0;z-index:9;
+  display:flex;flex-direction:column;background:var(--s-bg);
+  transform:translateY(102%);visibility:hidden;transition:transform .32s var(--ease),visibility .32s}
+.store.detail-on .st-detail-panel{transform:none;visibility:visible}
+.dp-x{position:absolute;top:14px;right:14px;z-index:2;width:34px;height:34px;border-radius:99px;font-size:14px;
+  background:color-mix(in srgb,var(--s-bg) 70%,transparent);backdrop-filter:blur(6px);color:var(--s-ink)}
+.dp-scroll{flex:1;overflow-y:auto}
+.dp-media{position:relative;aspect-ratio:16/11;display:grid;place-items:center;background:var(--s-brand-soft)}
+.dp-emoji{font-size:120px;line-height:1}
+.dp-body{padding:22px}
+.dp-name{font-family:var(--s-fd);font-weight:var(--s-fw,700);font-size:23px;line-height:1.2;margin:8px 0 8px}
+.dp-rating{display:flex;align-items:center;gap:7px;font-size:12px;color:var(--s-sub);margin-bottom:10px}
+.dp-rating b{color:var(--s-ink);font-weight:700}
+.dp-price{font-family:var(--s-fd);font-weight:700;font-size:22px;color:var(--s-brand);margin-bottom:16px}
+.dp-desc{font-size:13.5px;line-height:1.7;color:var(--s-sub)}
+.dp-meta{list-style:none;margin:18px 0 0;padding:0;border-top:1px solid var(--s-line)}
+.dp-meta li{display:flex;justify-content:space-between;padding:12px 0;border-bottom:1px solid var(--s-line);font-size:12.5px}
+.dp-meta li span{color:var(--s-sub)}
+.dp-meta li b{font-weight:600}
+/* 상세 — 리뷰 · 연관상품 */
+.dp-sec-t{font-family:var(--s-fd);font-weight:700;font-size:14px;margin:24px 0 12px}
+.dp-sec-t i{font-style:normal;color:var(--s-brand)}
+.dp-rev{padding:12px 0;border-top:1px solid var(--s-line)}
+.dp-rev-top{display:flex;align-items:center;gap:8px;margin-bottom:5px}
+.dp-rev-top b{font-size:12.5px;font-weight:600}
+.dp-rev p{font-size:12.5px;line-height:1.6;color:var(--s-sub)}
+.dp-related{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
+.dp-rel{text-align:left;border:1px solid var(--s-line);border-radius:var(--s-r);padding:10px;transition:.18s}
+.dp-rel:hover{border-color:var(--s-brand);transform:translateY(-3px)}
+.dp-rel-em{font-size:30px;display:block;margin-bottom:6px}
+.dp-rel b{display:block;font-size:11px;font-weight:600;line-height:1.3;height:2.6em;overflow:hidden}
+.dp-rel-p{font-size:11.5px;font-weight:700;color:var(--s-brand)}
+.dp-actions{display:flex;align-items:center;gap:10px;padding:14px 18px;border-top:1px solid var(--s-line);background:var(--s-bg)}
+.dp-fav{width:48px;height:50px;flex-shrink:0;border-radius:var(--s-radd,12px);border:1px solid var(--s-line);font-size:18px;color:var(--s-sub)}
+.dp-fav.on{color:#ff4d6d;border-color:#ff4d6d}
+.dp-qty{display:flex;align-items:center;gap:4px;flex-shrink:0;border:1px solid var(--s-line);border-radius:var(--s-radd,12px);padding:0 4px;height:50px}
+.dp-qty button{width:28px;height:48px;font-size:16px;color:var(--s-ink)}
+.dp-qty em{font-style:normal;font-weight:700;font-size:14px;min-width:1.6ch;text-align:center}
+.dp-add{flex:1;height:50px;padding:0 12px;border-radius:var(--s-rpill,12px);background:var(--s-brand);color:var(--s-brand-ink);font-family:var(--s-fd);font-weight:700;font-size:13.5px;transition:.18s}
+.dp-add:hover{filter:brightness(1.05)}
+
+/* 인스토어 토스트 */
+.st-toast{position:absolute;left:50%;transform:translateX(-50%);z-index:20;
+  display:flex;align-items:center;gap:8px;white-space:nowrap;
+  padding:11px 18px;border-radius:99px;font-size:12.5px;font-weight:600;
+  background:var(--s-ink);color:var(--s-bg);box-shadow:0 10px 30px -10px rgba(0,0,0,.5);
+  animation:stToast .26s var(--ease)}
+.st-toast b{font-weight:700}
+@keyframes stToast{from{opacity:0;transform:translate(-50%,12px)}to{opacity:1;transform:translate(-50%,0)}}
