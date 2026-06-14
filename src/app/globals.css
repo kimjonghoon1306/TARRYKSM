@@ -9,8 +9,22 @@
 }
 
 [data-theme="dark"] {
-  --background: #0b0c14;
-  --foreground: #ededed;
+  /* 순수 검정 X → 미드나잇 인디고 (색감 살린 다크) */
+  --background: #14152b;
+  --foreground: #eceaf6;
+}
+
+/* 다크 전용 배경 오로라 — 너무 깜깜하지 않게 은은한 보라/핑크/민트 글로우 */
+[data-theme="dark"] body::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+  background:
+    radial-gradient(60% 50% at 12% -5%, rgba(139, 92, 246, 0.18), transparent 70%),
+    radial-gradient(55% 45% at 95% 8%, rgba(236, 72, 153, 0.14), transparent 70%),
+    radial-gradient(60% 55% at 50% 110%, rgba(34, 211, 238, 0.1), transparent 70%);
 }
 
 @theme inline {

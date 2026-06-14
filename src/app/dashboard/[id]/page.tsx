@@ -37,6 +37,20 @@ export default async function StoreAdmin({
     .select("id", { count: "exact", head: true })
     .eq("store_id", id);
 
+  // 미리보기용 상품 썸네일 몇 개
+  const { data: preview } = await supabase
+    .from("products")
+    .select("id,emoji,image_url,name")
+    .eq("store_id", id)
+    .order("created_at", { ascending: false })
+    .limit(5);
+  const previewItems = (preview ?? []) as {
+    id: string;
+    emoji: string | null;
+    image_url: string | null;
+    name: string;
+  }[];
+
   const card =
     "rounded-2xl border border-black/5 bg-white p-5 shadow-sm dark:border-white/10 dark:bg-white/[0.03]";
 
@@ -154,12 +168,57 @@ export default async function StoreAdmin({
         )}
       </section>
 
-      <div className="mt-4 grid gap-4 sm:grid-cols-3">
-        <ManageCard title="🎨 디자인" desc={`스킨: ${s.skin}`} soon />
-        <Link href={`/dashboard/${s.id}/products`} className="block">
-          <ManageCard title="📦 상품" desc={`${count ?? 0}개 등록됨`} action="관리하기 →" />
+      {/* 상품 관리 — 핵심 (썸네일 미리보기 + 빠른 추가) */}
+      <section className={card + " mt-4"}>
+        <div className="mb-4 flex items-center justify-between">
+          <div>
+            <h2 className="font-semibold">📦 상품</h2>
+            <p className="text-xs text-neutral-500">{count ?? 0}개 등록됨</p>
+          </div>
+          <Link
+            href={`/dashboard/${s.id}/products`}
+            className="press-glow rounded-lg bg-gradient-to-r from-violet-500 to-pink-500 px-4 py-2 text-sm font-semibold text-white shadow-lg shadow-violet-500/25 transition hover:brightness-105"
+          >
+            ＋ 상품 추가·관리
+          </Link>
+        </div>
+        {previewItems.length === 0 ? (
+          <div className="rounded-xl border border-dashed border-black/10 py-8 text-center text-sm text-neutral-400 dark:border-white/10">
+            아직 상품이 없어요. 상품을 추가하면 쇼핑몰에 바로 보여요.
+          </div>
+        ) : (
+          <div className="flex flex-wrap gap-2">
+            {previewItems.map((p) => (
+              <Link
+                key={p.id}
+                href={`/dashboard/${s.id}/products/${p.id}`}
+                className="grid h-14 w-14 place-items-center overflow-hidden rounded-xl border border-black/5 bg-black/[0.03] text-2xl transition hover:border-violet-400 dark:border-white/10 dark:bg-white/[0.05]"
+                title={p.name}
+              >
+                {p.image_url ? (
+                  // eslint-disable-next-line @next/next/no-img-element
+                  <img src={p.image_url} alt={p.name} className="h-full w-full object-cover" />
+                ) : (
+                  p.emoji || "📦"
+                )}
+              </Link>
+            ))}
+          </div>
+        )}
+      </section>
+
+      {/* 기타 관리 */}
+      <div className="mt-4 grid gap-4 sm:grid-cols-2">
+        <Link href="/?studio=1" className={card + " lift block transition hover:border-violet-400"}>
+          <div className="font-semibold">🎨 디자인</div>
+          <div className="text-sm text-neutral-500">스튜디오에서 스킨 미리보기 (현재: {s.skin})</div>
+          <div className="mt-3 text-xs font-semibold text-violet-500">스튜디오 열기 →</div>
         </Link>
-        <ManageCard title="🧾 주문" desc="결제 연동 후" soon />
+        <Link href="/dashboard/orders" className={card + " lift block transition hover:border-violet-400"}>
+          <div className="font-semibold">🧾 주문</div>
+          <div className="text-sm text-neutral-500">고객 주문 관리</div>
+          <div className="mt-3 text-xs text-neutral-400">결제 연동 후 활성화</div>
+        </Link>
       </div>
     </div>
   );
@@ -171,23 +230,3 @@ function hostLabel(domain: string) {
   return parts.length > 2 ? parts[0] : "@";
 }
 
-function ManageCard({
-  title,
-  desc,
-  soon,
-  action,
-}: {
-  title: string;
-  desc: string;
-  soon?: boolean;
-  action?: string;
-}) {
-  return (
-    <div className="h-full rounded-2xl border border-black/5 bg-white p-5 shadow-sm transition hover:border-violet-400 dark:border-white/10 dark:bg-white/[0.03]">
-      <div className="mb-1 font-semibold">{title}</div>
-      <div className="text-sm text-neutral-500">{desc}</div>
-      {soon && <div className="mt-3 text-xs text-neutral-400">준비중</div>}
-      {action && <div className="mt-3 text-xs font-semibold text-violet-500">{action}</div>}
-    </div>
-  );
-}

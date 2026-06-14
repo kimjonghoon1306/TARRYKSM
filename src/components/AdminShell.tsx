@@ -137,14 +137,14 @@ export default function AdminShell({
   );
 
   return (
-    <div className="min-h-screen bg-neutral-50 text-neutral-900 dark:bg-[#0b0c14] dark:text-neutral-100">
+    <div className="min-h-screen bg-neutral-50 text-neutral-900 dark:bg-transparent dark:text-neutral-100">
       {/* 데스크탑 사이드바 */}
-      <aside className="fixed inset-y-0 left-0 z-30 hidden w-64 flex-col border-r border-black/5 bg-white p-4 dark:border-white/10 dark:bg-[#0e0f1a] lg:flex">
+      <aside className="fixed inset-y-0 left-0 z-30 hidden w-64 flex-col border-r border-black/5 bg-white p-4 dark:border-white/10 dark:bg-[#191a30] lg:flex">
         {Side}
       </aside>
 
       {/* 모바일 상단바 */}
-      <header className="sticky top-0 z-20 flex items-center justify-between border-b border-black/5 bg-white/80 px-4 py-3 backdrop-blur dark:border-white/10 dark:bg-[#0e0f1a]/80 lg:hidden">
+      <header className="sticky top-0 z-20 flex items-center justify-between border-b border-black/5 bg-white/80 px-4 py-3 backdrop-blur dark:border-white/10 dark:bg-[#191a30]/80 lg:hidden">
         <button
           onClick={() => setOpen(true)}
           aria-label="메뉴"
@@ -160,7 +160,7 @@ export default function AdminShell({
       {open && (
         <div className="fixed inset-0 z-40 lg:hidden">
           <div className="absolute inset-0 bg-black/50" onClick={() => setOpen(false)} />
-          <aside className="absolute inset-y-0 left-0 flex w-64 flex-col bg-white p-4 dark:bg-[#0e0f1a]">
+          <aside className="absolute inset-y-0 left-0 flex w-64 flex-col bg-white p-4 dark:bg-[#191a30]">
             {Side}
           </aside>
         </div>

@@ -13,7 +13,7 @@ export default function AuthShell({
   footer?: React.ReactNode;
 }) {
   return (
-    <main className="relative flex min-h-screen items-center justify-center overflow-hidden bg-gradient-to-b from-violet-50 via-white to-pink-50 px-4 py-10 dark:from-[#0b0c14] dark:via-[#0d0e1a] dark:to-[#0b0c14]">
+    <main className="relative flex min-h-screen items-center justify-center overflow-hidden bg-gradient-to-b from-violet-50 via-white to-pink-50 px-4 py-10 dark:from-[#181a35] dark:via-[#14152b] dark:to-[#1c1430]">
       {/* 오로라 글로우 배경 */}
       <div aria-hidden className="pointer-events-none absolute inset-0">
         <div className="absolute -left-24 -top-24 h-80 w-80 rounded-full bg-violet-400/30 blur-3xl dark:bg-violet-600/25" />
