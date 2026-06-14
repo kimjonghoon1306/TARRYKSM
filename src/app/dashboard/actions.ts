@@ -91,9 +91,11 @@ export async function setStoreSlug(formData: FormData) {
   const id = String(formData.get("id") || "");
   if (!id) return;
   const slug = slugify(String(formData.get("slug") || "").trim().toLowerCase());
+  // 어디서 호출됐는지(대시보드 or 몰관리)에 따라 결과를 그 화면으로 되돌림
+  const ret = String(formData.get("return") || "") === "dashboard" ? "/dashboard" : `/dashboard/${id}`;
 
   const back = (msg: string) =>
-    redirect(`/dashboard/${id}?serr=` + encodeURIComponent(msg));
+    redirect(`${ret}?serr=` + encodeURIComponent(msg));
 
   if (!slug || !/^[a-z0-9][a-z0-9-]{1,29}$/.test(slug)) {
     back("주소는 영문 소문자·숫자·하이픈 2~30자로 입력하세요 (예: myshop)");
@@ -113,7 +115,7 @@ export async function setStoreSlug(formData: FormData) {
   const { error } = await supabase.from("stores").update({ slug }).eq("id", id);
   if (error) back(/duplicate|unique/i.test(error.message) ? "이미 사용 중인 주소예요" : "변경 실패");
   revalidatePath("/dashboard", "layout");
-  redirect(`/dashboard/${id}?smsg=` + encodeURIComponent("주소를 변경했어요"));
+  redirect(`${ret}?smsg=` + encodeURIComponent("주소를 변경했어요"));
 }
 
 // 이미 만든 몰의 스킨 변경

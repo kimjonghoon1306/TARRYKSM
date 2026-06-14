@@ -2,10 +2,16 @@ import Link from "next/link";
 import { createClient } from "@/lib/supabase/server";
 import { SKINS } from "@/lib/skins";
 import { PRIMARY_DOMAIN } from "@/lib/domains";
+import { setStoreSlug } from "./actions";
 
 type Store = { id: string; name: string; skin: string; slug: string };
 
-export default async function Overview() {
+export default async function Overview({
+  searchParams,
+}: {
+  searchParams: Promise<{ smsg?: string; serr?: string }>;
+}) {
+  const { smsg, serr } = await searchParams;
   const supabase = await createClient();
   const {
     data: { user },
@@ -38,14 +44,21 @@ export default async function Overview() {
 
   return (
     <div className="mx-auto max-w-5xl">
-      <h1 className="text-2xl font-bold sm:text-3xl">개요</h1>
-      <p className="mt-1 text-sm text-neutral-500">사용자 · 프로그램을 한 곳에서 관리하세요</p>
+      <h1 className="text-2xl font-bold sm:text-3xl">대시보드</h1>
+      <p className="mt-1 text-sm text-neutral-500">모든 쇼핑몰을 여기서 만들고 · 수정하고 · 관리하세요</p>
 
       {!user && (
         <div className="mt-5 rounded-xl border border-amber-400/40 bg-amber-400/10 px-4 py-3 text-sm text-amber-700 dark:text-amber-300">
           둘러보기 모드예요. 쇼핑몰을 만들거나 저장하려면{" "}
           <Link href="/login" className="font-bold underline">로그인</Link>이 필요합니다.
         </div>
+      )}
+
+      {smsg && (
+        <p className="mt-4 rounded-lg bg-emerald-500/10 px-3 py-2 text-sm text-emerald-600 dark:text-emerald-400">{smsg}</p>
+      )}
+      {serr && (
+        <p className="mt-4 rounded-lg bg-rose-500/10 px-3 py-2 text-sm text-rose-600 dark:text-rose-400">{serr}</p>
       )}
 
       {/* 요약 통계 */}
@@ -107,9 +120,26 @@ export default async function Overview() {
                   {s.skin}
                 </span>
               </div>
-              <div className="mb-4 break-all text-xs text-neutral-400">
-                {PRIMARY_DOMAIN}/{s.slug}
-              </div>
+              {/* 주소(슬러그) 바로 수정 */}
+              <form action={setStoreSlug} className="mb-3">
+                <input type="hidden" name="id" value={s.id} />
+                <input type="hidden" name="return" value="dashboard" />
+                <label className="mb-1 block text-[11px] font-semibold text-neutral-400">주소 (수정 가능)</label>
+                <div className="flex items-stretch overflow-hidden rounded-lg border border-black/10 focus-within:border-violet-500 focus-within:ring-2 focus-within:ring-violet-500/25 dark:border-white/10">
+                  <span className="flex items-center whitespace-nowrap bg-black/[0.04] px-2 text-[11px] text-neutral-500 dark:bg-white/[0.06]">
+                    {PRIMARY_DOMAIN}/
+                  </span>
+                  <input
+                    name="slug"
+                    defaultValue={s.slug}
+                    pattern="[a-z0-9][a-z0-9\-]{1,29}"
+                    className="w-full min-w-0 bg-white px-2 py-1.5 font-mono text-xs outline-none dark:bg-white/[0.04]"
+                  />
+                  <button className="whitespace-nowrap bg-violet-500 px-2.5 text-[11px] font-bold text-white">
+                    저장
+                  </button>
+                </div>
+              </form>
               <div className="flex gap-2">
                 <Link
                   href={`/dashboard/${s.id}`}

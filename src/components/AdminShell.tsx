@@ -9,7 +9,7 @@ import { signout } from "@/app/auth/actions";
 type Role = "admin" | "founder";
 
 const NAV = [
-  { href: "/dashboard", label: "개요", icon: "📊" },
+  { href: "/dashboard", label: "대시보드", icon: "📊" },
   { href: "/dashboard/stores", label: "쇼핑몰", icon: "🏬" },
   { href: "/dashboard/products", label: "상품", icon: "📦" },
   { href: "/dashboard/orders", label: "주문", icon: "🧾" },
