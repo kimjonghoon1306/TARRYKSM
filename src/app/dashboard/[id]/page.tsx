@@ -209,10 +209,10 @@ export default async function StoreAdmin({
 
       {/* 기타 관리 */}
       <div className="mt-4 grid gap-4 sm:grid-cols-2">
-        <Link href="/?studio=1" className={card + " lift block transition hover:border-violet-400"}>
+        <Link href={`/dashboard/${s.id}/design`} className={card + " lift block transition hover:border-violet-400"}>
           <div className="font-semibold">🎨 디자인</div>
-          <div className="text-sm text-neutral-500">스튜디오에서 스킨 미리보기 (현재: {s.skin})</div>
-          <div className="mt-3 text-xs font-semibold text-violet-500">스튜디오 열기 →</div>
+          <div className="text-sm text-neutral-500">스킨 변경 (현재: {s.skin})</div>
+          <div className="mt-3 text-xs font-semibold text-violet-500">스킨 바꾸기 →</div>
         </Link>
         <Link href="/dashboard/orders" className={card + " lift block transition hover:border-violet-400"}>
           <div className="font-semibold">🧾 주문</div>

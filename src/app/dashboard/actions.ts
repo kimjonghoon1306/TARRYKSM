@@ -70,6 +70,18 @@ export async function deleteStore(formData: FormData) {
   revalidatePath("/dashboard");
 }
 
+// 이미 만든 몰의 스킨 변경
+export async function setStoreSkin(formData: FormData) {
+  const supabase = await createClient();
+  const id = String(formData.get("id") || "");
+  let skin = String(formData.get("skin") || "");
+  if (!id || !SKIN_IDS.includes(skin)) return;
+  await supabase.from("stores").update({ skin }).eq("id", id);
+  revalidatePath(`/dashboard/${id}`);
+  revalidatePath(`/dashboard/${id}/design`);
+  redirect(`/dashboard/${id}/design?msg=` + encodeURIComponent("스킨을 변경했어요"));
+}
+
 // 발행/비공개 토글 — 발행해야 스토어프런트(서브도메인·커스텀도메인)에 노출됨.
 export async function togglePublish(formData: FormData) {
   const supabase = await createClient();
