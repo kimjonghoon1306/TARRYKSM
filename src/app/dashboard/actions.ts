@@ -39,6 +39,16 @@ export async function deleteStore(formData: FormData) {
   revalidatePath("/dashboard");
 }
 
+// 발행/비공개 토글 — 발행해야 스토어프런트(서브도메인·커스텀도메인)에 노출됨.
+export async function togglePublish(formData: FormData) {
+  const supabase = await createClient();
+  const id = String(formData.get("id") || "");
+  const next = String(formData.get("publish") || "") === "1";
+  if (!id) return;
+  await supabase.from("stores").update({ published: next }).eq("id", id);
+  revalidatePath(`/dashboard/${id}`);
+}
+
 // 커스텀 도메인 연결/해제. 입력 정규화(프로토콜·경로·www 제거).
 export async function setStoreDomain(formData: FormData) {
   const supabase = await createClient();

@@ -2,7 +2,7 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { domainToUnicode } from "node:url";
 import { createClient } from "@/lib/supabase/server";
-import { setStoreDomain } from "../actions";
+import { setStoreDomain, togglePublish } from "../actions";
 
 type Store = {
   id: string;
@@ -59,7 +59,35 @@ export default async function StoreAdmin({
         </Link>
       </div>
 
-      <section className={card + " mt-6"}>
+      {/* 발행 상태 */}
+      <section className={card + " mt-6 flex flex-wrap items-center justify-between gap-3"}>
+        <div>
+          <div className="flex items-center gap-2">
+            <span className="font-semibold">
+              {s.published ? "🟢 발행됨" : "⚪ 비공개"}
+            </span>
+            <span className="text-xs text-neutral-400">
+              {s.published ? "고객이 접속할 수 있어요" : "발행해야 고객에게 보입니다"}
+            </span>
+          </div>
+        </div>
+        <form action={togglePublish}>
+          <input type="hidden" name="id" value={s.id} />
+          <input type="hidden" name="publish" value={s.published ? "0" : "1"} />
+          <button
+            className={
+              "rounded-xl px-4 py-2 text-sm font-semibold transition " +
+              (s.published
+                ? "border border-black/10 hover:border-rose-400 hover:text-rose-500 dark:border-white/15"
+                : "bg-gradient-to-r from-violet-500 to-pink-500 text-white shadow-lg shadow-violet-500/25 hover:brightness-105")
+            }
+          >
+            {s.published ? "비공개로 전환" : "🚀 발행하기"}
+          </button>
+        </form>
+      </section>
+
+      <section className={card + " mt-4"}>
         <div className="mb-1 text-xs font-semibold text-neutral-500">기본 주소 (서브도메인)</div>
         <div className="break-all font-mono text-sm">
           {s.slug}.{root}
