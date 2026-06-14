@@ -13,7 +13,7 @@ const I18N = {
     cm_name:'쇼핑몰 이름', cm_skin:'스킨 선택', cm_cancel:'취소', cm_create:'＋ 생성하기',
     // 스튜디오 뷰
     st_eyebrow:'SKIN STUDIO', st_title:'한 번의 클릭으로 <em>브랜드 전체</em>를 바꾸다',
-    st_desc:'색·서체·라운드·무드까지 통째로 갈아입는 8가지 스킨. 같은 상품도 완전히 다른 매장이 됩니다.',
+    st_desc:'색·서체·라운드·무드까지 통째로 갈아입는 14가지 스킨. 같은 상품도 완전히 다른 매장이 됩니다.',
     st_apply:'이 스킨 적용', st_applied:'적용됨', st_gallery:'스킨 갤러리', st_gallery_sub:'카드를 누르면 위 미리보기가 바뀝니다',
     st_use:'이 스킨으로 쇼핑몰 만들기',
     ml_title:'내 쇼핑몰', ml_sub:'운영 중인 매장을 한눈에',
@@ -33,7 +33,7 @@ const I18N = {
     cm_title:'Create a Store', cm_sub:'Name it, pick a skin, done',
     cm_name:'Store name', cm_skin:'Choose a skin', cm_cancel:'Cancel', cm_create:'＋ Create',
     st_eyebrow:'SKIN STUDIO', st_title:'Reskin your <em>entire brand</em> in one click',
-    st_desc:'8 skins swap color, type, radius and mood all at once. The same products become a totally different store.',
+    st_desc:'14 skins swap color, type, radius and mood all at once. The same products become a totally different store.',
     st_apply:'Apply skin', st_applied:'Applied', st_gallery:'Skin Gallery', st_gallery_sub:'Tap a card to update the preview',
     st_use:'Build a store with this skin',
     ml_title:'My Stores', ml_sub:'All your shops at a glance',

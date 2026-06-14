@@ -42,7 +42,7 @@ function renderStudio(){
         </div>
       </div>
       <div class="device ${deviceMode}" id="device">
-        <div class="device-screen" id="deviceScreen">${buildStore(activeSkin)}</div>
+        <div class="device-screen" id="deviceScreen"></div>
       </div>
     </div>
 
@@ -51,13 +51,15 @@ function renderStudio(){
     </div>
     <div class="skin-gallery">${cards}</div>`;
 
+  const screen = document.getElementById('deviceScreen');
+  if(screen) mountStore(screen, activeSkin);
   updatePsBar();
 }
 
 function applySkin(id){
   activeSkin = id;
   const screen = document.getElementById('deviceScreen');
-  if(screen) screen.innerHTML = buildStore(id);
+  if(screen) mountStore(screen, id);
   document.querySelectorAll('.sk-card').forEach(c=>c.classList.remove('active'));
   document.querySelector(`.sk-card .sk-mini[data-skin="${id}"]`)?.closest('.sk-card')?.classList.add('active');
   document.querySelector('.ps-swatch')?.setAttribute('data-skin', id);
@@ -138,8 +140,7 @@ function renderEditorSkins(){
 }
 function renderEditorPreview(){
   const m = malls[editingIndex];
-  document.getElementById('edPreview').innerHTML = buildStore(m.skin, m.name);
-  document.getElementById('edPreview').scrollTop = 0;
+  mountStore(document.getElementById('edPreview'), m.skin, m.name);
 }
 function editorSetSkin(id){
   if(!malls[editingIndex]) return;
