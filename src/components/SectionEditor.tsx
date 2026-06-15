@@ -3,6 +3,7 @@
 import { useState, useTransition } from "react";
 import Link from "next/link";
 import { createClient } from "@/lib/supabase/client";
+import SectionsTutorial from "./SectionsTutorial";
 import { SECTION_META, type Section, type SectionConfig, type SectionType } from "@/lib/sections";
 import {
   addSection,
@@ -128,6 +129,11 @@ export default function SectionEditor({
         배너·상품 선반·텍스트·그리드 블록을 쌓아 대문을 직접 구성하세요. 드래그로 순서를 바꿀 수 있어요.
         {sections.length === 0 && " 블록이 하나도 없으면 기본 진열(신상·베스트·전체)이 자동으로 보입니다."}
       </p>
+
+      {/* 만드는 과정 튜토리얼 모션그래픽 */}
+      <div className="mt-5">
+        <SectionsTutorial />
+      </div>
 
       {/* 블록 추가 */}
       <div className="relative mt-5">
