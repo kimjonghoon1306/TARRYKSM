@@ -1,0 +1,298 @@
+"use client";
+
+import { useState } from "react";
+
+/* 온봇 — AI 키 없이 클릭으로 답하는 디자이너 도우미.
+   프로그램 사용법·전체 기능·도메인 연결을 카테고리별 Q&A로 안내. */
+
+type QA = { q: string; a: React.ReactNode };
+type Cat = { id: string; label: string; icon: string; items: QA[] };
+
+const CATS: Cat[] = [
+  {
+    id: "start",
+    label: "시작하기",
+    icon: "🚀",
+    items: [
+      {
+        q: "쇼핑몰은 어떻게 만들어요?",
+        a: (
+          <>
+            대문 <b>스튜디오</b>에서 마음에 드는 <b>스킨</b>을 고른 뒤 <b>“이 스킨으로 제작하기”</b>를
+            누르세요. 주소(영문)를 정하고 이름만 적으면 바로 내 쇼핑몰이 생겨요.
+          </>
+        ),
+      },
+      {
+        q: "상품은 어떻게 올려요?",
+        a: (
+          <>
+            <b>대시보드 → 내 쇼핑몰 → (몰 선택) → 📦 상품</b>에서 <b>추가</b>를 누르고 사진·이름·가격·설명을
+            넣으면 됩니다. 사진은 바로 업로드돼요.
+          </>
+        ),
+      },
+      {
+        q: "손님이 보게 하려면요?",
+        a: (
+          <>
+            몰 관리 화면 위쪽의 <b>🟢 발행하기</b>를 누르세요. <b>발행</b> 상태여야 주소로 접속했을 때
+            손님에게 보입니다. (비공개면 나만 보여요)
+          </>
+        ),
+      },
+    ],
+  },
+  {
+    id: "design",
+    label: "디자인·꾸미기",
+    icon: "🎨",
+    items: [
+      {
+        q: "디자인(스킨) 바꾸기",
+        a: (
+          <>
+            몰 관리 → <b>디자인</b> 탭에서 스킨을 고르고 <b>저장</b>하면 색·서체·무드가 통째로 바뀝니다.
+            언제든 다시 바꿀 수 있어요.
+          </>
+        ),
+      },
+      {
+        q: "상단 로고·배너 꾸미기",
+        a: (
+          <>
+            몰 관리의 <b>🎨 상단 꾸미기</b>에서 로고·배너 이미지와 제목·문구를 바꿀 수 있어요.
+          </>
+        ),
+      },
+      {
+        q: "대문 구성(섹션) 편집",
+        a: (
+          <>
+            <b>섹션 빌더</b>에서 기획전 배너·상품 선반(신상/베스트)·텍스트 블록을 <b>추가하고 순서를
+            바꿔</b> 나만의 대문을 짤 수 있어요.
+          </>
+        ),
+      },
+    ],
+  },
+  {
+    id: "domain",
+    label: "도메인 연결",
+    icon: "🌐",
+    items: [
+      {
+        q: "기본 주소가 뭐예요?",
+        a: (
+          <>
+            발행하면 <b>on.온종일.com/내주소</b> 로 바로 열립니다. 주소(영문)는 몰 관리에서 언제든 바꿀
+            수 있어요. 따로 도메인을 안 사도 돼요.
+          </>
+        ),
+      },
+      {
+        q: "내 도메인(mybrand.com) 연결",
+        a: (
+          <>
+            ① 도메인 산 곳(가비아·후이즈·Cloudflare 등)의 <b>DNS 설정</b>에서 한 줄 추가:
+            <div className="mt-1.5 rounded-lg border border-black/10 bg-black/[0.03] p-2 font-mono text-[11px] dark:border-white/10 dark:bg-white/[0.05]">
+              shop.mybrand.com → 타입 <b>CNAME</b>, 값 <b>cname.vercel-dns.com</b>
+              <br />
+              mybrand.com → 타입 <b>A</b>, 값 <b>76.76.21.21</b>
+            </div>
+            ② 몰 관리 <b>도메인</b> 칸에 내 도메인을 적고 저장. ③ 서버 등록·🔒https는 <b>자동</b>이에요.
+            연결까지 몇 분~몇 시간 걸릴 수 있어요.
+          </>
+        ),
+      },
+    ],
+  },
+  {
+    id: "features",
+    label: "전체 기능",
+    icon: "🛠",
+    items: [
+      {
+        q: "대시보드에서 뭘 할 수 있어요?",
+        a: (
+          <>
+            <b>대시보드</b>(요약) · <b>쇼핑몰</b>(생성/관리) · <b>상품</b>(전체 상품) · <b>주문/고객</b> ·{" "}
+            <b>분석</b>(몰·상품·가치 통계) · <b>설정</b>(비밀번호 등)을 한 곳에서 관리해요.
+          </>
+        ),
+      },
+      {
+        q: "상품 정렬·태그(베스트/신상)",
+        a: (
+          <>
+            상품에 <b>태그</b>(예: 베스트·인기·NEW)를 달면 스토어프런트가 <b>🔥베스트·🆕신상품 선반</b>으로
+            자동 분리해 보여줘요.
+          </>
+        ),
+      },
+    ],
+  },
+  {
+    id: "account",
+    label: "계정·관리자",
+    icon: "🔑",
+    items: [
+      {
+        q: "비밀번호를 잊었어요",
+        a: (
+          <>
+            로그인 화면의 <b>비밀번호 찾기</b>로 메일을 받아 새로 정하세요. 아이디는 <b>가입한 이메일</b>이에요.
+          </>
+        ),
+      },
+      {
+        q: "관리자(컨트롤타워) 입장",
+        a: (
+          <>
+            스튜디오 <b>좌측 상단 로고</b>를 <b>4번 빠르게 클릭</b>하면 관리자 로그인으로 들어가요. (숨은
+            입구라 평소엔 안 보여요)
+          </>
+        ),
+      },
+    ],
+  },
+];
+
+function DesignerAvatar({ size = 40 }: { size?: number }) {
+  // 디자이너 캐릭터: 베레모 + 둥근 안경 + 미소
+  return (
+    <svg width={size} height={size} viewBox="0 0 48 48" aria-hidden>
+      <defs>
+        <linearGradient id="onbot-g" x1="0" y1="0" x2="1" y2="1">
+          <stop offset="0" stopColor="#7c6dff" />
+          <stop offset="1" stopColor="#ff6ec7" />
+        </linearGradient>
+      </defs>
+      <circle cx="24" cy="24" r="24" fill="url(#onbot-g)" />
+      {/* 얼굴 */}
+      <circle cx="24" cy="26" r="12" fill="#ffe0c7" />
+      {/* 머리/베레모 */}
+      <path d="M12 18c1-7 8-10 12-10s11 3 12 10c0 1-2 1-4 1-2-3-5-4-8-4s-6 1-8 4c-2 0-4 0-4-1z" fill="#2a2350" />
+      <circle cx="36" cy="15" r="2.4" fill="#ff6ec7" />
+      {/* 안경 */}
+      <g fill="none" stroke="#2a2350" strokeWidth="1.6">
+        <circle cx="19.5" cy="25" r="3.2" />
+        <circle cx="28.5" cy="25" r="3.2" />
+        <path d="M22.7 25h2.6" />
+      </g>
+      {/* 미소 */}
+      <path d="M20 30.5c1.6 1.8 6.4 1.8 8 0" fill="none" stroke="#c0694a" strokeWidth="1.6" strokeLinecap="round" />
+    </svg>
+  );
+}
+
+export default function OnBot() {
+  const [open, setOpen] = useState(false);
+  const [cat, setCat] = useState<Cat | null>(null);
+  const [qa, setQa] = useState<QA | null>(null);
+
+  function reset() {
+    setCat(null);
+    setQa(null);
+  }
+
+  return (
+    <>
+      {/* 플로팅 버튼 */}
+      <button
+        type="button"
+        aria-label="온봇 도우미 열기"
+        onClick={() => setOpen((v) => !v)}
+        className="fixed bottom-5 right-5 z-[120] flex items-center gap-2 rounded-full bg-white/90 py-1.5 pl-1.5 pr-4 shadow-xl shadow-violet-500/20 ring-1 ring-black/5 backdrop-blur transition hover:-translate-y-0.5 hover:shadow-2xl dark:bg-[#191a30]/90 dark:ring-white/10"
+      >
+        <span className="relative inline-grid place-items-center">
+          <DesignerAvatar size={38} />
+          <span className="absolute -right-0.5 -top-0.5 h-3 w-3 rounded-full border-2 border-white bg-emerald-400 dark:border-[#191a30]" />
+        </span>
+        <span className="text-sm font-bold">온봇</span>
+      </button>
+
+      {/* 패널 */}
+      {open && (
+        <div className="fixed bottom-24 right-5 z-[120] flex max-h-[70vh] w-[min(360px,92vw)] flex-col overflow-hidden rounded-3xl border border-black/10 bg-white shadow-2xl dark:border-white/12 dark:bg-[#16172b]">
+          {/* 헤더 */}
+          <div className="flex items-center gap-3 bg-gradient-to-r from-violet-500 to-pink-500 p-4 text-white">
+            <DesignerAvatar size={40} />
+            <div className="flex-1">
+              <div className="text-[15px] font-extrabold leading-tight">온봇</div>
+              <div className="text-[11px] text-white/80">무한분양 디자이너 도우미</div>
+            </div>
+            <button
+              type="button"
+              aria-label="닫기"
+              onClick={() => setOpen(false)}
+              className="grid h-8 w-8 place-items-center rounded-full bg-white/20 text-sm hover:bg-white/30"
+            >
+              ✕
+            </button>
+          </div>
+
+          {/* 본문 */}
+          <div className="flex-1 overflow-auto p-4 text-sm">
+            {!cat ? (
+              <>
+                <p className="mb-3 text-neutral-500 dark:text-neutral-300">
+                  안녕하세요! 무엇이 궁금하세요? 👇 눌러보세요.
+                </p>
+                <div className="grid grid-cols-2 gap-2">
+                  {CATS.map((c) => (
+                    <button
+                      key={c.id}
+                      onClick={() => {
+                        setCat(c);
+                        setQa(null);
+                      }}
+                      className="flex flex-col items-start gap-1 rounded-2xl border border-black/8 bg-black/[0.02] p-3 text-left transition hover:-translate-y-0.5 hover:border-violet-400/50 dark:border-white/10 dark:bg-white/[0.03]"
+                    >
+                      <span className="text-xl">{c.icon}</span>
+                      <span className="text-[13px] font-bold">{c.label}</span>
+                    </button>
+                  ))}
+                </div>
+              </>
+            ) : qa ? (
+              <>
+                <button onClick={() => setQa(null)} className="mb-3 text-xs font-semibold text-violet-500">
+                  ← {cat.label}
+                </button>
+                <div className="mb-2 font-bold">{qa.q}</div>
+                <div className="leading-relaxed text-neutral-600 dark:text-neutral-300">{qa.a}</div>
+              </>
+            ) : (
+              <>
+                <button onClick={reset} className="mb-3 text-xs font-semibold text-violet-500">
+                  ← 처음으로
+                </button>
+                <div className="mb-2 flex items-center gap-2 font-bold">
+                  <span>{cat.icon}</span>
+                  {cat.label}
+                </div>
+                <div className="space-y-2">
+                  {cat.items.map((it) => (
+                    <button
+                      key={it.q}
+                      onClick={() => setQa(it)}
+                      className="flex w-full items-center justify-between gap-2 rounded-xl border border-black/8 bg-black/[0.02] px-3 py-2.5 text-left text-[13px] font-medium transition hover:border-violet-400/50 dark:border-white/10 dark:bg-white/[0.03]"
+                    >
+                      <span>{it.q}</span>
+                      <span className="text-neutral-400">›</span>
+                    </button>
+                  ))}
+                </div>
+              </>
+            )}
+          </div>
+
+          <div className="border-t border-black/5 px-4 py-2.5 text-center text-[11px] text-neutral-400 dark:border-white/10">
+            온봇은 도움말을 안내해요 · AI 응답 아님
+          </div>
+        </div>
+      )}
+    </>
+  );
+}
