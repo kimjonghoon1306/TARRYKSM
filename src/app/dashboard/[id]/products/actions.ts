@@ -3,6 +3,29 @@
 import { revalidatePath } from "next/cache";
 import { createClient } from "@/lib/supabase/server";
 
+// 옵션 JSON 파싱·검증 ([{name, choices:[{label, add}]}])
+function parseOptions(raw: FormDataEntryValue | null): unknown[] {
+  try {
+    const arr = JSON.parse(String(raw || "[]"));
+    if (!Array.isArray(arr)) return [];
+    return arr
+      .map((g) => ({
+        name: String(g?.name || "").trim(),
+        choices: Array.isArray(g?.choices)
+          ? g.choices
+              .map((c: { label?: unknown; add?: unknown }) => ({
+                label: String(c?.label || "").trim(),
+                add: Math.max(0, parseInt(String(c?.add ?? 0), 10) || 0),
+              }))
+              .filter((c: { label: string }) => c.label)
+          : [],
+      }))
+      .filter((g) => g.name && g.choices.length);
+  } catch {
+    return [];
+  }
+}
+
 // 소유 확인: 이 store가 현재 유저 것인지 (RLS가 막지만 UX용 선검사)
 async function assertOwner(storeId: string) {
   const supabase = await createClient();
@@ -54,6 +77,7 @@ export async function addProduct(formData: FormData) {
     name,
     price,
     stock,
+    options: parseOptions(formData.get("options")),
     emoji: String(formData.get("emoji") || "📦").trim() || "📦",
     image_url: imageUrl,
     brand: String(formData.get("brand") || "").trim() || null,
@@ -82,6 +106,7 @@ export async function updateProduct(formData: FormData) {
     name,
     price,
     stock,
+    options: parseOptions(formData.get("options")),
     emoji: String(formData.get("emoji") || "📦").trim() || "📦",
     brand: String(formData.get("brand") || "").trim() || null,
     category: String(formData.get("category") || "전체").trim() || "전체",

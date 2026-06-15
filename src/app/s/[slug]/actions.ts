@@ -2,7 +2,8 @@
 
 import { createClient } from "@/lib/supabase/server";
 
-export type CheckoutItem = { product_id: string; qty: number };
+export type CheckoutItem = { product_id: string; qty: number; opts?: Record<string, string> };
+type OptGroup = { name: string; choices: { label: string; add: number }[] };
 export type CheckoutBuyer = {
   name: string;
   phone: string;
@@ -28,7 +29,7 @@ export async function placeOrder(
   const ids = items.map((i) => i.product_id);
   const { data: prods } = await supabase
     .from("products")
-    .select("id,name,price,store_id,stock")
+    .select("id,name,price,store_id,stock,options")
     .in("id", ids)
     .eq("store_id", storeId);
   if (!prods || prods.length === 0) return { ok: false, error: "상품 정보를 찾을 수 없어요." };
@@ -39,10 +40,23 @@ export async function placeOrder(
       const p = priceMap.get(i.product_id);
       if (!p) return null;
       const qty = Math.max(1, Math.min(999, i.qty | 0));
+      // 옵션 추가금·표시명 서버 재계산 (클라 값 신뢰 안 함)
+      const groups = (Array.isArray(p.options) ? p.options : []) as OptGroup[];
+      let addPrice = 0;
+      const labelParts: string[] = [];
+      for (const g of groups) {
+        const sel = i.opts?.[g.name];
+        const ch = g.choices.find((c) => c.label === sel);
+        if (ch) {
+          addPrice += ch.add || 0;
+          labelParts.push(`${g.name}: ${ch.label}`);
+        }
+      }
+      const optText = labelParts.length ? ` (${labelParts.join(" / ")})` : "";
       return {
         product_id: p.id as string,
-        name: p.name as string,
-        price: p.price as number,
+        name: (p.name as string) + optText,
+        price: (p.price as number) + addPrice,
         qty,
         stock: (p.stock ?? null) as number | null,
       };

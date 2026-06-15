@@ -2,6 +2,7 @@ import Link from "next/link";
 import { notFound, redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { updateProduct } from "../actions";
+import OptionsEditor from "@/components/OptionsEditor";
 
 type Product = {
   id: string;
@@ -14,6 +15,7 @@ type Product = {
   tag: string | null;
   description: string | null;
   stock: number | null;
+  options: { name: string; choices: { label: string; add: number }[] }[] | null;
 };
 
 const CATS = ["전체", "패션", "리빙", "뷰티", "액세서리", "테크"];
@@ -30,7 +32,7 @@ export default async function EditProduct({
 
   const { data } = await supabase
     .from("products")
-    .select("id,emoji,image_url,name,brand,category,price,tag,description,stock")
+    .select("id,emoji,image_url,name,brand,category,price,tag,description,stock,options")
     .eq("id", pid)
     .eq("store_id", id)
     .maybeSingle();
@@ -104,6 +106,11 @@ export default async function EditProduct({
         <div className="sm:col-span-2">
           <Field label="설명">
             <textarea name="description" rows={3} defaultValue={p.description || ""} className={INPUT} />
+          </Field>
+        </div>
+        <div className="sm:col-span-2">
+          <Field label="옵션 (색상·사이즈 등)">
+            <OptionsEditor initial={p.options || []} />
           </Field>
         </div>
         <div className="flex gap-2 sm:col-span-2">

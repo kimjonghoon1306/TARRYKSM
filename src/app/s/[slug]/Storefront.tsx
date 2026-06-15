@@ -16,7 +16,18 @@ export type Product = {
   description: string | null;
   tag: string | null;
   stock?: number | null;
+  options?: OptGroup[] | null;
   created_at?: string | null;
+};
+
+type OptGroup = { name: string; choices: { label: string; add: number }[] };
+type CartLine = {
+  key: string;
+  product: Product;
+  qty: number;
+  opts: Record<string, string>;
+  unit: number; // 옵션 추가금 포함 단가
+  label: string; // 옵션 표시 텍스트
 };
 
 const BEST_RE = /best|베스트|인기|추천|hot|스테디/i;
@@ -50,9 +61,10 @@ export default function Storefront({
   products: Product[];
   sections?: Section[];
 }) {
-  const [cart, setCart] = useState<Record<string, number>>({});
+  const [cart, setCart] = useState<Record<string, CartLine>>({});
   const [detail, setDetail] = useState<Product | null>(null);
   const [detailQty, setDetailQty] = useState(1);
+  const [detailOpts, setDetailOpts] = useState<Record<string, string>>({});
   const [cartOpen, setCartOpen] = useState(false);
   const [activeCat, setActiveCat] = useState("전체");
   const [sort, setSort] = useState("recommend");
@@ -111,39 +123,58 @@ export default function Storefront({
   // 기획전 배너에 띄울 대표 상품 (베스트 우선, 없으면 첫 상품)
   const feature = bestItems[0] || products[0] || null;
 
-  const cartCount = Object.values(cart).reduce((a, b) => a + b, 0);
-  const cartLines = products.filter((p) => cart[p.id]).map((p) => ({ ...p, qty: cart[p.id] }));
-  const total = cartLines.reduce((sum, l) => sum + l.price * l.qty, 0);
+  const cartLines = Object.values(cart);
+  const cartCount = cartLines.reduce((a, l) => a + l.qty, 0);
+  const total = cartLines.reduce((sum, l) => sum + l.unit * l.qty, 0);
 
   function flash(msg: string) {
     setToast(msg);
     setTimeout(() => setToast(""), 1800);
   }
-  function add(p: Product, qty = 1) {
+  // 옵션 포함 담기. opts 없으면 기본.
+  function add(
+    p: Product,
+    qty = 1,
+    opts: Record<string, string> = {},
+    unit = p.price,
+    label = ""
+  ) {
     if (p.stock === 0) {
       flash("품절된 상품이에요");
       return;
     }
+    const key = p.id + "|" + JSON.stringify(opts);
     setCart((c) => {
-      const next = (c[p.id] || 0) + qty;
-      // 재고가 있으면 그 수량까지만
+      const prev = c[key]?.qty || 0;
+      const next = prev + qty;
       const capped = typeof p.stock === "number" ? Math.min(next, p.stock) : next;
-      return { ...c, [p.id]: capped };
+      return { ...c, [key]: { key, product: p, qty: capped, opts, unit, label } };
     });
     flash(`🛒 ${p.name} 담음`);
   }
-  function setQty(id: string, qty: number) {
+  function setQty(key: string, qty: number) {
     setCart((c) => {
       const next = { ...c };
-      if (qty <= 0) delete next[id];
-      else next[id] = qty;
+      if (qty <= 0) delete next[key];
+      else if (next[key]) next[key] = { ...next[key], qty };
       return next;
     });
   }
   function openDetail(p: Product) {
     setDetail(p);
     setDetailQty(1);
+    setDetailOpts({});
   }
+
+  // 상세 시트 옵션 계산
+  const dOpts: OptGroup[] = detail?.options || [];
+  const dAddPrice = dOpts.reduce((s, g) => {
+    const ch = g.choices.find((c) => c.label === detailOpts[g.name]);
+    return s + (ch?.add || 0);
+  }, 0);
+  const dAllSelected = dOpts.every((g) => detailOpts[g.name]);
+  const dUnit = detail ? detail.price + dAddPrice : 0;
+  const dOptLabel = dOpts.map((g) => `${g.name}: ${detailOpts[g.name]}`).join(" / ");
 
   async function submitOrder() {
     setOrderErr("");
@@ -153,7 +184,7 @@ export default function Storefront({
     }
     setPlacing(true);
     try {
-      const items = cartLines.map((l) => ({ product_id: l.id, qty: l.qty }));
+      const items = cartLines.map((l) => ({ product_id: l.product.id, qty: l.qty, opts: l.opts }));
       const res = await placeOrder(store.id, buyer, items);
       if (!res.ok) {
         setOrderErr(res.error || "주문에 실패했어요.");
@@ -195,7 +226,9 @@ export default function Storefront({
               onClick={(e) => {
                 e.stopPropagation();
                 if (soldOut) return;
-                add(p);
+                // 옵션 있으면 상세에서 선택하도록
+                if (p.options && p.options.length) openDetail(p);
+                else add(p);
               }}
             >
               {soldOut ? "품절" : "담기"}
@@ -500,19 +533,43 @@ export default function Storefront({
             {detail.brand && <div className="sf-brand">{detail.brand}</div>}
             <h2>{detail.name}</h2>
             <div className="sf-sheet-desc">{detail.description || "정성껏 준비한 상품입니다."}</div>
+
+            {/* 옵션 선택 */}
+            {dOpts.map((g) => (
+              <div key={g.name} className="sf-opt">
+                <div className="sf-opt-name">{g.name}</div>
+                <div className="sf-opt-choices">
+                  {g.choices.map((c) => (
+                    <button
+                      key={c.label}
+                      className={"sf-opt-chip" + (detailOpts[g.name] === c.label ? " on" : "")}
+                      onClick={() => setDetailOpts((o) => ({ ...o, [g.name]: c.label }))}
+                    >
+                      {c.label}
+                      {c.add > 0 && <span className="sf-opt-add"> +{won(c.add)}</span>}
+                    </button>
+                  ))}
+                </div>
+              </div>
+            ))}
+
             <div className="sf-sheet-buy">
               <div className="sf-qty">
                 <button onClick={() => setDetailQty((q) => Math.max(1, q - 1))}>−</button>
                 <span>{detailQty}</span>
                 <button onClick={() => setDetailQty((q) => q + 1)}>+</button>
               </div>
-              <div className="sf-price" style={{ fontSize: 20 }}>{won(detail.price * detailQty)}</div>
+              <div className="sf-price" style={{ fontSize: 20 }}>{won(dUnit * detailQty)}</div>
             </div>
             <button
               className="sf-add"
               style={{ marginTop: 16, padding: 13, fontSize: 15 }}
               onClick={() => {
-                add(detail, detailQty);
+                if (!dAllSelected) {
+                  flash("옵션을 선택해 주세요");
+                  return;
+                }
+                add(detail, detailQty, detailOpts, dUnit, dOptLabel);
                 setDetail(null);
               }}
             >
@@ -534,23 +591,24 @@ export default function Storefront({
             <div className="sf-cart-empty">장바구니가 비어 있어요.</div>
           ) : (
             cartLines.map((l) => (
-              <div key={l.id} className="sf-citem">
+              <div key={l.key} className="sf-citem">
                 <div className="ci-img">
-                  {l.image_url ? (
+                  {l.product.image_url ? (
                     // eslint-disable-next-line @next/next/no-img-element
-                    <img src={l.image_url} alt={l.name} className="sf-thumb-img" />
+                    <img src={l.product.image_url} alt={l.product.name} className="sf-thumb-img" />
                   ) : (
-                    l.emoji || "📦"
+                    l.product.emoji || "📦"
                   )}
                 </div>
                 <div className="ci-info">
-                  <b>{l.name}</b>
-                  <i>{won(l.price)}</i>
+                  <b>{l.product.name}</b>
+                  {l.label && <small className="ci-opt">{l.label}</small>}
+                  <i>{won(l.unit)}</i>
                 </div>
                 <div className="sf-qty">
-                  <button onClick={() => setQty(l.id, l.qty - 1)}>−</button>
+                  <button onClick={() => setQty(l.key, l.qty - 1)}>−</button>
                   <span>{l.qty}</span>
-                  <button onClick={() => setQty(l.id, l.qty + 1)}>+</button>
+                  <button onClick={() => setQty(l.key, l.qty + 1)}>+</button>
                 </div>
               </div>
             ))
@@ -620,9 +678,9 @@ export default function Storefront({
                 {/* 주문 요약 */}
                 <div className="sf-checkout-summary">
                   {cartLines.map((l) => (
-                    <div key={l.id} className="sf-co-line">
-                      <span>{l.name} × {l.qty}</span>
-                      <b>{won(l.price * l.qty)}</b>
+                    <div key={l.key} className="sf-co-line">
+                      <span>{l.product.name}{l.label ? ` (${l.label})` : ""} × {l.qty}</span>
+                      <b>{won(l.unit * l.qty)}</b>
                     </div>
                   ))}
                   <div className="sf-co-total">

@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { addProduct } from "@/app/dashboard/[id]/products/actions";
 import { SKIN_BY_ID } from "@/lib/skins";
+import OptionsEditor from "@/components/OptionsEditor";
 
 const CATS = ["전체", "패션", "리빙", "뷰티", "액세서리", "테크"];
 const INPUT =
@@ -66,6 +67,11 @@ export default function ProductForm({ storeId, skin }: { storeId: string; skin: 
         <div className="sm:col-span-2">
           <L label="설명">
             <textarea name="description" rows={2} value={desc} onChange={(e) => setDesc(e.target.value)} placeholder="상품 설명" className={INPUT} />
+          </L>
+        </div>
+        <div className="sm:col-span-2">
+          <L label="옵션 (색상·사이즈 등)">
+            <OptionsEditor />
           </L>
         </div>
         <div className="sm:col-span-2">

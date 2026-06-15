@@ -34,7 +34,7 @@ export default async function StorefrontPage({
 
   const { data: products } = await supabase
     .from("products")
-    .select("id,emoji,image_url,name,brand,price,category,description,tag,stock,created_at")
+    .select("id,emoji,image_url,name,brand,price,category,description,tag,stock,options,created_at")
     .eq("store_id", s.id)
     .order("position", { ascending: true });
   const items = (products ?? []) as Product[];
