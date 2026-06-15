@@ -6,6 +6,7 @@ import { setStoreDomain, togglePublish, setStoreSlug } from "../actions";
 import { PRIMARY_DOMAIN } from "@/lib/domains";
 import DomainHelp from "@/components/DomainHelp";
 import BrandingForm from "@/components/BrandingForm";
+import BrandingTutorial from "@/components/BrandingTutorial";
 
 type Store = {
   id: string;
@@ -116,6 +117,7 @@ export default async function StoreAdmin({
         {brmsg && (
           <p className="mb-3 rounded-lg bg-emerald-500/10 px-3 py-2 text-sm text-emerald-600 dark:text-emerald-400">{brmsg}</p>
         )}
+        <BrandingTutorial />
         <BrandingForm
           storeId={s.id}
           storeName={s.name}
