@@ -55,6 +55,7 @@ export default async function LoginPage({
       )}
 
       <form action={login} className="space-y-4">
+        {isAdmin && <input type="hidden" name="admin" value="1" />}
         <Field name="email" type="email" label="이메일" placeholder="you@email.com" icon="mail" required autoComplete="email" />
         <Field name="password" type="password" label="비밀번호" placeholder="비밀번호" icon="lock" required autoComplete="current-password" />
         <button className="mt-1 w-full rounded-xl bg-gradient-to-r from-violet-500 to-pink-500 py-3 text-sm font-semibold text-white shadow-lg shadow-violet-500/25 transition hover:brightness-105 active:scale-[.99]">

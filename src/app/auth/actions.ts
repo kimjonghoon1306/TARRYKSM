@@ -15,8 +15,31 @@ export async function login(formData: FormData) {
   const supabase = await createClient();
   const email = String(formData.get("email") || "");
   const password = String(formData.get("password") || "");
-  const { error } = await supabase.auth.signInWithPassword({ email, password });
-  if (error) redirect("/login?error=" + encodeURIComponent(authMsg(error.message)));
+  const adminOnly = String(formData.get("admin") || "") === "1"; // 관리자 전용 입구
+  const { data, error } = await supabase.auth.signInWithPassword({ email, password });
+  if (error) {
+    const dest = adminOnly ? "/login?admin=1&error=" : "/login?error=";
+    redirect(dest + encodeURIComponent(authMsg(error.message)));
+  }
+
+  // 관리자 전용 입구: 로그인은 됐어도 admin 역할이 아니면 거부(로그아웃)
+  if (adminOnly) {
+    const uid = data.user?.id;
+    let isAdmin = false;
+    if (uid) {
+      const { data: prof } = await supabase
+        .from("profiles")
+        .select("role")
+        .eq("id", uid)
+        .maybeSingle();
+      isAdmin = prof?.role === "admin";
+    }
+    if (!isAdmin) {
+      await supabase.auth.signOut();
+      redirect("/login?admin=1&error=" + encodeURIComponent("잘못 입력되었습니다."));
+    }
+  }
+
   redirect("/dashboard");
 }
 
