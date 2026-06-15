@@ -1,5 +1,6 @@
 import { createClient } from "@/lib/supabase/server";
 import OrderStatusSelect from "@/components/OrderStatusSelect";
+import ShippingForm from "@/components/ShippingForm";
 
 type OrderItem = { id: string; name: string; price: number; qty: number };
 type Order = {
@@ -13,6 +14,8 @@ type Order = {
   total: number;
   status: string;
   created_at: string;
+  courier: string | null;
+  tracking_no: string | null;
   stores: { name: string; slug: string } | null;
   order_items: OrderItem[];
 };
@@ -36,7 +39,7 @@ export default async function OrdersPage() {
     const { data, error } = await supabase
       .from("orders")
       .select(
-        "id,store_id,buyer_name,buyer_phone,buyer_email,address,memo,total,status,created_at,stores(name,slug),order_items(id,name,price,qty)"
+        "id,store_id,buyer_name,buyer_phone,buyer_email,address,memo,total,status,created_at,courier,tracking_no,stores(name,slug),order_items(id,name,price,qty)"
       )
       .order("created_at", { ascending: false });
     if (error) tableMissing = true;
@@ -125,6 +128,8 @@ export default async function OrdersPage() {
                       {o.memo && <div>📝 {o.memo}</div>}
                     </div>
                   )}
+
+                  <ShippingForm orderId={o.id} courier={o.courier} trackingNo={o.tracking_no} />
                 </div>
               ))}
             </div>
