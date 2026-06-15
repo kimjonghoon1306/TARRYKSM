@@ -321,3 +321,10 @@ textarea.sf-co-input { resize: vertical; min-height: 56px; }
 .sf-pay-bank { margin-top: 6px; font-size: 16px; font-weight: 700; color: var(--s-ink); }
 .sf-pay-amt { margin-top: 4px; font-size: 14px; font-weight: 700; color: var(--s-ink); font-variant-numeric: tabular-nums; }
 .sf-pay-note { margin-top: 8px; font-size: 12.5px; line-height: 1.6; color: var(--s-sub); }
+
+/* 재고/품절 */
+.sf-tag-soldout { background: #6b7280 !important; color: #fff !important; }
+.sf-card.sf-soldout .sf-thumb { opacity: .5; }
+.sf-card.sf-soldout .sf-thumb-img { filter: grayscale(.6); }
+.sf-stock-low { margin-top: 2px; font-size: 11px; font-weight: 700; color: #e11d48; }
+.sf-add:disabled { background: #d1d5db; color: #6b7280; cursor: not-allowed; box-shadow: none; }

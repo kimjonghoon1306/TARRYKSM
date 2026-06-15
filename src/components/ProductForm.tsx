@@ -60,6 +60,9 @@ export default function ProductForm({ storeId, skin }: { storeId: string; skin: 
         <L label="태그(NEW·BEST 등)">
           <input name="tag" value={tag} onChange={(e) => setTag(e.target.value)} placeholder="NEW" className={INPUT} />
         </L>
+        <L label="재고 수량(비우면 무제한)">
+          <input name="stock" type="number" min={0} placeholder="무제한" className={INPUT} />
+        </L>
         <div className="sm:col-span-2">
           <L label="설명">
             <textarea name="description" rows={2} value={desc} onChange={(e) => setDesc(e.target.value)} placeholder="상품 설명" className={INPUT} />

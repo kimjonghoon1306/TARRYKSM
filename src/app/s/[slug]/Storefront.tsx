@@ -15,6 +15,7 @@ export type Product = {
   category: string | null;
   description: string | null;
   tag: string | null;
+  stock?: number | null;
   created_at?: string | null;
 };
 
@@ -119,7 +120,16 @@ export default function Storefront({
     setTimeout(() => setToast(""), 1800);
   }
   function add(p: Product, qty = 1) {
-    setCart((c) => ({ ...c, [p.id]: (c[p.id] || 0) + qty }));
+    if (p.stock === 0) {
+      flash("품절된 상품이에요");
+      return;
+    }
+    setCart((c) => {
+      const next = (c[p.id] || 0) + qty;
+      // 재고가 있으면 그 수량까지만
+      const capped = typeof p.stock === "number" ? Math.min(next, p.stock) : next;
+      return { ...c, [p.id]: capped };
+    });
     flash(`🛒 ${p.name} 담음`);
   }
   function setQty(id: string, qty: number) {
@@ -158,10 +168,12 @@ export default function Storefront({
   }
 
   function renderCard(p: Product) {
+    const soldOut = p.stock === 0;
     return (
-      <div key={p.id} className="sf-card" onClick={() => openDetail(p)}>
+      <div key={p.id} className={"sf-card" + (soldOut ? " sf-soldout" : "")} onClick={() => openDetail(p)}>
         <div className="sf-thumb">
-          {p.tag && <span className="sf-tag">{p.tag}</span>}
+          {p.tag && !soldOut && <span className="sf-tag">{p.tag}</span>}
+          {soldOut && <span className="sf-tag sf-tag-soldout">품절</span>}
           {p.image_url ? (
             // eslint-disable-next-line @next/next/no-img-element
             <img src={p.image_url} alt={p.name} className="sf-thumb-img" />
@@ -172,16 +184,21 @@ export default function Storefront({
         <div className="sf-meta">
           {p.brand && <div className="sf-brand">{p.brand}</div>}
           <div className="sf-name">{p.name}</div>
+          {typeof p.stock === "number" && p.stock > 0 && p.stock <= 5 && (
+            <div className="sf-stock-low">{p.stock}개 남음</div>
+          )}
           <div className="sf-bottom">
             <div className="sf-price">{won(p.price)}</div>
             <button
               className="sf-add"
+              disabled={soldOut}
               onClick={(e) => {
                 e.stopPropagation();
+                if (soldOut) return;
                 add(p);
               }}
             >
-              담기
+              {soldOut ? "품절" : "담기"}
             </button>
           </div>
         </div>

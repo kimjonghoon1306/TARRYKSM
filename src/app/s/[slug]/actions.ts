@@ -28,7 +28,7 @@ export async function placeOrder(
   const ids = items.map((i) => i.product_id);
   const { data: prods } = await supabase
     .from("products")
-    .select("id,name,price,store_id")
+    .select("id,name,price,store_id,stock")
     .in("id", ids)
     .eq("store_id", storeId);
   if (!prods || prods.length === 0) return { ok: false, error: "상품 정보를 찾을 수 없어요." };
@@ -39,10 +39,28 @@ export async function placeOrder(
       const p = priceMap.get(i.product_id);
       if (!p) return null;
       const qty = Math.max(1, Math.min(999, i.qty | 0));
-      return { product_id: p.id as string, name: p.name as string, price: p.price as number, qty };
+      return {
+        product_id: p.id as string,
+        name: p.name as string,
+        price: p.price as number,
+        qty,
+        stock: (p.stock ?? null) as number | null,
+      };
     })
-    .filter((l): l is { product_id: string; name: string; price: number; qty: number } => !!l);
+    .filter((l): l is { product_id: string; name: string; price: number; qty: number; stock: number | null } => !!l);
   if (!lines.length) return { ok: false, error: "주문할 상품이 없어요." };
+
+  // 재고 확인 (관리 중인 상품만)
+  const short = lines.find((l) => typeof l.stock === "number" && l.qty > (l.stock as number));
+  if (short) {
+    return {
+      ok: false,
+      error:
+        short.stock === 0
+          ? `'${short.name}'은(는) 품절됐어요.`
+          : `'${short.name}'은(는) ${short.stock}개만 남았어요.`,
+    };
+  }
 
   const total = lines.reduce((sum, l) => sum + l.price * l.qty, 0);
 
@@ -74,6 +92,13 @@ export async function placeOrder(
     // 줄 저장 실패 시 주문도 정리(주문은 본인이 못 지우므로 best-effort)
     return { ok: false, error: "주문 상품 저장에 실패했어요." };
   }
+
+  // 재고 차감 (관리 중인 상품만, RPC가 null이면 무시)
+  await Promise.all(
+    lines
+      .filter((l) => typeof l.stock === "number")
+      .map((l) => supabase.rpc("decrement_stock", { pid: l.product_id, qty: l.qty }))
+  );
 
   return { ok: true, orderId: order.id as string };
 }

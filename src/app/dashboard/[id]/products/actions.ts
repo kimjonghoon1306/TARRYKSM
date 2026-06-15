@@ -45,12 +45,15 @@ export async function addProduct(formData: FormData) {
   const name = String(formData.get("name") || "").trim();
   if (!name) return;
   const price = parseInt(String(formData.get("price") || "0"), 10) || 0;
+  const stockRaw = String(formData.get("stock") || "").trim();
+  const stock = stockRaw === "" ? null : Math.max(0, parseInt(stockRaw, 10) || 0);
   const imageUrl = await uploadImage(supabase, storeId, formData.get("image"));
 
   await supabase.from("products").insert({
     store_id: storeId,
     name,
     price,
+    stock,
     emoji: String(formData.get("emoji") || "📦").trim() || "📦",
     image_url: imageUrl,
     brand: String(formData.get("brand") || "").trim() || null,
@@ -71,11 +74,14 @@ export async function updateProduct(formData: FormData) {
   const name = String(formData.get("name") || "").trim();
   if (!name) return;
   const price = parseInt(String(formData.get("price") || "0"), 10) || 0;
+  const stockRaw = String(formData.get("stock") || "").trim();
+  const stock = stockRaw === "" ? null : Math.max(0, parseInt(stockRaw, 10) || 0);
   const imageUrl = await uploadImage(supabase, storeId, formData.get("image"));
 
   const patch: Record<string, unknown> = {
     name,
     price,
+    stock,
     emoji: String(formData.get("emoji") || "📦").trim() || "📦",
     brand: String(formData.get("brand") || "").trim() || null,
     category: String(formData.get("category") || "전체").trim() || "전체",

@@ -13,6 +13,7 @@ type Product = {
   price: number;
   tag: string | null;
   description: string | null;
+  stock: number | null;
 };
 
 const CATS = ["전체", "패션", "리빙", "뷰티", "액세서리", "테크"];
@@ -29,7 +30,7 @@ export default async function EditProduct({
 
   const { data } = await supabase
     .from("products")
-    .select("id,emoji,image_url,name,brand,category,price,tag,description")
+    .select("id,emoji,image_url,name,brand,category,price,tag,description,stock")
     .eq("id", pid)
     .eq("store_id", id)
     .maybeSingle();
@@ -96,6 +97,9 @@ export default async function EditProduct({
         </Field>
         <Field label="태그">
           <input name="tag" defaultValue={p.tag || ""} className={INPUT} />
+        </Field>
+        <Field label="재고 수량(비우면 무제한)">
+          <input name="stock" type="number" min={0} defaultValue={p.stock ?? ""} placeholder="무제한" className={INPUT} />
         </Field>
         <div className="sm:col-span-2">
           <Field label="설명">
