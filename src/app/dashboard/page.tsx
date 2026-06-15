@@ -31,6 +31,17 @@ export default async function Overview({
     productCount = count ?? 0;
   }
 
+  // 매출·주문 요약 (RLS가 내 몰 주문만 반환, 테이블 없으면 빈 배열)
+  let orders: { total: number; status: string }[] = [];
+  if (user) {
+    const { data } = await supabase.from("orders").select("total,status");
+    if (data) orders = data as { total: number; status: string }[];
+  }
+  const paidOrders = orders.filter((o) => o.status !== "취소");
+  const revenue = paidOrders.reduce((s, o) => s + (o.total || 0), 0);
+  const newOrders = orders.filter((o) => o.status === "신규").length;
+  const won = (n: number) => "₩" + n.toLocaleString("ko-KR");
+
   const card =
     "rounded-2xl border border-black/5 bg-white p-5 shadow-sm dark:border-white/10 dark:bg-white/[0.03]";
 
@@ -59,8 +70,26 @@ export default async function Overview({
         <p className="mt-4 rounded-lg bg-rose-500/10 px-3 py-2 text-sm text-rose-600 dark:text-rose-400">{serr}</p>
       )}
 
+      {/* 매출·주문 요약 (실주문 기반) */}
+      {user && (
+        <div className="mt-6 grid grid-cols-2 gap-3 sm:grid-cols-3">
+          <Link href="/dashboard/orders" className={card + " lift transition hover:border-violet-400"}>
+            <div className="text-2xl font-bold sm:text-3xl">{won(revenue)}</div>
+            <div className="mt-1 text-xs text-neutral-500">💰 총 매출 (취소 제외)</div>
+          </Link>
+          <Link href="/dashboard/orders" className={card + " lift transition hover:border-violet-400"}>
+            <div className="text-2xl font-bold text-violet-500 sm:text-3xl">{newOrders}</div>
+            <div className="mt-1 text-xs text-neutral-500">🧾 새 주문 (신규)</div>
+          </Link>
+          <Link href="/dashboard/orders" className={card + " lift col-span-2 transition hover:border-violet-400 sm:col-span-1"}>
+            <div className="text-2xl font-bold sm:text-3xl">{orders.length}</div>
+            <div className="mt-1 text-xs text-neutral-500">📦 전체 주문</div>
+          </Link>
+        </div>
+      )}
+
       {/* 요약 통계 */}
-      <div className="mt-6 grid grid-cols-3 gap-3">
+      <div className="mt-3 grid grid-cols-3 gap-3">
         {stats.map((s) => (
           <Link key={s.label} href={s.href} className={card + " lift transition hover:border-violet-400"}>
             <div className="text-2xl font-bold sm:text-3xl">{s.n}</div>
