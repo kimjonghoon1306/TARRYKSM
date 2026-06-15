@@ -75,6 +75,57 @@ const SKINS = [
     brand:'BLAZE', badge:'GO HARD',
     heroTitle:'Move faster', heroSub:'강렬한 레드로 밀어붙이는 액티브 셀렉션. 멈추지 않는 하루.',
     cta:'GEAR UP', chips:['ALL','스포츠','액티브','슈즈','기어'] },
+
+  // ── 식품·농축수산물·업태 특화 10종 ──
+  { id:'harvest', name:'Harvest', emoji:'🌾', vibe:'유기농 내추럴 그린',
+    brand:'들녘', badge:'정직하게 기른',
+    heroTitle:'땅이 키운 그대로', heroSub:'농약 대신 햇빛과 정성으로. 오늘 아침 밭에서 온 건강한 먹거리.',
+    cta:'수확물 보기', chips:['전체','채소','쌀·잡곡','과일','가공'] },
+
+  { id:'ocean', name:'Ocean', emoji:'🌊', vibe:'청량한 바다 블루',
+    brand:'바다온', badge:'오늘 들어온',
+    heroTitle:'바다에서 식탁까지', heroSub:'새벽 경매에서 막 올라온 신선함. 비린내 없이 깨끗하게.',
+    cta:'수산물 보기', chips:['전체','활어·선어','건어물','젓갈','해조류'] },
+
+  { id:'butcher', name:'Butcher', emoji:'🥩', vibe:'프리미엄 정육 버건디',
+    brand:'한근정육', badge:'PREMIUM CUT',
+    heroTitle:'한 점의 품격', heroSub:'엄선한 숙성과 정직한 등급. 특별한 식탁을 위한 고기.',
+    cta:'부위별 보기', chips:['전체','한우','돼지','수입육','가공육'] },
+
+  { id:'bakery', name:'Bakery', emoji:'🥐', vibe:'포근한 베이커리 카라멜',
+    brand:'오늘의빵', badge:'갓 구운',
+    heroTitle:'오늘도 따끈하게', heroSub:'버터 향 가득한 정직한 반죽. 매일 아침 갓 구워 냅니다.',
+    cta:'빵 구경하기', chips:['전체','식빵','페이스트리','케이크','쿠키'] },
+
+  { id:'orchard', name:'Orchard', emoji:'🍑', vibe:'상큼한 과수원 오렌지',
+    brand:'과수원집', badge:'제철 과일 🍊',
+    heroTitle:'햇살 담은 단맛', heroSub:'가장 맛있게 익은 순간에 수확. 한 입 베어 물면 과수원이 펼쳐져요.',
+    cta:'제철 보기', chips:['전체','제철','선물세트','주스','말랭이'] },
+
+  { id:'hanok', name:'Hanok', emoji:'🏮', vibe:'전통 한지 단청',
+    brand:'고운결', badge:'전통의 손맛',
+    heroTitle:'느린 시간이 빚은 맛', heroSub:'장독대에서 익어가는 정성. 대를 이어온 우리 발효의 깊이.',
+    cta:'전통식품 보기', chips:['전체','장류','김치·발효','전통주','선물'] },
+
+  { id:'market', name:'Market', emoji:'🛒', vibe:'활기찬 전통시장 레드',
+    brand:'정다운반찬', badge:'오늘도 푸짐',
+    heroTitle:'엄마손 반찬, 한가득', heroSub:'매일 아침 직접 만든 반찬. 싸고 푸짐하게, 정 담아 드려요.',
+    cta:'반찬 보기', chips:['전체','밑반찬','국·찌개','김치','분식'] },
+
+  { id:'sprout', name:'Sprout', emoji:'🥬', vibe:'싱그러운 새싹 그린',
+    brand:'초록한끼', badge:'FRESH & CLEAN',
+    heroTitle:'가볍고 깨끗한 한 끼', heroSub:'아침 이슬 머금은 채소 그대로. 몸이 가벼워지는 신선함.',
+    cta:'신선채소 보기', chips:['전체','샐러드','쌈채소','비건','즙'] },
+
+  { id:'dairy', name:'Dairy', emoji:'🥛', vibe:'포근한 낙농 밀키블루',
+    brand:'목장하루', badge:'매일 신선',
+    heroTitle:'순하고 부드럽게', heroSub:'좋은 목장에서 온 신선한 유제품. 아이도 안심하고 먹어요.',
+    cta:'유제품 보기', chips:['전체','우유','치즈','요거트','아이스크림'] },
+
+  { id:'gourmet', name:'Gourmet', emoji:'🎁', vibe:'다크 골드 프리미엄 델리',
+    brand:'MAISON DELI', badge:'GIFT SELECTION',
+    heroTitle:'귀한 분께, 귀한 맛', heroSub:'엄선한 프리미엄 식료와 선물세트. 격이 다른 한 상자.',
+    cta:'선물세트 보기', chips:['ALL','선물세트','수입식품','와인·차','델리'] },
 ];
 
 const SKIN_BY_ID = Object.fromEntries(SKINS.map(s => [s.id, s]));

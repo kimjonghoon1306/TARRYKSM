@@ -47,6 +47,31 @@
 .sf[data-skin="crimson"] { --s-bg:#fdf1f0;--s-surf:#fff;--s-ink:#2a0f0d;--s-sub:#b07f7b;--s-line:#f8d6d2;--s-brand:#e23b2e;--s-brand-ink:#fff;--s-brand-soft:#ffd8d3;--s-hero:linear-gradient(120deg,#ffd9d4,#fff0ed);--s-r:12px;--s-fw:800;--s-ls:-.01em;--s-hls:-.03em;--s-fd:'Archivo',sans-serif;--s-fb:'Inter',sans-serif; }
 .sf[data-skin="crimson"] .sf-hero h1, .sf[data-skin="crimson"] .sf-logo { text-transform: uppercase; }
 
+/* ════════════════════════════════════════
+   식품 · 농축수산물 · 업태 특화 스킨 10종
+════════════════════════════════════════ */
+/* 15 · HARVEST — 유기농 내추럴 그린 */
+.sf[data-skin="harvest"] { --s-bg:#f3f6ec;--s-surf:#fff;--s-ink:#243218;--s-sub:#6f7d5a;--s-line:#e0e7d0;--s-brand:#5c8a3a;--s-brand-ink:#fff;--s-brand-soft:#e2eed0;--s-hero:linear-gradient(135deg,#dfeccb,#f3f6ec);--s-r:14px;--s-fw:500;--s-hls:0;--s-fd:'Fraunces',serif;--s-fb:'Inter',sans-serif; }
+/* 16 · OCEAN — 청량한 바다 블루 */
+.sf[data-skin="ocean"] { --s-bg:#eef5f6;--s-surf:#fff;--s-ink:#0d2a33;--s-sub:#5f8893;--s-line:#d6e6ea;--s-brand:#0e8aa8;--s-brand-ink:#fff;--s-brand-soft:#d2ecf2;--s-hero:linear-gradient(150deg,#cfe9ef,#eff7f8);--s-r:12px;--s-fd:'Space Grotesk',sans-serif;--s-fb:'Inter',sans-serif; }
+/* 17 · BUTCHER — 프리미엄 정육 버건디 */
+.sf[data-skin="butcher"] { --s-bg:#f5efe9;--s-surf:#fbf6f1;--s-ink:#2a1512;--s-sub:#997a70;--s-line:#e6d8cf;--s-brand:#9c2b2b;--s-brand-ink:#fff;--s-brand-soft:#efd9d3;--s-hero:linear-gradient(140deg,#e7d3cb,#f5efe9);--s-r:8px;--s-fw:500;--s-hls:0;--s-fd:'Fraunces',serif;--s-fb:'Inter',sans-serif; }
+/* 18 · BAKERY — 포근한 베이커리 카라멜 */
+.sf[data-skin="bakery"] { --s-bg:#fbf3e7;--s-surf:#fffaf2;--s-ink:#4a3522;--s-sub:#a98c6c;--s-line:#efe0cb;--s-brand:#c8893f;--s-brand-ink:#fff;--s-brand-soft:#f5e3c8;--s-hero:linear-gradient(135deg,#f6e6cd,#fbf3e7);--s-r:18px;--s-radd:14px;--s-fd:'Fraunces',serif;--s-fb:'Plus Jakarta Sans',sans-serif; }
+/* 19 · ORCHARD — 상큼한 과수원 오렌지 */
+.sf[data-skin="orchard"] { --s-bg:#fff3ee;--s-surf:#fff;--s-ink:#43251c;--s-sub:#c0907f;--s-line:#fdded0;--s-brand:#ff7a3d;--s-brand-ink:#fff;--s-brand-soft:#ffe0d0;--s-hero:linear-gradient(130deg,#ffd9c2,#fff1e8);--s-r:20px;--s-radd:14px;--s-fw:800;--s-hls:-.03em;--s-fd:'Archivo',sans-serif;--s-fb:'Plus Jakarta Sans',sans-serif; }
+/* 20 · HANOK — 전통 한지 단청 */
+.sf[data-skin="hanok"] { --s-bg:#f4eee1;--s-surf:#fbf7ee;--s-ink:#2c241a;--s-sub:#8c7c63;--s-line:#e4d9c4;--s-brand:#b23a2e;--s-brand-ink:#fff;--s-brand-soft:#ecd9bf;--s-hero:linear-gradient(140deg,#e8dcc4,#f4eee1);--s-r:6px;--s-fw:500;--s-ls:.02em;--s-hls:0;--s-fd:'Fraunces',serif;--s-fb:'Inter',sans-serif; }
+/* 21 · MARKET — 활기찬 전통시장 레드 */
+.sf[data-skin="market"] { --s-bg:#fff7e8;--s-surf:#fff;--s-ink:#3a2410;--s-sub:#b08a4f;--s-line:#f3e2bd;--s-brand:#e8442e;--s-brand-ink:#fff;--s-brand-soft:#ffe1b0;--s-hero:linear-gradient(120deg,#ffd98a,#ffe9c2);--s-r:10px;--s-fw:800;--s-ls:-.01em;--s-hls:-.02em;--s-fd:'Archivo',sans-serif;--s-fb:'Inter',sans-serif; }
+/* 22 · SPROUT — 싱그러운 새싹 그린 */
+.sf[data-skin="sprout"] { --s-bg:#f0f7ee;--s-surf:#fff;--s-ink:#18301c;--s-sub:#6f8a6e;--s-line:#dcebd6;--s-brand:#3fa64f;--s-brand-ink:#fff;--s-brand-soft:#d6efd6;--s-hero:linear-gradient(140deg,#d4eecd,#f0f7ee);--s-r:16px;--s-fd:'Space Grotesk',sans-serif;--s-fb:'Inter',sans-serif; }
+/* 23 · DAIRY — 포근한 낙농 밀키블루 */
+.sf[data-skin="dairy"] { --s-bg:#f3f6fb;--s-surf:#fff;--s-ink:#2a3142;--s-sub:#8893a8;--s-line:#e2e8f2;--s-brand:#5b8fd6;--s-brand-ink:#fff;--s-brand-soft:#dde9f8;--s-hero:linear-gradient(150deg,#e3edf8,#f3f6fb);--s-r:20px;--s-radd:14px;--s-fd:'Plus Jakarta Sans',sans-serif;--s-fb:'Plus Jakarta Sans',sans-serif; }
+/* 24 · GOURMET — 다크 골드 프리미엄 델리 */
+.sf[data-skin="gourmet"] { --s-bg:#14130f;--s-surf:#1d1c16;--s-ink:#f2ede0;--s-sub:#9c9686;--s-line:rgba(255,255,255,.09);--s-brand:#c9a44f;--s-brand-ink:#14130f;--s-brand-soft:rgba(201,164,79,.16);--s-hero:linear-gradient(160deg,#22201a,#14130f);--s-r:8px;--s-fw:500;--s-hls:0;--s-shadow:0 22px 44px -18px rgba(0,0,0,.7);--s-fd:'Fraunces',serif;--s-fb:'Inter',sans-serif; }
+.sf[data-skin="gourmet"] .sf-add, .sf[data-skin="gourmet"] .sf-cart-btn { box-shadow: 0 0 18px rgba(201,164,79,.35); }
+
 /* ── 컴포넌트 ── */
 .sf { min-height: 100vh; background: var(--s-bg); color: var(--s-ink); font-family: var(--s-fb); }
 .sf * { box-sizing: border-box; }

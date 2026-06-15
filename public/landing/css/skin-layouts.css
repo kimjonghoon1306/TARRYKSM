@@ -56,3 +56,34 @@
 [data-skin="grape"] .pcard:hover,[data-skin="midnight"] .pcard:hover{
   border-color:var(--s-brand);
 }
+
+/* ════ 식품·농수산 스킨 레이아웃 배정 ════ */
+/* SOFT(가운데·부드럽게): ocean·bakery·sprout·dairy */
+[data-skin="ocean"] .st-hero,[data-skin="bakery"] .st-hero,
+[data-skin="sprout"] .st-hero,[data-skin="dairy"] .st-hero{
+  display:flex;flex-direction:column;align-items:center;text-align:center;
+}
+[data-skin="ocean"] .sth-sub,[data-skin="bakery"] .sth-sub,
+[data-skin="sprout"] .sth-sub,[data-skin="dairy"] .sth-sub{margin-left:auto;margin-right:auto}
+[data-skin="ocean"] .sh-head,[data-skin="bakery"] .sh-head,
+[data-skin="sprout"] .sh-head,[data-skin="dairy"] .sh-head{justify-content:center;text-align:center}
+[data-skin="ocean"] .pcard,[data-skin="bakery"] .pcard,
+[data-skin="sprout"] .pcard,[data-skin="dairy"] .pcard{text-align:center}
+[data-skin="ocean"] .pc-bottom,[data-skin="bakery"] .pc-bottom,
+[data-skin="sprout"] .pc-bottom,[data-skin="dairy"] .pc-bottom{justify-content:center;gap:10px}
+
+/* EDITORIAL(세로 긴 컷·여유 그리드): harvest·butcher·hanok·gourmet (세리프 무드) */
+[data-skin="harvest"] .sh-grid,[data-skin="butcher"] .sh-grid,
+[data-skin="hanok"] .sh-grid,[data-skin="gourmet"] .sh-grid{
+  grid-template-columns:repeat(auto-fill,minmax(198px,1fr));
+}
+[data-skin="harvest"] .pc-media,[data-skin="butcher"] .pc-media,
+[data-skin="hanok"] .pc-media,[data-skin="gourmet"] .pc-media{aspect-ratio:4/5}
+
+/* POP(촘촘·굵은 밑줄 헤더): orchard·market */
+[data-skin="orchard"] .sh-grid,[data-skin="market"] .sh-grid{
+  grid-template-columns:repeat(auto-fill,minmax(146px,1fr));
+}
+[data-skin="orchard"] .sh-head,[data-skin="market"] .sh-head{
+  border-bottom:3px solid var(--s-brand);padding-bottom:12px;align-items:center;
+}
