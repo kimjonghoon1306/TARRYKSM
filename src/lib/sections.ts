@@ -13,6 +13,7 @@ export type SectionConfig = {
   cta_label?: string;
   link_product_id?: string | null;
   link_url?: string | null;
+  height?: "sm" | "md" | "lg";
   // 선반/그리드
   source?: "new" | "best" | "category" | "manual" | "all";
   category?: string;

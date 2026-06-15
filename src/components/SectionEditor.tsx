@@ -82,6 +82,18 @@ export default function SectionEditor({
     start(() => deleteSection(storeId, id).then(() => {}));
   }
 
+  // 모바일/접근성용 위·아래 이동 (드래그는 터치에서 안 됨)
+  function move(id: string, dir: -1 | 1) {
+    const ids = sections.map((s) => s.id);
+    const from = ids.indexOf(id);
+    const to = from + dir;
+    if (to < 0 || to >= sections.length) return;
+    const next = [...sections];
+    [next[from], next[to]] = [next[to], next[from]];
+    setSections(next);
+    start(() => reorderSections(storeId, next.map((s) => s.id)).then(() => {}));
+  }
+
   function onDrop(targetId: string) {
     setOver(null);
     if (!drag || drag === targetId) return setDrag(null);
@@ -154,7 +166,7 @@ export default function SectionEditor({
             아직 블록이 없어요. <span className="font-semibold text-violet-500">＋ 블록 추가</span>로 시작하세요.
           </div>
         )}
-        {sections.map((s) => {
+        {sections.map((s, idx) => {
           const m = SECTION_META[s.type];
           const isOpen = open === s.id;
           return (
@@ -181,8 +193,26 @@ export default function SectionEditor({
             >
               {/* 헤더 줄 */}
               <div className="flex items-center gap-2 px-4 py-3">
-                <span className="cursor-grab select-none text-neutral-300 active:cursor-grabbing" title="드래그로 이동">
+                <span className="hidden cursor-grab select-none text-neutral-300 active:cursor-grabbing sm:inline" title="드래그로 이동">
                   ⠿
+                </span>
+                <span className="flex flex-col leading-none">
+                  <button
+                    onClick={() => move(s.id, -1)}
+                    disabled={idx === 0}
+                    title="위로"
+                    className="px-1 text-[10px] text-neutral-400 transition hover:text-violet-500 disabled:opacity-20"
+                  >
+                    ▲
+                  </button>
+                  <button
+                    onClick={() => move(s.id, 1)}
+                    disabled={idx === sections.length - 1}
+                    title="아래로"
+                    className="px-1 text-[10px] text-neutral-400 transition hover:text-violet-500 disabled:opacity-20"
+                  >
+                    ▼
+                  </button>
                 </span>
                 <span className="text-lg">{m.icon}</span>
                 <button onClick={() => setOpen(isOpen ? null : s.id)} className="flex-1 text-left">
@@ -287,9 +317,19 @@ function Fields({
           <label className={label}>제목</label>
           <input className={input} value={c.title || ""} onChange={(e) => onPatch({ title: e.target.value })} placeholder="기획전 제목" />
         </div>
-        <div>
-          <label className={label}>부제</label>
-          <input className={input} value={c.subtitle || ""} onChange={(e) => onPatch({ subtitle: e.target.value })} placeholder="부제를 입력하세요" />
+        <div className="grid gap-4 sm:grid-cols-2">
+          <div>
+            <label className={label}>부제</label>
+            <input className={input} value={c.subtitle || ""} onChange={(e) => onPatch({ subtitle: e.target.value })} placeholder="부제를 입력하세요" />
+          </div>
+          <div>
+            <label className={label}>배너 높이</label>
+            <select className={input} value={c.height || "md"} onChange={(e) => onPatch({ height: e.target.value as SectionConfig["height"] })}>
+              <option value="sm">작게</option>
+              <option value="md">보통</option>
+              <option value="lg">크게</option>
+            </select>
+          </div>
         </div>
         <div className="grid gap-4 sm:grid-cols-2">
           <div>

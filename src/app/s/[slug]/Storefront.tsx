@@ -162,7 +162,7 @@ export default function Storefront({
       return (
         <button
           key={s.id}
-          className={"sf-promo" + (c.image_url ? " has-img" : "")}
+          className={"sf-promo sf-promo--" + (c.height || "md") + (c.image_url ? " has-img" : "")}
           style={c.image_url ? { backgroundImage: `url(${c.image_url})` } : undefined}
           onClick={() => {
             if (link) openDetail(link);

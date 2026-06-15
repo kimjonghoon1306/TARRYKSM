@@ -273,6 +273,11 @@
 .sf-promo { display: block; width: 100%; text-align: left; cursor: pointer; border: 0; position: relative; overflow: hidden; margin: 2px 0 32px; padding: 40px 34px; border-radius: calc(var(--s-r) + 6px); background: linear-gradient(120deg, var(--s-brand), color-mix(in srgb, var(--s-brand) 52%, var(--s-ink))); color: var(--s-brand-ink); box-shadow: var(--s-shadow); transition: transform .25s var(--ease), box-shadow .25s var(--ease); }
 .sf-promo:hover { transform: translateY(-3px); box-shadow: var(--s-shadow), 0 16px 34px -12px rgba(0, 0, 0, .42); }
 .sf-promo.has-img { background-size: cover; background-position: center; min-height: 210px; color: #fff; }
+/* 배너 높이 옵션 (작게/보통/크게) */
+.sf-promo--sm { padding: 26px 30px; }
+.sf-promo--sm.has-img { min-height: 150px; }
+.sf-promo--lg { padding: 58px 38px; }
+.sf-promo--lg.has-img { min-height: 320px; display: flex; align-items: flex-end; }
 .sf-promo.has-img::after { content: ""; position: absolute; inset: 0; background: linear-gradient(110deg, rgba(0, 0, 0, .62), rgba(0, 0, 0, .15) 64%, transparent); }
 .sf-promo-inner { position: relative; z-index: 1; }
 .sf-promo-eyebrow { font-family: var(--s-fd); font-size: 11px; font-weight: 800; letter-spacing: .2em; text-transform: uppercase; opacity: .85; }
