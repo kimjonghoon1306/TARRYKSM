@@ -44,6 +44,12 @@ export default async function StoreAdmin({
     .select("id", { count: "exact", head: true })
     .eq("store_id", id);
 
+  // 이 몰의 주문 수 (orders 테이블 없으면 null)
+  const { count: orderCount } = await supabase
+    .from("orders")
+    .select("id", { count: "exact", head: true })
+    .eq("store_id", id);
+
   // 미리보기용 상품 썸네일 몇 개
   const { data: preview } = await supabase
     .from("products")
@@ -285,8 +291,10 @@ export default async function StoreAdmin({
         </Link>
         <Link href="/dashboard/orders" className={card + " lift block transition hover:border-violet-400"}>
           <div className="font-semibold">🧾 주문</div>
-          <div className="text-sm text-neutral-500">고객 주문 관리</div>
-          <div className="mt-3 text-xs text-neutral-400">결제 연동 후 활성화</div>
+          <div className="text-sm text-neutral-500">
+            {orderCount ? `${orderCount}건의 주문` : "고객 주문 관리"}
+          </div>
+          <div className="mt-3 text-xs font-semibold text-violet-500">주문 보기 →</div>
         </Link>
       </div>
     </div>
