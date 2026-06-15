@@ -129,7 +129,11 @@ export default async function PlatformPage() {
                 .sort((a, b) => (a.role === "admin" ? -1 : 1) - (b.role === "admin" ? -1 : 1))
                 .map((p) => (
                   <tr key={p.id} className="border-b border-black/[0.03] last:border-0 dark:border-white/[0.05]">
-                    <td className="px-4 py-3">{p.email || <span className="text-neutral-400">{p.id.slice(0, 8)}…</span>}</td>
+                    <td className="px-4 py-3">
+                      <Link href={`/dashboard/platform/${p.id}`} className="font-medium text-violet-600 hover:underline dark:text-violet-300">
+                        {p.email || `${p.id.slice(0, 8)}…`}
+                      </Link>
+                    </td>
                     <td className="px-4 py-3 text-right tabular-nums text-neutral-500">{storesByOwner.get(p.id) || 0}</td>
                     <td className="px-4 py-3 text-right">
                       <PlanToggle userId={p.id} plan={p.plan || "free"} />
