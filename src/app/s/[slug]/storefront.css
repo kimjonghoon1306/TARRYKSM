@@ -200,3 +200,38 @@
   .sf-card, .sf-hero .sf-eyebrow, .sf-hero h1, .sf-hero p, .sf-hero.has-img,
   .sf-empty-ico, .sf-toolbar { animation: none; }
 }
+
+/* ════════════════════════════════════════
+   C · 디테일 폴리싱 (2026-06-15) — 타이포·여백·그림자 마감
+   (뒤에 와서 위 기본값을 덮어씀)
+════════════════════════════════════════ */
+/* 숫자 정렬 — 가격이 자릿수마다 흔들리지 않게 (프로 디테일) */
+.sf-price, .sf-total b, .sf-citem .ci-info i, .sf-cart-badge { font-variant-numeric: tabular-nums; }
+
+/* 헤더: 경계 더 또렷하게, 본문 위로 살짝 떠 보이게 */
+.sf-bar { box-shadow: 0 1px 0 var(--s-line), 0 6px 18px -16px rgba(0, 0, 0, .4); }
+
+/* 히어로: 그라데이션 배경에 브랜드 글로우 블롭으로 깊이감, 여백 리듬 정리 */
+.sf-hero { margin: 18px 18px 8px; padding: 64px 40px; }
+.sf-hero:not(.has-img)::before {
+  content: ""; position: absolute; top: -45%; right: -8%;
+  width: 56%; height: 170%; border-radius: 50%;
+  background: radial-gradient(circle, color-mix(in srgb, var(--s-brand) 28%, transparent), transparent 70%);
+  filter: blur(24px); opacity: .5; pointer-events: none;
+}
+.sf-hero p { margin-top: 12px; line-height: 1.55; font-size: 15.5px; }
+
+/* 섹션 헤더 — 단조로운 "히어로+그리드" 사이에 리듬 */
+.sf-section { display: flex; align-items: baseline; justify-content: space-between; gap: 12px; margin: 10px 2px 14px; }
+.sf-section h2 { font-family: var(--s-fd); font-weight: var(--s-fw); font-size: 19px; letter-spacing: var(--s-hls); }
+.sf-section .sf-count { font-size: 12.5px; color: var(--s-sub); font-weight: 700; font-variant-numeric: tabular-nums; }
+
+/* 카드: 2겹 그림자(은은한 기본 + 깊은 호버), 이름 높이 통일로 가격줄 정렬 */
+.sf-card { box-shadow: 0 1px 2px rgba(0, 0, 0, .04); }
+.sf-card:hover { box-shadow: var(--s-shadow), 0 3px 10px -6px rgba(0, 0, 0, .25); }
+.sf-meta { padding: 13px 14px 15px; gap: 4px; }
+.sf-name { min-height: 2.6em; }
+.sf-price { font-size: 16px; }
+
+/* 키보드 포커스 링 (접근성 마감) */
+.sf button:focus-visible, .sf input:focus-visible { outline: 2px solid var(--s-brand); outline-offset: 2px; }

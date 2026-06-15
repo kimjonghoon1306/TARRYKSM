@@ -187,7 +187,12 @@ export default function Storefront({
             <span>다른 키워드로 찾아보세요.</span>
           </div>
         ) : (
-          <div className="sf-grid">
+          <>
+            <div className="sf-section">
+              <h2>{activeCat === "전체" ? "전체 상품" : activeCat}</h2>
+              <span className="sf-count">{shown.length}개</span>
+            </div>
+            <div className="sf-grid">
             {shown.map((p) => (
               <div key={p.id} className="sf-card" onClick={() => openDetail(p)}>
                 <div className="sf-thumb">
@@ -217,7 +222,8 @@ export default function Storefront({
                 </div>
               </div>
             ))}
-          </div>
+            </div>
+          </>
         )}
 
         <div className="sf-foot">
