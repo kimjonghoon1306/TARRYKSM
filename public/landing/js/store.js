@@ -7,11 +7,11 @@
 
 /* ── 상태 헬퍼 ── */
 function cartCount(st){ return st.cart.reduce((n,c)=>n+c.qty,0); }
-function cartTotal(st){ return st.cart.reduce((s,c)=>s+PRODUCTS[c.i].p*c.qty,0); }
+function cartTotal(st){ return st.cart.reduce((s,c)=>s+st.products[c.i].p*c.qty,0); }
 function visibleProducts(st){
   const q = st.q.trim().toLowerCase();
-  const list = PRODUCTS.map((p,i)=>({p,i}))
-    .filter(({p}) => st.cat==='전체' || p.cat===st.cat)
+  const list = st.products.map((p,i)=>({p,i}))
+    .filter(({p}) => st.cat==='전체' || st.cat==='ALL' || p.cat===st.cat)
     .filter(({p}) => !q || p.n.toLowerCase().includes(q) || p.b.toLowerCase().includes(q) || p.cat.includes(q));
   const by = {
     reco: (a,b)=> a.i-b.i,
@@ -24,10 +24,10 @@ function visibleProducts(st){
 }
 
 /* 연관 상품 — 같은 카테고리 우선, 부족하면 다른 상품으로 채움 (자기 제외) */
-function relatedProducts(i, n=3){
-  const cur = PRODUCTS[i];
-  const same = PRODUCTS.map((p,j)=>({p,j})).filter(o=>o.j!==i && o.p.cat===cur.cat);
-  const rest = PRODUCTS.map((p,j)=>({p,j})).filter(o=>o.j!==i && o.p.cat!==cur.cat);
+function relatedProducts(st, i, n=3){
+  const P = st.products, cur = P[i];
+  const same = P.map((p,j)=>({p,j})).filter(o=>o.j!==i && o.p.cat===cur.cat);
+  const rest = P.map((p,j)=>({p,j})).filter(o=>o.j!==i && o.p.cat!==cur.cat);
   return same.concat(rest).slice(0,n);
 }
 
@@ -61,7 +61,7 @@ function gridHTML(st){
 }
 
 function railHTML(st){
-  return CATS.map(c=>`<span class="rail-chip ${c===st.cat?'on':''}" data-act="filter" data-cat="${c}">${c}</span>`).join('');
+  return st.cats.map(c=>`<span class="rail-chip ${c===st.cat?'on':''}" data-act="filter" data-cat="${c}">${c}</span>`).join('');
 }
 
 const SORTS = [['reco','추천'],['low','낮은가격'],['high','높은가격'],['new','신상'],['rating','별점순']];
@@ -75,7 +75,7 @@ function cartHTML(st){
     return head + `<div class="cp-empty"><span>🛒</span><b>장바구니가 비었어요</b><button class="cp-shop" data-act="close">쇼핑하러 가기</button></div>`;
   }
   const rows = st.cart.map(c=>{
-    const p = PRODUCTS[c.i];
+    const p = st.products[c.i];
     return `<div class="cp-row">
       <div class="cp-thumb">${p.e}</div>
       <div class="cp-info"><b>${p.n}</b><span>${won(p.p)}</span></div>
@@ -95,14 +95,14 @@ function cartHTML(st){
 }
 
 function detailHTML(i,st){
-  const p = PRODUCTS[i];
+  const p = st.products[i];
   const fav = st.favs.has(i);
   const qty = st.dqty;
   const revs = [REVIEWS[i % REVIEWS.length], REVIEWS[(i+3) % REVIEWS.length]];
   const reviewHTML = revs.map(rv=>`<div class="dp-rev">
       <div class="dp-rev-top"><b>${rv.n}</b><span class="pc-stars">${stars(rv.s)}</span></div>
       <p>${rv.t}</p></div>`).join('');
-  const related = relatedProducts(i).map(({p:rp,j})=>`<button class="dp-rel" data-act="open" data-i="${j}">
+  const related = relatedProducts(st,i).map(({p:rp,j})=>`<button class="dp-rel" data-act="open" data-i="${j}">
       <span class="dp-rel-em">${rp.e}</span>
       <b>${rp.n}</b>
       <span class="dp-rel-p">${won(rp.p)}</span></button>`).join('');
@@ -198,7 +198,8 @@ function buildStore(st){
 ════════════════════════════════════════ */
 function mountStore(box, skinId, brandOverride){
   const s = SKIN_BY_ID[skinId] || SKINS[0];
-  const st = { box, skin:s.id, brand:brandOverride||s.brand, cart:[], cat:'전체', sort:'reco', q:'', search:false, favs:new Set(), detailIdx:-1, dqty:1 };
+  const theme = themeFor(s.id);
+  const st = { box, skin:s.id, brand:brandOverride||s.brand, products:theme.items, cats:theme.cats, cart:[], cat:theme.cats[0], sort:'reco', q:'', search:false, favs:new Set(), detailIdx:-1, dqty:1 };
   box._ss = st;
   box.style.overflow = '';        // 이전 오버레이 lock 잔존 방지
   box.innerHTML = buildStore(st);
@@ -216,8 +217,8 @@ function onStoreClick(e){
   const a = e.target.closest('[data-act]'); if(!a) return;
   const i = a.dataset.i != null ? +a.dataset.i : null;
   switch(a.dataset.act){
-    case 'add':        e.stopPropagation(); addToCart(st,i,1); bumpCart(st); storeToast(st,`🛒 <b>${PRODUCTS[i].n}</b> 담았어요`); break;
-    case 'add-close':  addToCart(st,i,st.dqty); closeOverlay(st); bumpCart(st); storeToast(st,`🛒 <b>${PRODUCTS[i].n}</b> ${st.dqty}개 담았어요`); break;
+    case 'add':        e.stopPropagation(); addToCart(st,i,1); bumpCart(st); storeToast(st,`🛒 <b>${st.products[i].n}</b> 담았어요`); break;
+    case 'add-close':  addToCart(st,i,st.dqty); closeOverlay(st); bumpCart(st); storeToast(st,`🛒 <b>${st.products[i].n}</b> ${st.dqty}개 담았어요`); break;
     case 'open':       openDetail(st,i); break;
     case 'fav':        e.stopPropagation(); toggleFav(st,i); break;
     case 'filter':     st.cat = a.dataset.cat; refreshGrid(st); break;
@@ -346,9 +347,10 @@ function closeOverlay(st){
 /* ── 갤러리/몰카드용 미니 프리뷰 (내부 HTML만 반환) ── */
 function buildMini(skinId){
   const s = SKIN_BY_ID[skinId] || SKINS[0];
+  const it = themeFor(s.id).items;
   return `
     <div class="skm-top"><span class="skm-logo">${s.brand}</span><span class="skm-dot"></span></div>
     <div class="skm-hero">${s.heroTitle}</div>
-    <div class="skm-tiles"><div class="skm-tile">${PRODUCTS[0].e}</div><div class="skm-tile">${PRODUCTS[1].e}</div><div class="skm-tile">${PRODUCTS[2].e}</div></div>
+    <div class="skm-tiles"><div class="skm-tile">${it[0].e}</div><div class="skm-tile">${it[1].e}</div><div class="skm-tile">${it[2].e}</div></div>
     <span class="skm-pill">${s.cta}</span>`;
 }
