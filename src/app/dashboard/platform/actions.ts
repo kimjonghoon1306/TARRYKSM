@@ -18,6 +18,14 @@ export async function setUserRole(userId: string, role: "admin" | "founder") {
   revalidatePath("/dashboard/platform");
 }
 
+// 회원 요금제 변경 (free/basic/pro) — 실결제 전 수동 적용
+export async function setUserPlan(userId: string, plan: "free" | "basic" | "pro") {
+  if (!(await assertAdmin())) return;
+  const supabase = await createClient();
+  await supabase.from("profiles").update({ plan }).eq("id", userId);
+  revalidatePath("/dashboard/platform");
+}
+
 // 쇼핑몰 강제 비공개/공개 토글
 export async function adminSetPublished(storeId: string, published: boolean) {
   if (!(await assertAdmin())) return;

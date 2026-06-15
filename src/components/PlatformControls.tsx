@@ -1,7 +1,29 @@
 "use client";
 
 import { useState, useTransition } from "react";
-import { setUserRole, adminSetPublished, adminDeleteStore } from "@/app/dashboard/platform/actions";
+import { setUserRole, setUserPlan, adminSetPublished, adminDeleteStore } from "@/app/dashboard/platform/actions";
+
+// 회원 요금제 변경
+export function PlanToggle({ userId, plan }: { userId: string; plan: string }) {
+  const [cur, setCur] = useState(plan === "basic" || plan === "pro" ? plan : "free");
+  const [pending, start] = useTransition();
+  return (
+    <select
+      value={cur}
+      disabled={pending}
+      onChange={(e) => {
+        const next = e.target.value as "free" | "basic" | "pro";
+        setCur(next);
+        start(() => setUserPlan(userId, next).then(() => {}));
+      }}
+      className="rounded-lg border-0 bg-black/5 px-2.5 py-1 text-xs font-bold text-neutral-600 outline-none ring-1 ring-black/5 dark:bg-white/10 dark:text-neutral-300 dark:ring-white/10"
+    >
+      <option value="free">무료</option>
+      <option value="basic">베이직</option>
+      <option value="pro">프로</option>
+    </select>
+  );
+}
 
 // 회원 역할 토글 (창업자 ↔ 관리자)
 export function RoleToggle({

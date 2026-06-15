@@ -3,7 +3,7 @@ import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { getMe } from "@/lib/role";
 import { PRIMARY_DOMAIN } from "@/lib/domains";
-import { RoleToggle, StoreAdminControls } from "@/components/PlatformControls";
+import { RoleToggle, PlanToggle, StoreAdminControls } from "@/components/PlatformControls";
 
 type Store = {
   id: string;
@@ -14,7 +14,7 @@ type Store = {
   published: boolean | null;
   created_at: string;
 };
-type Profile = { id: string; role: string | null; email: string | null };
+type Profile = { id: string; role: string | null; email: string | null; plan: string | null };
 
 const won = (n: number) => "₩" + n.toLocaleString("ko-KR");
 function fmt(d: string) {
@@ -32,7 +32,7 @@ export default async function PlatformPage() {
       .from("stores")
       .select("id,name,slug,skin,owner,published,created_at")
       .order("created_at", { ascending: false }),
-    supabase.from("profiles").select("id,role,email"),
+    supabase.from("profiles").select("id,role,email,plan"),
     supabase.from("orders").select("store_id,total,status"),
   ]);
   const stores = (storesData ?? []) as Store[];
@@ -104,6 +104,7 @@ export default async function PlatformPage() {
               <tr className="border-b border-black/5 text-left text-xs text-neutral-500 dark:border-white/10">
                 <th className="px-4 py-3 font-semibold">이메일</th>
                 <th className="px-4 py-3 text-right font-semibold">쇼핑몰</th>
+                <th className="px-4 py-3 text-right font-semibold">요금제</th>
                 <th className="px-4 py-3 text-right font-semibold">역할</th>
               </tr>
             </thead>
@@ -114,6 +115,9 @@ export default async function PlatformPage() {
                   <tr key={p.id} className="border-b border-black/[0.03] last:border-0 dark:border-white/[0.05]">
                     <td className="px-4 py-3">{p.email || <span className="text-neutral-400">{p.id.slice(0, 8)}…</span>}</td>
                     <td className="px-4 py-3 text-right tabular-nums text-neutral-500">{storesByOwner.get(p.id) || 0}</td>
+                    <td className="px-4 py-3 text-right">
+                      <PlanToggle userId={p.id} plan={p.plan || "free"} />
+                    </td>
                     <td className="px-4 py-3 text-right">
                       <RoleToggle
                         userId={p.id}

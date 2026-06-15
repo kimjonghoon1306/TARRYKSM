@@ -7,6 +7,8 @@ import { createClient } from "@/lib/supabase/server";
 import { addDomainToVercel, removeDomainFromVercel } from "@/lib/vercel";
 import { slugify } from "@/lib/slug";
 import { SKIN_IDS } from "@/lib/skins";
+import { getMe } from "@/lib/role";
+import { planOf } from "@/lib/plans";
 
 export async function createStore(formData: FormData) {
   const supabase = await createClient();
@@ -66,6 +68,17 @@ export async function createStoreOpen(formData: FormData) {
   // 중복 확인
   const { data: dup } = await supabase.from("stores").select("id").eq("slug", slug).maybeSingle();
   if (dup) back("이미 사용 중인 주소예요. 다른 주소를 입력하세요");
+
+  // 요금제별 쇼핑몰 개수 제한
+  const me = await getMe();
+  const limit = planOf(me.role, me.plan).maxStores;
+  const { count } = await supabase
+    .from("stores")
+    .select("id", { count: "exact", head: true })
+    .eq("owner", user.id);
+  if ((count ?? 0) >= limit) {
+    back(`현재 요금제로는 쇼핑몰 ${limit}개까지 만들 수 있어요. 요금제를 올리면 더 만들 수 있어요.`);
+  }
 
   const { data: created, error } = await supabase
     .from("stores")
