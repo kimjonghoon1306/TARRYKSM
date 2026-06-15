@@ -13,7 +13,10 @@ export type Product = {
   category: string | null;
   description: string | null;
   tag: string | null;
+  created_at?: string | null;
 };
+
+const BEST_RE = /best|베스트|인기|추천|hot|스테디/i;
 type Store = {
   name: string;
   skin: string;
@@ -70,6 +73,25 @@ export default function Storefront({
     return arr;
   }, [products, activeCat, q, sort]);
 
+  // 홈(기본) 뷰 = 전체 + 추천정렬 + 검색없음 → 리치 진열(신상·기획전·베스트)
+  const isHome = activeCat === "전체" && !q.trim() && sort === "recommend";
+
+  const bestItems = useMemo(
+    () => products.filter((p) => p.tag && BEST_RE.test(p.tag)).slice(0, 8),
+    [products]
+  );
+  const newItems = useMemo(() => {
+    const arr = [...products];
+    arr.sort((a, b) => {
+      const ta = a.created_at ? Date.parse(a.created_at) : 0;
+      const tb = b.created_at ? Date.parse(b.created_at) : 0;
+      return tb - ta;
+    });
+    return arr.slice(0, 8);
+  }, [products]);
+  // 기획전 배너에 띄울 대표 상품 (베스트 우선, 없으면 첫 상품)
+  const feature = bestItems[0] || products[0] || null;
+
   const cartCount = Object.values(cart).reduce((a, b) => a + b, 0);
   const cartLines = products.filter((p) => cart[p.id]).map((p) => ({ ...p, qty: cart[p.id] }));
   const total = cartLines.reduce((sum, l) => sum + l.price * l.qty, 0);
@@ -93,6 +115,38 @@ export default function Storefront({
   function openDetail(p: Product) {
     setDetail(p);
     setDetailQty(1);
+  }
+
+  function renderCard(p: Product) {
+    return (
+      <div key={p.id} className="sf-card" onClick={() => openDetail(p)}>
+        <div className="sf-thumb">
+          {p.tag && <span className="sf-tag">{p.tag}</span>}
+          {p.image_url ? (
+            // eslint-disable-next-line @next/next/no-img-element
+            <img src={p.image_url} alt={p.name} className="sf-thumb-img" />
+          ) : (
+            p.emoji || "📦"
+          )}
+        </div>
+        <div className="sf-meta">
+          {p.brand && <div className="sf-brand">{p.brand}</div>}
+          <div className="sf-name">{p.name}</div>
+          <div className="sf-bottom">
+            <div className="sf-price">{won(p.price)}</div>
+            <button
+              className="sf-add"
+              onClick={(e) => {
+                e.stopPropagation();
+                add(p);
+              }}
+            >
+              담기
+            </button>
+          </div>
+        </div>
+      </div>
+    );
   }
 
   const heroTitle = store.hero_title || store.name;
@@ -173,13 +227,59 @@ export default function Storefront({
           </div>
         )}
 
-        {/* 그리드 */}
+        {/* 진열 */}
         {products.length === 0 ? (
           <div className="sf-empty">
             <div className="sf-empty-ico">🛍️</div>
             <b>곧 만나요</b>
             <span>상품을 준비 중이에요.</span>
           </div>
+        ) : isHome ? (
+          /* ── 홈: 신상 선반 · 기획전 배너 · 베스트 선반 · 전체 그리드 ── */
+          <>
+            {newItems.length >= 2 && (
+              <section className="sf-shelf">
+                <div className="sf-shelf-head">
+                  <h2>🆕 신상품</h2>
+                  <span className="sf-shelf-sub">방금 들어온 따끈한 신상</span>
+                </div>
+                <div className="sf-grid">{newItems.map(renderCard)}</div>
+              </section>
+            )}
+
+            {feature && (
+              <button
+                className={"sf-promo" + (feature.image_url ? " has-img" : "")}
+                style={feature.image_url ? { backgroundImage: `url(${feature.image_url})` } : undefined}
+                onClick={() => openDetail(feature)}
+              >
+                <div className="sf-promo-inner">
+                  <span className="sf-promo-eyebrow">SPECIAL PICK</span>
+                  <h3>{bestItems.length ? "이번 주 베스트" : "오늘의 추천"}</h3>
+                  <p>{feature.name} · {won(feature.price)}</p>
+                  <span className="sf-promo-cta">지금 보기 →</span>
+                </div>
+              </button>
+            )}
+
+            {bestItems.length >= 2 && (
+              <section className="sf-shelf">
+                <div className="sf-shelf-head">
+                  <h2>🔥 베스트</h2>
+                  <span className="sf-shelf-sub">가장 사랑받는 상품</span>
+                </div>
+                <div className="sf-grid">{bestItems.map(renderCard)}</div>
+              </section>
+            )}
+
+            <section className="sf-shelf">
+              <div className="sf-section">
+                <h2>전체 상품</h2>
+                <span className="sf-count">{products.length}개</span>
+              </div>
+              <div className="sf-grid">{products.map(renderCard)}</div>
+            </section>
+          </>
         ) : shown.length === 0 ? (
           <div className="sf-empty">
             <div className="sf-empty-ico">🔍</div>
@@ -187,42 +287,13 @@ export default function Storefront({
             <span>다른 키워드로 찾아보세요.</span>
           </div>
         ) : (
+          /* ── 필터/검색/정렬 뷰: 단순 그리드 ── */
           <>
             <div className="sf-section">
               <h2>{activeCat === "전체" ? "전체 상품" : activeCat}</h2>
               <span className="sf-count">{shown.length}개</span>
             </div>
-            <div className="sf-grid">
-            {shown.map((p) => (
-              <div key={p.id} className="sf-card" onClick={() => openDetail(p)}>
-                <div className="sf-thumb">
-                  {p.tag && <span className="sf-tag">{p.tag}</span>}
-                  {p.image_url ? (
-                    // eslint-disable-next-line @next/next/no-img-element
-                    <img src={p.image_url} alt={p.name} className="sf-thumb-img" />
-                  ) : (
-                    p.emoji || "📦"
-                  )}
-                </div>
-                <div className="sf-meta">
-                  {p.brand && <div className="sf-brand">{p.brand}</div>}
-                  <div className="sf-name">{p.name}</div>
-                  <div className="sf-bottom">
-                    <div className="sf-price">{won(p.price)}</div>
-                    <button
-                      className="sf-add"
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        add(p);
-                      }}
-                    >
-                      담기
-                    </button>
-                  </div>
-                </div>
-              </div>
-            ))}
-            </div>
+            <div className="sf-grid">{shown.map(renderCard)}</div>
           </>
         )}
 

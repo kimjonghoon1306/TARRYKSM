@@ -63,7 +63,7 @@ export default async function PrettyStorefront({
 
   const { data: products } = await supabase
     .from("products")
-    .select("id,emoji,image_url,name,brand,price,category,description,tag")
+    .select("id,emoji,image_url,name,brand,price,category,description,tag,created_at")
     .eq("store_id", s.id)
     .order("position", { ascending: true });
   const items = (products ?? []) as Product[];

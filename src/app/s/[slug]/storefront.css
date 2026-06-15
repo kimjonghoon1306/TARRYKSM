@@ -235,3 +235,24 @@
 
 /* 키보드 포커스 링 (접근성 마감) */
 .sf button:focus-visible, .sf input:focus-visible { outline: 2px solid var(--s-brand); outline-offset: 2px; }
+
+/* ════════════════════════════════════════
+   B · 상품 진열 고도화 (2026-06-15) — 신상/베스트 선반 + 기획전 배너
+════════════════════════════════════════ */
+.sf-shelf { margin: 0 0 32px; }
+.sf-shelf-head { display: flex; align-items: baseline; justify-content: space-between; gap: 12px; margin: 6px 2px 14px; }
+.sf-shelf-head h2 { font-family: var(--s-fd); font-weight: var(--s-fw); font-size: 19px; letter-spacing: var(--s-hls); }
+.sf-shelf-sub { font-size: 12.5px; color: var(--s-sub); font-weight: 600; }
+
+/* 기획전 배너 (대표 상품 강조) */
+.sf-promo { display: block; width: 100%; text-align: left; cursor: pointer; border: 0; position: relative; overflow: hidden; margin: 2px 0 32px; padding: 40px 34px; border-radius: calc(var(--s-r) + 6px); background: linear-gradient(120deg, var(--s-brand), color-mix(in srgb, var(--s-brand) 52%, var(--s-ink))); color: var(--s-brand-ink); box-shadow: var(--s-shadow); transition: transform .25s var(--ease), box-shadow .25s var(--ease); }
+.sf-promo:hover { transform: translateY(-3px); box-shadow: var(--s-shadow), 0 16px 34px -12px rgba(0, 0, 0, .42); }
+.sf-promo.has-img { background-size: cover; background-position: center; min-height: 210px; color: #fff; }
+.sf-promo.has-img::after { content: ""; position: absolute; inset: 0; background: linear-gradient(110deg, rgba(0, 0, 0, .62), rgba(0, 0, 0, .15) 64%, transparent); }
+.sf-promo-inner { position: relative; z-index: 1; }
+.sf-promo-eyebrow { font-family: var(--s-fd); font-size: 11px; font-weight: 800; letter-spacing: .2em; text-transform: uppercase; opacity: .85; }
+.sf-promo h3 { font-family: var(--s-fd); font-weight: var(--s-fw); font-size: clamp(22px, 4vw, 32px); letter-spacing: var(--s-hls); margin: 9px 0 6px; line-height: 1.08; }
+.sf-promo p { font-size: 14px; opacity: .92; font-variant-numeric: tabular-nums; }
+.sf-promo-cta { display: inline-flex; align-items: center; gap: 6px; margin-top: 18px; font-weight: 700; font-size: 13.5px; padding: 10px 20px; border-radius: var(--s-rpill); background: rgba(255, 255, 255, .2); backdrop-filter: blur(4px); transition: background .2s var(--ease); }
+.sf-promo:hover .sf-promo-cta { background: rgba(255, 255, 255, .3); }
+.sf-promo:active { transform: translateY(-1px) scale(.995); }
