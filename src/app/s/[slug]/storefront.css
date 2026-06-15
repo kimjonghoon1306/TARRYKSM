@@ -339,3 +339,31 @@ textarea.sf-co-input { resize: vertical; min-height: 56px; }
 .sf-opt-add { font-size: 11px; opacity: .8; }
 /* 장바구니 옵션 표시 */
 .ci-opt { display: block; font-size: 11.5px; color: var(--s-sub); margin: 1px 0 2px; }
+
+/* ── 리뷰(상세 시트) ── */
+.sf-reviews { margin-top: 22px; padding-top: 18px; border-top: 1px solid var(--s-line); }
+.sf-rev-head { display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px; }
+.sf-rev-head h3 { font-size: 15px; font-weight: 700; margin: 0; }
+.sf-rev-avg { font-size: 13px; color: var(--s-sub); }
+.sf-rev-avg b { color: var(--s-brand); font-size: 15px; }
+.sf-rev-empty { font-size: 13px; color: var(--s-sub); padding: 10px 0 16px; }
+.sf-rev-list { list-style: none; margin: 0 0 8px; padding: 0; display: flex; flex-direction: column; gap: 12px; }
+.sf-rev-item { background: var(--s-soft, rgba(0,0,0,.03)); border-radius: 12px; padding: 11px 13px; }
+.sf-rev-top { display: flex; align-items: center; gap: 8px; }
+.sf-rev-top b { font-size: 13px; }
+.sf-rev-stars { font-size: 12px; color: #f5a623; letter-spacing: 1px; }
+.sf-rev-body { font-size: 13px; color: var(--s-ink); margin: 6px 0 0; line-height: 1.5; white-space: pre-wrap; }
+.sf-rev-reply { margin-top: 8px; padding: 8px 10px; border-radius: 9px; background: var(--s-brand); color: var(--s-brand-ink); font-size: 12.5px; line-height: 1.45; }
+.sf-rev-reply b { display: inline-block; margin-right: 6px; opacity: .85; }
+/* 작성 폼 */
+.sf-rev-form { margin-top: 14px; display: flex; flex-direction: column; gap: 8px; }
+.sf-rev-stars-pick { display: flex; gap: 2px; }
+.sf-star-btn { background: none; border: none; font-size: 26px; line-height: 1; cursor: pointer; color: #d8d8e0; padding: 0; transition: transform .1s, color .15s; }
+.sf-star-btn:hover { transform: scale(1.15); }
+.sf-star-btn.on { color: #f5a623; }
+.sf-rev-input { width: 100%; border: 1px solid var(--s-line); border-radius: 10px; padding: 10px 12px; font-size: 13px; background: var(--s-bg); color: var(--s-ink); font-family: inherit; }
+.sf-rev-input:focus { outline: none; border-color: var(--s-brand); }
+.sf-rev-area { min-height: 64px; resize: vertical; }
+.sf-rev-err { font-size: 12px; color: #e0245e; }
+.sf-rev-submit { align-self: flex-start; border: none; border-radius: 10px; padding: 10px 18px; font-size: 13px; font-weight: 700; cursor: pointer; background: var(--s-brand); color: var(--s-brand-ink); }
+.sf-rev-submit:disabled { opacity: .55; cursor: default; }

@@ -116,3 +116,50 @@ export async function placeOrder(
 
   return { ok: true, orderId: order.id as string };
 }
+
+// 손님 리뷰 작성 (발행몰이면 비로그인 가능). reviews 테이블이 없으면 안내.
+export async function submitReview(input: {
+  storeId: string;
+  productId: string;
+  name: string;
+  rating: number;
+  comment?: string;
+}): Promise<{ ok: boolean; error?: string; review?: { id: string; buyer_name: string; rating: number; comment: string | null; created_at: string } }> {
+  const name = (input.name || "").trim();
+  const rating = Math.max(1, Math.min(5, input.rating | 0));
+  const comment = (input.comment || "").trim().slice(0, 1000) || null;
+  if (!name) return { ok: false, error: "이름을 입력해 주세요." };
+  if (!rating) return { ok: false, error: "별점을 선택해 주세요." };
+
+  const supabase = await createClient();
+  const { data, error } = await supabase
+    .from("reviews")
+    .insert({ store_id: input.storeId, product_id: input.productId, buyer_name: name, rating, comment })
+    .select("id,buyer_name,rating,comment,created_at")
+    .maybeSingle();
+  if (error || !data) return { ok: false, error: "리뷰 등록에 실패했어요. 잠시 후 다시 시도해 주세요." };
+  return {
+    ok: true,
+    review: data as { id: string; buyer_name: string; rating: number; comment: string | null; created_at: string },
+  };
+}
+
+// 체크아웃 쿠폰 검증 (코드+소계 → 할인액). coupons 테이블/RPC 없으면 무시(할인 0).
+export async function checkCoupon(
+  storeId: string,
+  code: string,
+  subtotal: number
+): Promise<{ ok: boolean; error?: string; discount?: number; code?: string }> {
+  const c = (code || "").trim();
+  if (!c) return { ok: false, error: "쿠폰 코드를 입력해 주세요." };
+  const supabase = await createClient();
+  const { data, error } = await supabase.rpc("validate_coupon", {
+    p_store_id: storeId,
+    p_code: c,
+    p_subtotal: subtotal,
+  });
+  if (error) return { ok: false, error: "쿠폰을 확인할 수 없어요." };
+  const r = data as { ok: boolean; error?: string; discount?: number; code?: string } | null;
+  if (!r || !r.ok) return { ok: false, error: r?.error || "사용할 수 없는 쿠폰이에요." };
+  return { ok: true, discount: r.discount || 0, code: r.code };
+}

@@ -2,8 +2,18 @@
 
 import { useMemo, useState } from "react";
 import type { Section } from "@/lib/sections";
-import { placeOrder } from "./actions";
+import { placeOrder, submitReview } from "./actions";
 import "./storefront.css";
+
+export type Review = {
+  id: string;
+  product_id?: string;
+  buyer_name: string;
+  rating: number;
+  comment: string | null;
+  reply?: string | null;
+  created_at: string;
+};
 
 export type Product = {
   id: string;
@@ -56,10 +66,12 @@ export default function Storefront({
   store,
   products,
   sections,
+  reviewsByProduct,
 }: {
   store: Store;
   products: Product[];
   sections?: Section[];
+  reviewsByProduct?: Record<string, Review[]>;
 }) {
   const [cart, setCart] = useState<Record<string, CartLine>>({});
   const [detail, setDetail] = useState<Product | null>(null);
@@ -78,6 +90,13 @@ export default function Storefront({
   const [orderErr, setOrderErr] = useState("");
   const [orderDone, setOrderDone] = useState(false);
   const [paidTotal, setPaidTotal] = useState(0);
+  // 리뷰 (상세 시트). 서버에서 받은 것 + 이번 세션에 작성한 것(낙관적)
+  const [addedReviews, setAddedReviews] = useState<Record<string, Review[]>>({});
+  const [revName, setRevName] = useState("");
+  const [revRating, setRevRating] = useState(5);
+  const [revComment, setRevComment] = useState("");
+  const [revBusy, setRevBusy] = useState(false);
+  const [revErr, setRevErr] = useState("");
 
   const cats = useMemo(() => {
     const set = new Set<string>();
@@ -164,6 +183,10 @@ export default function Storefront({
     setDetail(p);
     setDetailQty(1);
     setDetailOpts({});
+    setRevName("");
+    setRevRating(5);
+    setRevComment("");
+    setRevErr("");
   }
 
   // 상세 시트 옵션 계산
@@ -175,6 +198,37 @@ export default function Storefront({
   const dAllSelected = dOpts.every((g) => detailOpts[g.name]);
   const dUnit = detail ? detail.price + dAddPrice : 0;
   const dOptLabel = dOpts.map((g) => `${g.name}: ${detailOpts[g.name]}`).join(" / ");
+
+  // 상세 시트 리뷰 (서버 + 이번에 작성한 것)
+  const dReviews: Review[] = detail
+    ? [...(addedReviews[detail.id] || []), ...((reviewsByProduct || {})[detail.id] || [])]
+    : [];
+  const dAvg = dReviews.length
+    ? Math.round((dReviews.reduce((s, r) => s + r.rating, 0) / dReviews.length) * 10) / 10
+    : 0;
+  const stars = (n: number) => "★★★★★".slice(0, n) + "☆☆☆☆☆".slice(0, 5 - n);
+
+  async function postReview() {
+    if (!detail) return;
+    setRevErr("");
+    if (!revName.trim()) return setRevErr("이름을 입력해 주세요.");
+    setRevBusy(true);
+    const res = await submitReview({
+      storeId: store.id,
+      productId: detail.id,
+      name: revName,
+      rating: revRating,
+      comment: revComment,
+    });
+    setRevBusy(false);
+    if (!res.ok || !res.review) return setRevErr(res.error || "등록에 실패했어요.");
+    const pid = detail.id;
+    setAddedReviews((m) => ({ ...m, [pid]: [{ ...res.review!, product_id: pid }, ...(m[pid] || [])] }));
+    setRevName("");
+    setRevComment("");
+    setRevRating(5);
+    flash("리뷰가 등록됐어요 🙌");
+  }
 
   async function submitOrder() {
     setOrderErr("");
@@ -575,6 +629,74 @@ export default function Storefront({
             >
               장바구니에 담기
             </button>
+
+            {/* 리뷰 */}
+            <div className="sf-reviews">
+              <div className="sf-rev-head">
+                <h3>구매 후기</h3>
+                {dReviews.length > 0 && (
+                  <span className="sf-rev-avg">
+                    <b>★ {dAvg}</b> <span>({dReviews.length})</span>
+                  </span>
+                )}
+              </div>
+
+              {dReviews.length === 0 ? (
+                <div className="sf-rev-empty">아직 후기가 없어요. 첫 후기를 남겨보세요!</div>
+              ) : (
+                <ul className="sf-rev-list">
+                  {dReviews.map((r) => (
+                    <li key={r.id} className="sf-rev-item">
+                      <div className="sf-rev-top">
+                        <b>{r.buyer_name}</b>
+                        <span className="sf-rev-stars">{stars(r.rating)}</span>
+                      </div>
+                      {r.comment && <p className="sf-rev-body">{r.comment}</p>}
+                      {r.reply && (
+                        <div className="sf-rev-reply">
+                          <b>판매자</b> {r.reply}
+                        </div>
+                      )}
+                    </li>
+                  ))}
+                </ul>
+              )}
+
+              {/* 작성 폼 */}
+              <div className="sf-rev-form">
+                <div className="sf-rev-stars-pick">
+                  {[1, 2, 3, 4, 5].map((n) => (
+                    <button
+                      key={n}
+                      type="button"
+                      className={"sf-star-btn" + (n <= revRating ? " on" : "")}
+                      onClick={() => setRevRating(n)}
+                      aria-label={`${n}점`}
+                    >
+                      ★
+                    </button>
+                  ))}
+                </div>
+                <input
+                  className="sf-rev-input"
+                  placeholder="이름"
+                  value={revName}
+                  onChange={(e) => setRevName(e.target.value)}
+                  maxLength={20}
+                />
+                <textarea
+                  className="sf-rev-input sf-rev-area"
+                  placeholder="후기를 남겨주세요 (선택)"
+                  value={revComment}
+                  onChange={(e) => setRevComment(e.target.value)}
+                  maxLength={1000}
+                />
+                {revErr && <div className="sf-rev-err">{revErr}</div>}
+                <button className="sf-rev-submit" onClick={postReview} disabled={revBusy}>
+                  {revBusy ? "등록 중…" : "후기 등록"}
+                </button>
+              </div>
+            </div>
           </div>
         </div>
       )}
