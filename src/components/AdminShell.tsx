@@ -15,6 +15,7 @@ const NAV = [
   { href: "/dashboard/orders", label: "주문", icon: "🧾" },
   { href: "/dashboard/customers", label: "고객", icon: "👤" },
   { href: "/dashboard/reviews", label: "리뷰", icon: "⭐" },
+  { href: "/dashboard/notifications", label: "알림", icon: "🔔" },
   { href: "/dashboard/analytics", label: "분석", icon: "📈" },
   { href: "/dashboard/plan", label: "요금제", icon: "💎" },
   { href: "/dashboard/settings", label: "계정 설정", icon: "⚙️" },
@@ -23,10 +24,12 @@ const NAV = [
 export default function AdminShell({
   email,
   role = "founder",
+  unread = 0,
   children,
 }: {
   email: string | null;
   role?: Role;
+  unread?: number;
   children: React.ReactNode;
 }) {
   const path = usePathname();
@@ -84,6 +87,11 @@ export default function AdminShell({
               }
             >
               <span>{n.icon}</span> {n.label}
+              {n.href === "/dashboard/notifications" && unread > 0 && (
+                <span className="ml-auto grid h-5 min-w-5 place-items-center rounded-full bg-rose-500 px-1.5 text-[11px] font-bold text-white">
+                  {unread > 99 ? "99+" : unread}
+                </span>
+              )}
             </Link>
           );
         })}
@@ -168,8 +176,20 @@ export default function AdminShell({
         </div>
       )}
 
-      {/* 데스크탑 우상단 테마토글 */}
-      <div className="fixed right-5 top-4 z-20 hidden lg:block">
+      {/* 데스크탑 우상단 알림 벨 + 테마토글 */}
+      <div className="fixed right-5 top-4 z-20 hidden items-center gap-2 lg:flex">
+        <Link
+          href="/dashboard/notifications"
+          aria-label="알림"
+          className="relative grid h-9 w-9 place-items-center rounded-lg border border-black/10 text-lg dark:border-white/15"
+        >
+          🔔
+          {unread > 0 && (
+            <span className="absolute -right-1 -top-1 grid h-4 min-w-4 place-items-center rounded-full bg-rose-500 px-1 text-[10px] font-bold text-white">
+              {unread > 9 ? "9+" : unread}
+            </span>
+          )}
+        </Link>
         <ThemeToggle />
       </div>
 
