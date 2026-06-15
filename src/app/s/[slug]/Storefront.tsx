@@ -2,7 +2,7 @@
 
 import { useMemo, useState } from "react";
 import type { Section } from "@/lib/sections";
-import { placeOrder, submitReview } from "./actions";
+import { placeOrder, submitReview, checkCoupon } from "./actions";
 import "./storefront.css";
 
 export type Review = {
@@ -90,6 +90,13 @@ export default function Storefront({
   const [orderErr, setOrderErr] = useState("");
   const [orderDone, setOrderDone] = useState(false);
   const [paidTotal, setPaidTotal] = useState(0);
+  // 쿠폰
+  const [couponInput, setCouponInput] = useState("");
+  const [couponCode, setCouponCode] = useState("");
+  const [couponDiscount, setCouponDiscount] = useState(0);
+  const [couponMsg, setCouponMsg] = useState("");
+  const [couponErr, setCouponErr] = useState(false);
+  const [couponBusy, setCouponBusy] = useState(false);
   // 리뷰 (상세 시트). 서버에서 받은 것 + 이번 세션에 작성한 것(낙관적)
   const [addedReviews, setAddedReviews] = useState<Record<string, Review[]>>({});
   const [revName, setRevName] = useState("");
@@ -230,6 +237,40 @@ export default function Storefront({
     flash("리뷰가 등록됐어요 🙌");
   }
 
+  // 쿠폰 적용/해제. 표시 할인은 현재 장바구니 총액으로 클램프, 최종은 서버 재검증.
+  const effectDiscount = Math.min(couponDiscount, total);
+  const payable = total - effectDiscount;
+
+  async function applyCoupon() {
+    setCouponErr(false);
+    setCouponMsg("");
+    if (!couponInput.trim()) {
+      setCouponErr(true);
+      setCouponMsg("쿠폰 코드를 입력해 주세요.");
+      return;
+    }
+    setCouponBusy(true);
+    const res = await checkCoupon(store.id, couponInput, total);
+    setCouponBusy(false);
+    if (!res.ok) {
+      setCouponErr(true);
+      setCouponMsg(res.error || "사용할 수 없는 쿠폰이에요.");
+      setCouponDiscount(0);
+      setCouponCode("");
+      return;
+    }
+    setCouponCode(res.code || couponInput.trim());
+    setCouponDiscount(res.discount || 0);
+    setCouponMsg(`쿠폰 적용! -${won(res.discount || 0)}`);
+  }
+  function clearCoupon() {
+    setCouponCode("");
+    setCouponDiscount(0);
+    setCouponMsg("");
+    setCouponErr(false);
+    setCouponInput("");
+  }
+
   async function submitOrder() {
     setOrderErr("");
     if (!buyer.name.trim() || !buyer.phone.trim()) {
@@ -239,13 +280,14 @@ export default function Storefront({
     setPlacing(true);
     try {
       const items = cartLines.map((l) => ({ product_id: l.product.id, qty: l.qty, opts: l.opts }));
-      const res = await placeOrder(store.id, buyer, items);
+      const res = await placeOrder(store.id, buyer, items, couponCode || undefined);
       if (!res.ok) {
         setOrderErr(res.error || "주문에 실패했어요.");
         return;
       }
-      setPaidTotal(total);
+      setPaidTotal(payable);
       setCart({});
+      clearCoupon();
       setOrderDone(true);
     } finally {
       setPlacing(false);
@@ -805,10 +847,52 @@ export default function Storefront({
                       <b>{won(l.unit * l.qty)}</b>
                     </div>
                   ))}
+                  {effectDiscount > 0 && (
+                    <>
+                      <div className="sf-co-line">
+                        <span>상품 합계</span>
+                        <b>{won(total)}</b>
+                      </div>
+                      <div className="sf-co-line sf-co-discount">
+                        <span>쿠폰 할인{couponCode ? ` (${couponCode})` : ""}</span>
+                        <b>-{won(effectDiscount)}</b>
+                      </div>
+                    </>
+                  )}
                   <div className="sf-co-total">
-                    <span>합계</span>
-                    <b>{won(total)}</b>
+                    <span>{effectDiscount > 0 ? "결제 예정" : "합계"}</span>
+                    <b>{won(payable)}</b>
                   </div>
+                </div>
+
+                {/* 쿠폰 */}
+                <div className="sf-coupon">
+                  <div className="sf-coupon-row">
+                    <input
+                      className="sf-co-input sf-coupon-input"
+                      value={couponInput}
+                      onChange={(e) => setCouponInput(e.target.value)}
+                      placeholder="쿠폰 코드"
+                      disabled={!!couponCode}
+                    />
+                    {couponCode ? (
+                      <button type="button" className="sf-coupon-btn sf-coupon-clear" onClick={clearCoupon}>
+                        해제
+                      </button>
+                    ) : (
+                      <button
+                        type="button"
+                        className="sf-coupon-btn"
+                        onClick={applyCoupon}
+                        disabled={couponBusy}
+                      >
+                        {couponBusy ? "확인 중…" : "적용"}
+                      </button>
+                    )}
+                  </div>
+                  {couponMsg && (
+                    <div className={"sf-coupon-msg" + (couponErr ? " err" : " ok")}>{couponMsg}</div>
+                  )}
                 </div>
 
                 {/* 받는 사람 정보 */}
@@ -854,7 +938,7 @@ export default function Storefront({
                 {orderErr && <div className="sf-co-err">{orderErr}</div>}
 
                 <button className="sf-checkout" disabled={placing} onClick={submitOrder}>
-                  {placing ? "접수 중…" : `${won(total)} 주문 접수하기`}
+                  {placing ? "접수 중…" : `${won(payable)} 주문 접수하기`}
                 </button>
                 <p className="sf-co-note">
                   💳 결제는 사장님과 별도로 진행돼요. (지금은 주문 접수까지)

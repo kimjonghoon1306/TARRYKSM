@@ -367,3 +367,16 @@ textarea.sf-co-input { resize: vertical; min-height: 56px; }
 .sf-rev-err { font-size: 12px; color: #e0245e; }
 .sf-rev-submit { align-self: flex-start; border: none; border-radius: 10px; padding: 10px 18px; font-size: 13px; font-weight: 700; cursor: pointer; background: var(--s-brand); color: var(--s-brand-ink); }
 .sf-rev-submit:disabled { opacity: .55; cursor: default; }
+
+/* ── 쿠폰(체크아웃) ── */
+.sf-co-discount b { color: #16a34a; }
+.sf-coupon { margin: 12px 0 4px; }
+.sf-coupon-row { display: flex; gap: 8px; }
+.sf-coupon-input { flex: 1; margin: 0; }
+.sf-coupon-input:disabled { opacity: .6; }
+.sf-coupon-btn { flex-shrink: 0; border: none; border-radius: 10px; padding: 0 18px; font-size: 13px; font-weight: 700; cursor: pointer; background: var(--s-brand); color: var(--s-brand-ink); }
+.sf-coupon-btn:disabled { opacity: .55; cursor: default; }
+.sf-coupon-clear { background: transparent; border: 1px solid var(--s-line); color: var(--s-sub); }
+.sf-coupon-msg { margin-top: 6px; font-size: 12px; }
+.sf-coupon-msg.ok { color: #16a34a; }
+.sf-coupon-msg.err { color: #e0245e; }

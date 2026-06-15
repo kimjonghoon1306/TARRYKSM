@@ -342,6 +342,11 @@ export default async function StoreAdmin({
           </div>
           <div className="mt-3 text-xs font-semibold text-violet-500">주문 보기 →</div>
         </Link>
+        <Link href={`/dashboard/${s.id}/coupons`} className={card + " lift block transition hover:border-violet-400"}>
+          <div className="font-semibold">🎟️ 쿠폰</div>
+          <div className="text-sm text-neutral-500">할인 코드 발급·관리</div>
+          <div className="mt-3 text-xs font-semibold text-violet-500">쿠폰 관리 →</div>
+        </Link>
       </div>
     </div>
   );

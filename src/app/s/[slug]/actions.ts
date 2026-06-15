@@ -16,7 +16,8 @@ export type CheckoutBuyer = {
 export async function placeOrder(
   storeId: string,
   buyer: CheckoutBuyer,
-  items: CheckoutItem[]
+  items: CheckoutItem[],
+  couponCode?: string
 ): Promise<{ ok: boolean; error?: string; orderId?: string }> {
   const name = (buyer.name || "").trim();
   const phone = (buyer.phone || "").trim();
@@ -76,19 +77,44 @@ export async function placeOrder(
     };
   }
 
-  const total = lines.reduce((sum, l) => sum + l.price * l.qty, 0);
+  const subtotal = lines.reduce((sum, l) => sum + l.price * l.qty, 0);
+
+  // 쿠폰 적용 (서버에서 RPC로 재검증 — 클라 값 신뢰 안 함). RPC 없거나 실패 시 할인 0.
+  let discount = 0;
+  let appliedCode: string | null = null;
+  const code = (couponCode || "").trim();
+  if (code) {
+    const { data: cv } = await supabase.rpc("validate_coupon", {
+      p_store_id: storeId,
+      p_code: code,
+      p_subtotal: subtotal,
+    });
+    const r = cv as { ok?: boolean; discount?: number; code?: string } | null;
+    if (r?.ok) {
+      discount = Math.min(subtotal, r.discount || 0);
+      appliedCode = r.code || code;
+    }
+  }
+  const total = subtotal - discount;
+
+  // 할인 적용 시에만 discount/coupon_code 컬럼 포함 (coupons.sql 미실행 환경 하위호환)
+  const orderRow: Record<string, unknown> = {
+    store_id: storeId,
+    buyer_name: name,
+    buyer_phone: phone,
+    buyer_email: (buyer.email || "").trim() || null,
+    address: (buyer.address || "").trim() || null,
+    memo: (buyer.memo || "").trim() || null,
+    total,
+  };
+  if (discount > 0) {
+    orderRow.discount = discount;
+    orderRow.coupon_code = appliedCode;
+  }
 
   const { data: order, error: oerr } = await supabase
     .from("orders")
-    .insert({
-      store_id: storeId,
-      buyer_name: name,
-      buyer_phone: phone,
-      buyer_email: (buyer.email || "").trim() || null,
-      address: (buyer.address || "").trim() || null,
-      memo: (buyer.memo || "").trim() || null,
-      total,
-    })
+    .insert(orderRow)
     .select("id")
     .maybeSingle();
   if (oerr || !order) return { ok: false, error: "주문 접수에 실패했어요. 잠시 후 다시 시도해 주세요." };
@@ -113,6 +139,11 @@ export async function placeOrder(
       .filter((l) => typeof l.stock === "number")
       .map((l) => supabase.rpc("decrement_stock", { pid: l.product_id, qty: l.qty }))
   );
+
+  // 쿠폰 사용횟수 +1 (적용된 경우만, RPC 없으면 무시)
+  if (appliedCode) {
+    await supabase.rpc("redeem_coupon", { p_store_id: storeId, p_code: appliedCode });
+  }
 
   return { ok: true, orderId: order.id as string };
 }
