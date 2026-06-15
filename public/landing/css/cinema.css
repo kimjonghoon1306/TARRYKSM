@@ -2,11 +2,22 @@
    cinema.css — 메인 대문 시네마틱 인트로 (6씬 모션그래픽)
    0 로고 · 1 골격 · 2 상품 · 3 360°스킨 · 4 무한분양 · 5 피날레
 ════════════════════════════════════════ */
-#intro{padding:0}                       /* 풀스크린 */
+#intro{padding:0;--ease:cubic-bezier(.16,1,.3,1);--font-mono:ui-monospace,'SF Mono','Cascadia Code','Roboto Mono',monospace}  /* 풀스크린 · 더 묵직한 이징(대기업 모션) */
+
+/* 로고마크 드로우인용 각도 변수 (conic 스트로크 애니) */
+@property --deg{syntax:'<angle>';inherits:false;initial-value:0deg}
+
+/* ── 필름 그레인 + 비네트 (질감/깊이) ── */
+.cine-fx{position:absolute;inset:0;z-index:9;pointer-events:none}
+/* 비네트: 가장자리 살짝 가라앉혀 시선 중앙으로 */
+.cine-fx{background:radial-gradient(120% 120% at 50% 42%,transparent 52%,rgba(8,6,24,.22) 100%)}
+/* 그레인: 미세 노이즈 → 그라데이션 밴딩 제거, '필름' 질감 */
+.cine-fx::after{content:"";position:absolute;inset:-50%;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");opacity:.05;mix-blend-mode:overlay;animation:grainShift 1.1s steps(4) infinite}
+@keyframes grainShift{0%{transform:translate(0,0)}25%{transform:translate(-3%,2%)}50%{transform:translate(2%,-2%)}75%{transform:translate(-2%,-3%)}100%{transform:translate(3%,2%)}}
 
 /* ── 배경 ── */
-.cine-bg{position:absolute;inset:0;overflow:hidden;z-index:0}
-.cine-aura{position:absolute;border-radius:50%;filter:blur(110px)}
+.cine-bg{position:absolute;inset:0;overflow:hidden;z-index:0;transform:translate3d(calc(var(--px,0)*-12px),calc(var(--py,0)*-9px),0);transition:transform .35s ease-out}  /* 커서 패럴랙스(원거리) */
+.cine-aura{position:absolute;border-radius:50%;filter:blur(130px) saturate(.82)}  /* 톤다운: 더 부드럽고 비싸 보이게 */
 .cine-aura.a1{width:46vw;height:46vw;background:var(--brand);top:-12vw;left:-8vw;opacity:.5;animation:auraFloat 14s var(--ease) infinite}
 .cine-aura.a2{width:42vw;height:42vw;background:var(--brand-2);bottom:-14vw;right:-8vw;opacity:.35;animation:auraFloat 17s var(--ease) infinite reverse}
 .cine-aura.a3{width:34vw;height:34vw;background:var(--brand-3);top:40%;left:55%;opacity:.18;animation:auraFloat 20s var(--ease) infinite}
@@ -27,7 +38,7 @@
 .cine-skip:hover span{transform:translateX(4px)}
 
 /* ── 지속 빌드 스테이지 (씬1~3) ── */
-.cine-store-stage{position:absolute;inset:0;z-index:2;display:flex;align-items:center;justify-content:center;padding-bottom:11vh;opacity:0;visibility:hidden;transform:scale(.92);transition:opacity .6s var(--ease),transform .6s var(--ease),visibility .6s}
+.cine-store-stage{position:absolute;inset:0;z-index:2;display:flex;align-items:center;justify-content:center;padding-bottom:11vh;opacity:0;visibility:hidden;transform:scale(.92);translate:calc(var(--px,0)*20px) calc(var(--py,0)*15px);transition:opacity .6s var(--ease),transform .6s var(--ease),translate .35s ease-out,visibility .6s}  /* translate=패럴랙스(근거리), transform과 합성 */
 .cine-store-stage.show{opacity:1;visibility:visible;transform:none}
 .cine-glow{position:absolute;width:40vw;height:40vw;max-width:540px;max-height:540px;border-radius:50%;background:radial-gradient(circle,var(--glow),transparent 68%);filter:blur(20px)}
 
@@ -68,14 +79,14 @@
 
 /* ── 씬 레이어 ── */
 .cine-scenes{position:absolute;inset:0;z-index:4}
-.scene{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;opacity:0;visibility:hidden;transition:opacity .6s var(--ease),visibility .6s;pointer-events:none;padding:24px}
-.scene.on{opacity:1;visibility:visible;pointer-events:auto}
+.scene{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;opacity:0;visibility:hidden;transform:scale(1.035);filter:blur(7px);transition:opacity .7s var(--ease),transform .7s var(--ease),filter .7s var(--ease),visibility .7s;pointer-events:none;padding:24px}
+.scene.on{opacity:1;visibility:visible;transform:none;filter:none;pointer-events:auto}
 
 /* 0 · 로고 */
-.sc-eyebrow{font-size:12px;font-weight:700;letter-spacing:.32em;color:var(--txt-2);margin-bottom:24px;opacity:0;animation:fadeIn .8s .1s forwards}
+.sc-eyebrow{font-family:var(--font-mono);font-size:11px;font-weight:600;letter-spacing:.34em;color:var(--txt-2);margin-bottom:24px;opacity:0;animation:fadeIn .8s .1s forwards}
 .scene.on .sc-eyebrow{animation:fadeIn .8s .1s forwards}
 .sc-word{display:flex;gap:clamp(2px,.6vw,8px);font-family:var(--font-display);font-weight:700;font-size:clamp(48px,14vw,150px);letter-spacing:-.02em;line-height:1}
-.sc-word span{display:inline-block;opacity:0;transform:translateY(40px) rotateX(-40deg)}
+.sc-word span{display:inline-block;opacity:0;transform:translateY(40px) rotateX(-40deg);filter:blur(14px)}
 .scene.on .sc-word span{animation:letterUp .7s var(--ease) forwards}
 .sc-word span:nth-child(1){animation-delay:.20s}.sc-word span:nth-child(2){animation-delay:.28s}
 .sc-word span:nth-child(3){animation-delay:.36s}.sc-word span:nth-child(4){animation-delay:.44s}
@@ -116,11 +127,11 @@
 .fin-title{font-family:var(--font-display);font-weight:700;font-size:clamp(34px,7vw,72px);line-height:1.05;letter-spacing:-.02em}
 .scene.on .fin-title{animation:fadeUp2 .8s .12s both}
 .fin-title em{font-style:normal;background:linear-gradient(120deg,var(--brand),var(--brand-2),var(--brand-3));-webkit-background-clip:text;background-clip:text;color:transparent}
-.fin-cta{display:inline-flex;align-items:center;gap:10px;font-family:var(--font-display);font-weight:600;font-size:16px;color:#fff;padding:16px 34px;border-radius:99px;margin-top:34px;background:linear-gradient(135deg,var(--brand),var(--brand-2));box-shadow:0 16px 40px -12px var(--glow);transition:transform .25s var(--ease)}
-.scene.on .fin-cta{animation:fadeUp2 .8s .3s both}
+.fin-cta{display:inline-flex;align-items:center;gap:10px;font-family:var(--font-display);font-weight:600;font-size:16px;color:#fff;padding:16px 34px;border-radius:99px;margin-top:34px;background:linear-gradient(135deg,var(--brand),var(--brand-2));box-shadow:0 16px 40px -12px var(--glow);transition:transform .25s var(--ease),translate .2s ease-out}
+.scene.on .fin-cta{animation:fadeUp2 .8s .3s both,ctaPulse 2.8s 1.2s var(--ease) infinite}
 .fin-cta:hover{transform:translateY(-3px)}
 .fin-cta span{transition:transform .25s}.fin-cta:hover span{transform:translateX(5px)}
-.fin-auto{display:flex;align-items:center;gap:10px;margin-top:26px;font-size:12px;font-weight:600;letter-spacing:.1em;color:var(--sub)}
+.fin-auto{display:flex;align-items:center;gap:10px;margin-top:26px;font-family:var(--font-mono);font-size:11px;font-weight:500;letter-spacing:.16em;text-transform:uppercase;color:var(--sub)}
 .cine-ring{width:34px;height:34px}
 .ring-bg{fill:none;stroke:var(--line-2);stroke-width:3}
 .ring-fg{fill:none;stroke:var(--brand);stroke-width:3;stroke-linecap:round;stroke-dasharray:131.95;stroke-dashoffset:131.95;transform:rotate(-90deg);transform-origin:center}
@@ -129,8 +140,21 @@
 /* 안전망: 인트로가 닫히면 어떤 씬/스테이지도 앱 위에 남지 않게 (클릭 가로채기 방지) */
 #intro.gone .scene,#intro.gone .cine-store-stage{opacity:0;visibility:hidden;pointer-events:none}
 
+/* ── 로고마크 드로우인 링 (conic 스트로크가 0→360° 그려짐) ── */
+.cls-mark,.fin-mark{position:relative}
+.cls-mark::after,.sc-finale.on .fin-mark::after{
+  content:"";position:absolute;inset:-5px;border-radius:inherit;padding:1.5px;
+  background:conic-gradient(from -90deg,var(--brand),var(--brand-2),transparent var(--deg,0deg));
+  -webkit-mask:linear-gradient(#000 0 0) content-box,linear-gradient(#000 0 0);
+  -webkit-mask-composite:xor;mask:linear-gradient(#000 0 0) content-box,linear-gradient(#000 0 0);mask-composite:exclude;
+  animation:drawRing 1.3s var(--ease) forwards;
+}
+.fin-mark::after{content:none}                       /* 피날레 진입 전엔 숨김 → .on에서만 그림 */
+@keyframes drawRing{from{--deg:0deg}to{--deg:360deg}}
+@keyframes ctaPulse{0%,100%{box-shadow:0 16px 40px -12px var(--glow)}50%{box-shadow:0 22px 56px -10px var(--glow),0 0 0 4px color-mix(in srgb,var(--brand) 16%,transparent)}}
+
 /* ── 키프레임 ── */
-@keyframes letterUp{to{opacity:1;transform:none}}
+@keyframes letterUp{to{opacity:1;transform:none;filter:blur(0)}}
 @keyframes fadeIn{to{opacity:1}}
 @keyframes fadeUp2{from{opacity:0;transform:translateY(22px)}to{opacity:1;transform:none}}
 @keyframes mallIn{to{opacity:1;transform:none}}

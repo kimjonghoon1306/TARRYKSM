@@ -94,6 +94,38 @@ function replayCinema(){
   cineGo(0);
 }
 
+/* 커서 패럴랙스(레이어 깊이감) + 마그네틱 CTA — 대기업 인터랙티브 마감 */
+function setupCineFx(){
+  const intro = document.getElementById('intro');
+  if(!intro || intro._fx) return; intro._fx = true;
+  let raf = null, tx = 0, ty = 0;
+  intro.addEventListener('mousemove', (e)=>{
+    if(intro.classList.contains('gone')) return;
+    const r = intro.getBoundingClientRect();
+    tx = ((e.clientX - r.left)/r.width) * 2 - 1;     // -1 ~ 1
+    ty = ((e.clientY - r.top)/r.height) * 2 - 1;
+    if(!raf) raf = requestAnimationFrame(()=>{
+      intro.style.setProperty('--px', tx.toFixed(3));
+      intro.style.setProperty('--py', ty.toFixed(3));
+      raf = null;
+    });
+  });
+  intro.addEventListener('mouseleave', ()=>{
+    intro.style.setProperty('--px', 0); intro.style.setProperty('--py', 0);
+  });
+  // 마그네틱: 커서가 버튼 위를 지날 때 살짝 끌려옴 (translate=개별속성→entrance transform과 충돌X)
+  const cta = intro.querySelector('.fin-cta');
+  if(cta){
+    cta.addEventListener('mousemove', (e)=>{
+      const r = cta.getBoundingClientRect();
+      const dx = (e.clientX - (r.left + r.width/2)) * .28;
+      const dy = (e.clientY - (r.top + r.height/2)) * .4;
+      cta.style.translate = `${dx.toFixed(1)}px ${dy.toFixed(1)}px`;
+    });
+    cta.addEventListener('mouseleave', ()=>{ cta.style.translate = '0 0'; });
+  }
+}
+
 /* 시작 */
 function startCinema(){
   if(cineStarted) return;
@@ -104,5 +136,6 @@ function startCinema(){
   }
   buildCineProgress();
   buildCineMalls();
+  setupCineFx();
   cineGo(0);
 }
