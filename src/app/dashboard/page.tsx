@@ -2,6 +2,7 @@ import Link from "next/link";
 import { createClient } from "@/lib/supabase/server";
 import { SKINS } from "@/lib/skins";
 import { PRIMARY_DOMAIN } from "@/lib/domains";
+import { fetchActiveAnnouncements } from "@/lib/announcements";
 import { setStoreSlug } from "./actions";
 
 type Store = { id: string; name: string; skin: string; slug: string };
@@ -42,6 +43,9 @@ export default async function Overview({
   const newOrders = orders.filter((o) => o.status === "신규").length;
   const won = (n: number) => "₩" + n.toLocaleString("ko-KR");
 
+  // 플랫폼 공지 (활성만)
+  const announcements = user ? await fetchActiveAnnouncements(supabase, 3) : [];
+
   const card =
     "rounded-2xl border border-black/5 bg-white p-5 shadow-sm dark:border-white/10 dark:bg-white/[0.03]";
 
@@ -55,6 +59,28 @@ export default async function Overview({
     <div className="mx-auto max-w-5xl">
       <h1 className="text-2xl font-bold sm:text-3xl">대시보드</h1>
       <p className="mt-1 text-sm text-neutral-500">모든 쇼핑몰을 여기서 만들고 · 수정하고 · 관리하세요</p>
+
+      {/* 플랫폼 공지 배너 */}
+      {announcements.length > 0 && (
+        <div className="mt-5 space-y-2">
+          {announcements.map((a) => (
+            <div
+              key={a.id}
+              className="rounded-xl border border-violet-400/40 bg-violet-500/[0.07] px-4 py-3"
+            >
+              <div className="flex items-center gap-2 text-sm font-semibold text-violet-700 dark:text-violet-200">
+                <span>{a.pinned ? "📌" : "📢"}</span>
+                {a.title}
+              </div>
+              {a.body && (
+                <p className="mt-1 whitespace-pre-wrap text-sm text-neutral-600 dark:text-neutral-300">
+                  {a.body}
+                </p>
+              )}
+            </div>
+          ))}
+        </div>
+      )}
 
       {!user && (
         <div className="mt-5 rounded-xl border border-amber-400/40 bg-amber-400/10 px-4 py-3 text-sm text-amber-700 dark:text-amber-300">

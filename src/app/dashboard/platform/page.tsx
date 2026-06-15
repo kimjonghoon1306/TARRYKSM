@@ -67,6 +67,22 @@ export default async function PlatformPage() {
       </div>
       <p className="mt-1 text-sm text-neutral-500">모든 회원과 쇼핑몰·매출을 총괄하고 직접 제어합니다</p>
 
+      {/* 바로가기 */}
+      <div className="mt-5 flex flex-wrap gap-3">
+        <Link
+          href="/dashboard/platform/announcements"
+          className="rounded-xl border border-black/10 px-4 py-2.5 text-sm font-semibold transition hover:border-violet-500 dark:border-white/15"
+        >
+          📢 공지 관리
+        </Link>
+        <Link
+          href="/dashboard/platform/settlements"
+          className="rounded-xl border border-black/10 px-4 py-2.5 text-sm font-semibold transition hover:border-violet-500 dark:border-white/15"
+        >
+          💰 정산
+        </Link>
+      </div>
+
       {/* 지표 */}
       <div className="mt-6 grid grid-cols-2 gap-3 lg:grid-cols-5">
         <div className={card}>
