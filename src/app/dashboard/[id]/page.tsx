@@ -260,6 +260,20 @@ export default async function StoreAdmin({
         )}
       </section>
 
+      {/* 대문 구성(섹션 빌더) */}
+      <Link
+        href={`/dashboard/${s.id}/sections`}
+        className={card + " lift mt-4 block transition hover:border-violet-400"}
+      >
+        <div className="flex items-center justify-between">
+          <div>
+            <div className="font-semibold">🧩 대문 구성</div>
+            <div className="text-sm text-neutral-500">배너·상품 선반·텍스트 블록을 쌓아 대문을 직접 만들기</div>
+          </div>
+          <span className="text-xs font-semibold text-violet-500">구성하기 →</span>
+        </div>
+      </Link>
+
       {/* 기타 관리 */}
       <div className="mt-4 grid gap-4 sm:grid-cols-2">
         <Link href={`/dashboard/${s.id}/design`} className={card + " lift block transition hover:border-violet-400"}>
