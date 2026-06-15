@@ -169,6 +169,24 @@ export async function togglePublish(formData: FormData) {
   revalidatePath(`/dashboard/${id}`);
 }
 
+// 결제 설정 — 무통장입금 계좌 + 안내문구 (PG는 추후)
+export async function setStorePayment(formData: FormData) {
+  const supabase = await createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+  if (!user) redirect("/login");
+  const id = String(formData.get("id") || "");
+  if (!id) return;
+
+  const payBank = String(formData.get("pay_bank") || "").trim() || null;
+  const payNote = String(formData.get("pay_note") || "").trim() || null;
+
+  await supabase.from("stores").update({ pay_bank: payBank, pay_note: payNote }).eq("id", id);
+  revalidatePath(`/dashboard/${id}`);
+  redirect(`/dashboard/${id}?pmsg=` + encodeURIComponent("결제 설정을 저장했어요"));
+}
+
 // 커스텀 도메인 연결/해제. 입력 정규화(프로토콜·경로·www 제거).
 export async function setStoreDomain(formData: FormData) {
   const supabase = await createClient();

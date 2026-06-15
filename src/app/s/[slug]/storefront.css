@@ -314,3 +314,10 @@ textarea.sf-co-input { resize: vertical; min-height: 56px; }
 .sf-done-ico { font-size: 52px; }
 .sf-order-done h2 { font-family: var(--s-fd); font-weight: var(--s-fw); font-size: 22px; margin: 14px 0 8px; }
 .sf-order-done p { color: var(--s-sub); font-size: 14px; line-height: 1.7; margin-bottom: 20px; }
+
+/* 주문완료 입금계좌 안내 */
+.sf-pay-box { margin: 0 0 20px; padding: 16px; border-radius: var(--s-r); background: var(--s-brand-soft, rgba(0,0,0,.05)); text-align: left; }
+.sf-pay-label { font-size: 12px; font-weight: 800; color: var(--s-brand); }
+.sf-pay-bank { margin-top: 6px; font-size: 16px; font-weight: 700; color: var(--s-ink); }
+.sf-pay-amt { margin-top: 4px; font-size: 14px; font-weight: 700; color: var(--s-ink); font-variant-numeric: tabular-nums; }
+.sf-pay-note { margin-top: 8px; font-size: 12.5px; line-height: 1.6; color: var(--s-sub); }

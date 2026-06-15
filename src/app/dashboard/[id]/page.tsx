@@ -2,7 +2,7 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { domainToUnicode } from "node:url";
 import { createClient } from "@/lib/supabase/server";
-import { setStoreDomain, togglePublish, setStoreSlug } from "../actions";
+import { setStoreDomain, togglePublish, setStoreSlug, setStorePayment } from "../actions";
 import { PRIMARY_DOMAIN } from "@/lib/domains";
 import DomainHelp from "@/components/DomainHelp";
 import BrandingForm from "@/components/BrandingForm";
@@ -19,6 +19,8 @@ type Store = {
   hero_image_url: string | null;
   hero_title: string | null;
   hero_subtitle: string | null;
+  pay_bank: string | null;
+  pay_note: string | null;
 };
 
 export default async function StoreAdmin({
@@ -26,14 +28,14 @@ export default async function StoreAdmin({
   searchParams,
 }: {
   params: Promise<{ id: string }>;
-  searchParams: Promise<{ dmsg?: string; derr?: string; smsg?: string; serr?: string; brmsg?: string }>;
+  searchParams: Promise<{ dmsg?: string; derr?: string; smsg?: string; serr?: string; brmsg?: string; pmsg?: string }>;
 }) {
   const { id } = await params;
-  const { dmsg, derr, smsg, serr, brmsg } = await searchParams;
+  const { dmsg, derr, smsg, serr, brmsg, pmsg } = await searchParams;
   const supabase = await createClient();
   const { data: store } = await supabase
     .from("stores")
-    .select("id,name,skin,slug,published,custom_domain,logo_url,hero_image_url,hero_title,hero_subtitle")
+    .select("id,name,skin,slug,published,custom_domain,logo_url,hero_image_url,hero_title,hero_subtitle,pay_bank,pay_note")
     .eq("id", id)
     .maybeSingle();
   if (!store) notFound();
@@ -266,6 +268,50 @@ export default async function StoreAdmin({
             ))}
           </div>
         )}
+      </section>
+
+      {/* 결제 설정 */}
+      <section className={card + " mt-4"}>
+        <h2 className="mb-1 font-semibold">💳 결제 설정</h2>
+        <p className="mb-4 text-xs text-neutral-500">
+          손님이 주문할 때 안내할 입금 계좌를 넣으세요. 카드결제(PG)는 아래에서 곧 연결할 수 있어요.
+        </p>
+        {pmsg && (
+          <p className="mb-3 rounded-lg bg-emerald-500/10 px-3 py-2 text-sm text-emerald-600 dark:text-emerald-400">{pmsg}</p>
+        )}
+        <form action={setStorePayment} className="space-y-3">
+          <input type="hidden" name="id" value={s.id} />
+          <div>
+            <label className="mb-1.5 block text-xs font-semibold text-neutral-500">입금 계좌 (무통장입금)</label>
+            <input
+              name="pay_bank"
+              defaultValue={s.pay_bank || ""}
+              placeholder="예: 농협 123-4567-8901 (홍길동)"
+              className="w-full rounded-xl border border-black/10 bg-white px-4 py-2.5 text-sm outline-none focus:border-violet-500 focus:ring-2 focus:ring-violet-500/25 dark:border-white/10 dark:bg-white/[0.04]"
+            />
+          </div>
+          <div>
+            <label className="mb-1.5 block text-xs font-semibold text-neutral-500">입금 안내 문구 (선택)</label>
+            <input
+              name="pay_note"
+              defaultValue={s.pay_note || ""}
+              placeholder="예: 주문 후 24시간 내 입금해 주세요. 입금자명을 주문자와 같게 해주세요."
+              className="w-full rounded-xl border border-black/10 bg-white px-4 py-2.5 text-sm outline-none focus:border-violet-500 focus:ring-2 focus:ring-violet-500/25 dark:border-white/10 dark:bg-white/[0.04]"
+            />
+          </div>
+          <button className="rounded-xl bg-gradient-to-r from-violet-500 to-pink-500 px-5 py-2.5 text-sm font-semibold text-white shadow-lg shadow-violet-500/25 transition hover:brightness-105">
+            결제 설정 저장
+          </button>
+        </form>
+
+        {/* 카드결제(PG) — 준비중 안내 */}
+        <div className="mt-5 rounded-xl border border-dashed border-black/10 bg-black/[0.02] p-4 dark:border-white/10 dark:bg-white/[0.03]">
+          <div className="flex items-center gap-2 text-sm font-semibold">💳 카드결제 연결 (PG) <span className="rounded-full bg-amber-400/20 px-2 py-0.5 text-[11px] font-bold text-amber-600 dark:text-amber-300">준비 중</span></div>
+          <p className="mt-1.5 text-xs text-neutral-500">
+            토스페이먼츠·카카오페이 등 카드결제는 사장님이 본인 PG 계정을 직접 연결하는 방식으로 곧 제공됩니다.
+            (아임웹·식스샵과 동일한 방식) 지금은 무통장입금으로 주문을 받을 수 있어요.
+          </p>
+        </div>
       </section>
 
       {/* 대문 구성(섹션 빌더) */}

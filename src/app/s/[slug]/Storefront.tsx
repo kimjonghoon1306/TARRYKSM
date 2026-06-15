@@ -27,6 +27,8 @@ type Store = {
   hero_image_url?: string | null;
   hero_title?: string | null;
   hero_subtitle?: string | null;
+  pay_bank?: string | null;
+  pay_note?: string | null;
 };
 
 const won = (n: number) => "₩" + n.toLocaleString("ko-KR");
@@ -62,6 +64,7 @@ export default function Storefront({
   const [placing, setPlacing] = useState(false);
   const [orderErr, setOrderErr] = useState("");
   const [orderDone, setOrderDone] = useState(false);
+  const [paidTotal, setPaidTotal] = useState(0);
 
   const cats = useMemo(() => {
     const set = new Set<string>();
@@ -146,6 +149,7 @@ export default function Storefront({
         setOrderErr(res.error || "주문에 실패했어요.");
         return;
       }
+      setPaidTotal(total);
       setCart({});
       setOrderDone(true);
     } finally {
@@ -574,6 +578,14 @@ export default function Storefront({
                   <br />
                   주문해 주셔서 감사합니다.
                 </p>
+                {store.pay_bank && (
+                  <div className="sf-pay-box">
+                    <div className="sf-pay-label">💳 입금 계좌</div>
+                    <div className="sf-pay-bank">{store.pay_bank}</div>
+                    <div className="sf-pay-amt">입금액 {won(paidTotal)}</div>
+                    {store.pay_note && <div className="sf-pay-note">{store.pay_note}</div>}
+                  </div>
+                )}
                 <button
                   className="sf-checkout"
                   onClick={() => {
