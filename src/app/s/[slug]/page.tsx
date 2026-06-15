@@ -46,6 +46,7 @@ export default async function StorefrontPage({
       />
       <Storefront
         store={{
+          id: s.id,
           name: s.name,
           skin: s.skin,
           logo_url: s.logo_url,

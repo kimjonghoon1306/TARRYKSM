@@ -293,3 +293,24 @@
 .sf-tb-eyebrow { font-family: var(--s-fd); font-size: 11px; font-weight: 800; letter-spacing: .2em; text-transform: uppercase; color: var(--s-brand); }
 .sf-textblock h2 { font-family: var(--s-fd); font-weight: var(--s-fw); font-size: clamp(22px, 4vw, 30px); letter-spacing: var(--s-hls); margin: 8px 0 10px; }
 .sf-textblock p { color: var(--s-sub); font-size: 15px; line-height: 1.7; white-space: pre-line; }
+
+/* 주문서(체크아웃) */
+.sf-checkout-body { padding: 22px 20px 26px; }
+.sf-checkout-title { font-family: var(--s-fd); font-weight: var(--s-fw); font-size: 22px; margin: 0 0 16px; }
+.sf-checkout-summary { background: var(--s-soft, rgba(0,0,0,.04)); border-radius: var(--s-r); padding: 14px 16px; margin-bottom: 18px; }
+.sf-co-line { display: flex; justify-content: space-between; gap: 10px; font-size: 14px; padding: 3px 0; color: var(--s-sub); }
+.sf-co-line b { color: var(--s-ink); font-variant-numeric: tabular-nums; }
+.sf-co-total { display: flex; justify-content: space-between; gap: 10px; margin-top: 8px; padding-top: 10px; border-top: 1px solid var(--s-line, rgba(0,0,0,.1)); font-size: 16px; font-weight: 800; }
+.sf-co-total b { color: var(--s-brand); font-variant-numeric: tabular-nums; }
+.sf-co-label { display: block; font-size: 12.5px; font-weight: 700; color: var(--s-sub); margin: 12px 0 5px; }
+.sf-co-input { width: 100%; border: 1px solid var(--s-line, rgba(0,0,0,.14)); border-radius: var(--s-r); background: var(--s-bg, #fff); color: var(--s-ink); padding: 11px 13px; font-size: 14px; font-family: inherit; outline: none; transition: border-color .15s; }
+.sf-co-input:focus { border-color: var(--s-brand); }
+textarea.sf-co-input { resize: vertical; min-height: 56px; }
+.sf-co-err { margin-top: 12px; padding: 9px 12px; border-radius: var(--s-r); background: rgba(244,63,94,.12); color: #e11d48; font-size: 13px; }
+.sf-co-note { margin-top: 10px; text-align: center; font-size: 12px; color: var(--s-sub); }
+.sf-checkout-body .sf-checkout { margin-top: 18px; }
+/* 주문 완료 */
+.sf-order-done { text-align: center; padding: 24px 8px; }
+.sf-done-ico { font-size: 52px; }
+.sf-order-done h2 { font-family: var(--s-fd); font-weight: var(--s-fw); font-size: 22px; margin: 14px 0 8px; }
+.sf-order-done p { color: var(--s-sub); font-size: 14px; line-height: 1.7; margin-bottom: 20px; }

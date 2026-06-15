@@ -2,6 +2,7 @@
 
 import { useMemo, useState } from "react";
 import type { Section } from "@/lib/sections";
+import { placeOrder } from "./actions";
 import "./storefront.css";
 
 export type Product = {
@@ -19,6 +20,7 @@ export type Product = {
 
 const BEST_RE = /best|베스트|인기|추천|hot|스테디/i;
 type Store = {
+  id: string;
   name: string;
   skin: string;
   logo_url?: string | null;
@@ -54,6 +56,12 @@ export default function Storefront({
   const [q, setQ] = useState("");
   const [searchOn, setSearchOn] = useState(false);
   const [toast, setToast] = useState("");
+  // 체크아웃(주문서)
+  const [checkout, setCheckout] = useState(false);
+  const [buyer, setBuyer] = useState({ name: "", phone: "", email: "", address: "", memo: "" });
+  const [placing, setPlacing] = useState(false);
+  const [orderErr, setOrderErr] = useState("");
+  const [orderDone, setOrderDone] = useState(false);
 
   const cats = useMemo(() => {
     const set = new Set<string>();
@@ -122,6 +130,27 @@ export default function Storefront({
   function openDetail(p: Product) {
     setDetail(p);
     setDetailQty(1);
+  }
+
+  async function submitOrder() {
+    setOrderErr("");
+    if (!buyer.name.trim() || !buyer.phone.trim()) {
+      setOrderErr("이름과 연락처를 입력해 주세요.");
+      return;
+    }
+    setPlacing(true);
+    try {
+      const items = cartLines.map((l) => ({ product_id: l.id, qty: l.qty }));
+      const res = await placeOrder(store.id, buyer, items);
+      if (!res.ok) {
+        setOrderErr(res.error || "주문에 실패했어요.");
+        return;
+      }
+      setCart({});
+      setOrderDone(true);
+    } finally {
+      setPlacing(false);
+    }
   }
 
   function renderCard(p: Product) {
@@ -515,12 +544,117 @@ export default function Storefront({
             className="sf-checkout"
             disabled={cartLines.length === 0}
             style={{ opacity: cartLines.length === 0 ? 0.5 : 1 }}
-            onClick={() => flash("💳 결제 연동은 곧 추가됩니다 (데모)")}
+            onClick={() => {
+              if (cartLines.length === 0) return;
+              setOrderErr("");
+              setOrderDone(false);
+              setCartOpen(false);
+              setCheckout(true);
+            }}
           >
-            결제하기
+            주문하기
           </button>
         </div>
       </aside>
+
+      {/* 주문서(체크아웃) */}
+      <div className={"sf-scrim" + (checkout ? " on" : "")} onClick={() => !placing && setCheckout(false)} />
+      {checkout && (
+        <div className="sf-sheet on" role="dialog">
+          {!placing && (
+            <button className="sf-x" onClick={() => setCheckout(false)}>✕</button>
+          )}
+          <div className="sf-sheet-body sf-checkout-body">
+            {orderDone ? (
+              <div className="sf-order-done">
+                <div className="sf-done-ico">✅</div>
+                <h2>주문이 접수됐어요!</h2>
+                <p>
+                  사장님이 확인 후 연락드릴 거예요.
+                  <br />
+                  주문해 주셔서 감사합니다.
+                </p>
+                <button
+                  className="sf-checkout"
+                  onClick={() => {
+                    setCheckout(false);
+                    setBuyer({ name: "", phone: "", email: "", address: "", memo: "" });
+                  }}
+                >
+                  쇼핑 계속하기
+                </button>
+              </div>
+            ) : (
+              <>
+                <h2 className="sf-checkout-title">주문서 작성</h2>
+
+                {/* 주문 요약 */}
+                <div className="sf-checkout-summary">
+                  {cartLines.map((l) => (
+                    <div key={l.id} className="sf-co-line">
+                      <span>{l.name} × {l.qty}</span>
+                      <b>{won(l.price * l.qty)}</b>
+                    </div>
+                  ))}
+                  <div className="sf-co-total">
+                    <span>합계</span>
+                    <b>{won(total)}</b>
+                  </div>
+                </div>
+
+                {/* 받는 사람 정보 */}
+                <label className="sf-co-label">받는 분 이름 *</label>
+                <input
+                  className="sf-co-input"
+                  value={buyer.name}
+                  onChange={(e) => setBuyer({ ...buyer, name: e.target.value })}
+                  placeholder="홍길동"
+                />
+                <label className="sf-co-label">연락처 *</label>
+                <input
+                  className="sf-co-input"
+                  value={buyer.phone}
+                  onChange={(e) => setBuyer({ ...buyer, phone: e.target.value })}
+                  placeholder="010-1234-5678"
+                  inputMode="tel"
+                />
+                <label className="sf-co-label">이메일 (선택)</label>
+                <input
+                  className="sf-co-input"
+                  value={buyer.email}
+                  onChange={(e) => setBuyer({ ...buyer, email: e.target.value })}
+                  placeholder="hong@example.com"
+                  inputMode="email"
+                />
+                <label className="sf-co-label">배송 주소 (선택)</label>
+                <input
+                  className="sf-co-input"
+                  value={buyer.address}
+                  onChange={(e) => setBuyer({ ...buyer, address: e.target.value })}
+                  placeholder="주소를 입력하세요"
+                />
+                <label className="sf-co-label">요청사항 (선택)</label>
+                <textarea
+                  className="sf-co-input"
+                  value={buyer.memo}
+                  onChange={(e) => setBuyer({ ...buyer, memo: e.target.value })}
+                  placeholder="예: 부재 시 문 앞에 놓아주세요"
+                  rows={2}
+                />
+
+                {orderErr && <div className="sf-co-err">{orderErr}</div>}
+
+                <button className="sf-checkout" disabled={placing} onClick={submitOrder}>
+                  {placing ? "접수 중…" : `${won(total)} 주문 접수하기`}
+                </button>
+                <p className="sf-co-note">
+                  💳 결제는 사장님과 별도로 진행돼요. (지금은 주문 접수까지)
+                </p>
+              </>
+            )}
+          </div>
+        </div>
+      )}
 
       <div className={"sf-toast" + (toast ? " on" : "")}>{toast}</div>
     </div>
