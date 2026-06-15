@@ -8,9 +8,10 @@ import Field from "@/components/Field";
 export default async function LoginPage({
   searchParams,
 }: {
-  searchParams: Promise<{ error?: string; msg?: string }>;
+  searchParams: Promise<{ error?: string; msg?: string; admin?: string }>;
 }) {
   const sp = await searchParams;
+  const isAdmin = sp.admin === "1"; // 비밀 입구(로고 연타) → 관리자 로그인 변형
   // 이미 로그인된 사용자는 대시보드로 (로그인 화면 재노출 방지)
   const supabase = await createClient();
   const {
@@ -19,22 +20,31 @@ export default async function LoginPage({
   if (user) redirect("/dashboard");
   return (
     <AuthShell
-      title="로그인"
-      subtitle="이메일로 로그인하세요"
+      title={isAdmin ? "🔐 관리자 로그인" : "로그인"}
+      subtitle={isAdmin ? "사용자·프로그램 관리 컨트롤타워" : "이메일로 로그인하세요"}
       footer={
-        <div className="space-y-2">
-          <div>
-            계정이 없으세요?{" "}
-            <Link href="/signup" className="font-semibold text-violet-500 hover:text-violet-400">
-              회원가입
+        isAdmin ? (
+          <div className="text-xs text-neutral-400">
+            일반 회원이신가요?{" "}
+            <Link href="/login" className="font-semibold text-violet-500 hover:text-violet-400">
+              회원 로그인
             </Link>
           </div>
-          <div className="text-xs text-neutral-400">
-            <Link href="/find-email" className="hover:text-violet-500">이메일 찾기</Link>
-            <span className="mx-2">·</span>
-            <Link href="/reset-password" className="hover:text-violet-500">비밀번호 찾기</Link>
+        ) : (
+          <div className="space-y-2">
+            <div>
+              계정이 없으세요?{" "}
+              <Link href="/signup" className="font-semibold text-violet-500 hover:text-violet-400">
+                회원가입
+              </Link>
+            </div>
+            <div className="text-xs text-neutral-400">
+              <Link href="/find-email" className="hover:text-violet-500">이메일 찾기</Link>
+              <span className="mx-2">·</span>
+              <Link href="/reset-password" className="hover:text-violet-500">비밀번호 찾기</Link>
+            </div>
           </div>
-        </div>
+        )
       }
     >
       {sp.msg && (

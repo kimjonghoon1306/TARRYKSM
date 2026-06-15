@@ -1,6 +1,7 @@
 "use client";
 
 import { useMemo, useState } from "react";
+import type { Section } from "@/lib/sections";
 import "./storefront.css";
 
 export type Product = {
@@ -38,9 +39,11 @@ const SORTS = [
 export default function Storefront({
   store,
   products,
+  sections,
 }: {
   store: Store;
   products: Product[];
+  sections?: Section[];
 }) {
   const [cart, setCart] = useState<Record<string, number>>({});
   const [detail, setDetail] = useState<Product | null>(null);
@@ -73,6 +76,8 @@ export default function Storefront({
     return arr;
   }, [products, activeCat, q, sort]);
 
+  // 창업자가 섹션 빌더로 구성을 짰으면 그걸 우선 렌더(없으면 기본 진열)
+  const hasSections = !!(sections && sections.length);
   // 홈(기본) 뷰 = 전체 + 추천정렬 + 검색없음 → 리치 진열(신상·기획전·베스트)
   const isHome = activeCat === "전체" && !q.trim() && sort === "recommend";
 
@@ -149,6 +154,76 @@ export default function Storefront({
     );
   }
 
+  // 섹션 빌더 블록 렌더 (창업자가 구성한 대문)
+  function renderSection(s: Section) {
+    const c = s.config || {};
+    if (s.type === "banner") {
+      const link = c.link_product_id ? products.find((p) => p.id === c.link_product_id) : null;
+      return (
+        <button
+          key={s.id}
+          className={"sf-promo" + (c.image_url ? " has-img" : "")}
+          style={c.image_url ? { backgroundImage: `url(${c.image_url})` } : undefined}
+          onClick={() => {
+            if (link) openDetail(link);
+            else if (c.link_url) window.open(c.link_url, "_blank");
+          }}
+        >
+          <div className="sf-promo-inner">
+            {c.eyebrow && <span className="sf-promo-eyebrow">{c.eyebrow}</span>}
+            {c.title && <h3>{c.title}</h3>}
+            {c.subtitle && <p>{c.subtitle}</p>}
+            {c.cta_label && <span className="sf-promo-cta">{c.cta_label} →</span>}
+          </div>
+        </button>
+      );
+    }
+    if (s.type === "text") {
+      return (
+        <section key={s.id} className={"sf-textblock" + (c.align === "left" ? " left" : "")}>
+          {c.eyebrow && <span className="sf-tb-eyebrow">{c.eyebrow}</span>}
+          {c.title && <h2>{c.title}</h2>}
+          {c.body && <p>{c.body}</p>}
+        </section>
+      );
+    }
+    if (s.type === "shelf") {
+      let items: Product[] = [];
+      if (c.source === "best") items = bestItems;
+      else if (c.source === "category") items = products.filter((p) => p.category === c.category);
+      else if (c.source === "manual")
+        items = (c.product_ids || [])
+          .map((id) => products.find((p) => p.id === id))
+          .filter((p): p is Product => !!p);
+      else items = newItems; // 'new' 기본
+      items = items.slice(0, c.limit || 8);
+      if (!items.length) return null;
+      return (
+        <section key={s.id} className="sf-shelf">
+          <div className="sf-shelf-head">
+            <h2>{c.title || "상품"}</h2>
+            {c.subtitle && <span className="sf-shelf-sub">{c.subtitle}</span>}
+          </div>
+          <div className="sf-grid">{items.map(renderCard)}</div>
+        </section>
+      );
+    }
+    if (s.type === "grid") {
+      const items = c.source === "category" ? products.filter((p) => p.category === c.category) : products;
+      if (!items.length) return null;
+      return (
+        <section key={s.id} className="sf-shelf">
+          <div className="sf-section">
+            <h2>{c.title || "전체 상품"}</h2>
+            <span className="sf-count">{items.length}개</span>
+          </div>
+          <div className="sf-grid">{items.map(renderCard)}</div>
+        </section>
+      );
+    }
+    return null;
+  }
+
   const heroTitle = store.hero_title || store.name;
   const heroSub = store.hero_subtitle || "엄선한 상품을 한 곳에. 지금 둘러보세요.";
 
@@ -199,6 +274,10 @@ export default function Storefront({
       </section>
 
       <div className="sf-wrap">
+        {hasSections ? (
+          sections!.map(renderSection)
+        ) : (
+        <>
         {/* 카테고리 + 정렬 */}
         {products.length > 0 && (
           <div className="sf-toolbar">
@@ -295,6 +374,8 @@ export default function Storefront({
             </div>
             <div className="sf-grid">{shown.map(renderCard)}</div>
           </>
+        )}
+        </>
         )}
 
         <div className="sf-foot">

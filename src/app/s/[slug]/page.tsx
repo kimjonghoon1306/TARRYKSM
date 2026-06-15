@@ -1,5 +1,6 @@
 import { notFound } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
+import { fetchSections } from "@/lib/sections";
 import Storefront, { type Product } from "./Storefront";
 
 type Store = {
@@ -35,6 +36,7 @@ export default async function StorefrontPage({
     .eq("store_id", s.id)
     .order("position", { ascending: true });
   const items = (products ?? []) as Product[];
+  const sections = await fetchSections(supabase, s.id);
 
   return (
     <>
@@ -52,6 +54,7 @@ export default async function StorefrontPage({
           hero_subtitle: s.hero_subtitle,
         }}
         products={items}
+        sections={sections}
       />
     </>
   );

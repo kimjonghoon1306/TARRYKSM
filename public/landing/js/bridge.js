@@ -27,7 +27,7 @@ window.openCreate = function (skin) {
 /* app.js init이 호출 — 인페이지 인증 없음 */
 window.initAuth = function () {};
 
-/* ── 비밀 입구: 로고 5번 연속 클릭 → 관리자 로그인 ──
+/* ── 비밀 입구: 로고 4번 연속 클릭 → 관리자 로그인 ──
    (대문에 버튼 노출 없이, 아는 사람만 들어가는 숨은 입구) */
 let _adminTaps = 0;
 let _adminTimer = null;
@@ -36,13 +36,13 @@ window.secretAdmin = function () {
   clearTimeout(_adminTimer);
   _adminTimer = setTimeout(function () { _adminTaps = 0; }, 1500); // 1.5초 내 연타
 
-  const left = 5 - _adminTaps;
-  if (_adminTaps >= 3 && _adminTaps < 5 && typeof toast === 'function') {
+  const left = 4 - _adminTaps;
+  if (_adminTaps >= 2 && _adminTaps < 4 && typeof toast === 'function') {
     toast('🔑 ' + left + '번 더…');
   }
-  if (_adminTaps >= 5) {
+  if (_adminTaps >= 4) {
     _adminTaps = 0;
     if (typeof toast === 'function') toast('🔓 관리자 로그인');
-    setTimeout(function () { location.href = '/login'; }, 250);
+    setTimeout(function () { location.href = '/login?admin=1'; }, 250);  // 관리자 로그인 변형
   }
 };

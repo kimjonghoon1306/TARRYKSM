@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
+import { fetchSections } from "@/lib/sections";
 import Storefront, { type Product } from "../s/[slug]/Storefront";
 
 // 각 쇼핑몰 링크 공유 시: 가게 이름·로고(파비콘)·배너(미리보기 이미지)
@@ -67,6 +68,7 @@ export default async function PrettyStorefront({
     .eq("store_id", s.id)
     .order("position", { ascending: true });
   const items = (products ?? []) as Product[];
+  const sections = await fetchSections(supabase, s.id);
 
   return (
     <>
@@ -84,6 +86,7 @@ export default async function PrettyStorefront({
           hero_subtitle: s.hero_subtitle,
         }}
         products={items}
+        sections={sections}
       />
     </>
   );
