@@ -21,21 +21,33 @@ function buildCineProgress(){
   el.innerHTML = CINE.map((_,i)=>`<div class="seg" onclick="cineGo(${i})"><span class="seg-fill"></span></div>`).join('');
 }
 
-/* 무한분양 씬 — 스킨 수만큼 색이 다른 미니 매장 증식 */
+/* 무한분양 씬 — 색뿐 아니라 레이아웃(모양)까지 다양한 미니 매장 증식 */
 function buildCineMalls(){
   const el = document.getElementById('cineMalls');
   if(!el) return;
-  const emo = ['🕯️','👟','🧴','👜','⌚','🎧','🕶️','☕','🧢','🌿','💄','📷','🎒','🕰️'];
+  const emo = ['🕯️','👟','🧴','👜','⌚','🎧','🕶️','☕','🧢','🌿','💄','📷','🎒','🕰️','🥑','🍞','🐟','🥩','🍎','🥬'];
   const N = 14;
   let html = '';
   for(let i=0;i<N;i++){
     const hue = Math.round((360/N)*i);
     const d = (i*0.05).toFixed(2);
-    const a = emo[i%emo.length], b = emo[(i+5)%emo.length];
-    html += `<div class="cine-mall" style="--h:${hue}deg;--d:${d}s">
-      <div class="cm-bar"></div>
-      <div class="cm-body"><div class="cm-hero"></div><div class="cm-tiles"><i>${a}</i><i>${b}</i></div></div>
-    </div>`;
+    const v = i % 6;                                   // 6가지 레이아웃 변형
+    const e = (k)=> emo[(i*3+k) % emo.length];
+    let inner;
+    if(v===0){            // 클래식: 바 + 히어로 + 타일2
+      inner = `<div class="cm-bar"></div><div class="cm-body"><div class="cm-hero"></div><div class="cm-tiles"><i>${e(0)}</i><i>${e(1)}</i></div></div>`;
+    } else if(v===1){     // 카탈로그: 바 + 타일4(2×2)
+      inner = `<div class="cm-bar"></div><div class="cm-body"><div class="cm-tiles cm-4"><i>${e(0)}</i><i>${e(1)}</i><i>${e(2)}</i><i>${e(3)}</i></div></div>`;
+    } else if(v===2){     // 배너형: 큰 히어로 + 와이드 타일
+      inner = `<div class="cm-body cm-banner"><div class="cm-hero cm-hero-lg"><b>${e(0)}</b></div><div class="cm-tiles cm-wide"><i>${e(1)}</i></div></div>`;
+    } else if(v===3){     // 브랜드형: 둥근 로고 + 라인 + 타일2
+      inner = `<div class="cm-body"><div class="cm-brand"><span class="cm-dot"></span><span class="cm-lines"><i></i><i></i></span></div><div class="cm-tiles"><i>${e(0)}</i><i>${e(1)}</i></div></div>`;
+    } else if(v===4){     // 리스트형: 얇은 바 + 가로 행 3
+      inner = `<div class="cm-bar cm-bar-sm"></div><div class="cm-body"><div class="cm-rows"><span>${e(0)}</span><span>${e(1)}</span><span>${e(2)}</span></div></div>`;
+    } else {              // 풀블리드: 큰 단일 상품 + 하단 캡션바
+      inner = `<div class="cm-body cm-solo"><div class="cm-big">${e(0)}</div><div class="cm-cap"></div></div>`;
+    }
+    html += `<div class="cine-mall cm-v${v}" style="--h:${hue}deg;--d:${d}s">${inner}</div>`;
   }
   el.innerHTML = html;
 }

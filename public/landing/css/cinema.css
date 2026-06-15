@@ -117,6 +117,29 @@
 .cm-hero{height:26px;border-radius:6px;background:rgba(109,94,252,.18)}
 .cm-tiles{display:grid;grid-template-columns:1fr 1fr;gap:6px}
 .cm-tiles i{aspect-ratio:1;border-radius:6px;background:rgba(109,94,252,.14);display:grid;place-items:center;font-size:13px;font-style:normal}
+
+/* 미니몰 레이아웃 변형 — 모서리/구조를 매장마다 다르게 */
+.cine-mall.cm-v1{border-radius:7px}
+.cine-mall.cm-v2{border-radius:15px}
+.cine-mall.cm-v3{border-radius:18px}
+.cine-mall.cm-v4{border-radius:8px}
+.cine-mall.cm-v5{border-radius:20px}
+.cm-bar-sm{height:13%}
+.cm-tiles.cm-4{grid-template-columns:1fr 1fr;grid-template-rows:1fr 1fr}
+.cm-tiles.cm-wide{grid-template-columns:1fr}
+.cm-banner{gap:8px}
+.cm-hero-lg{height:52px;display:grid;place-items:center;font-size:22px}
+.cm-hero-lg b{font-style:normal}
+.cm-brand{display:flex;align-items:center;gap:6px;margin-bottom:2px}
+.cm-dot{width:18px;height:18px;border-radius:50%;background:var(--brand);flex:none;opacity:.9}
+.cm-lines{display:flex;flex-direction:column;gap:4px;flex:1}
+.cm-lines i{height:5px;border-radius:3px;background:rgba(109,94,252,.22)}
+.cm-lines i:last-child{width:55%}
+.cm-rows{display:flex;flex-direction:column;gap:5px}
+.cm-rows span{display:flex;align-items:center;height:22px;border-radius:6px;background:rgba(109,94,252,.12);padding-left:8px;font-size:12px;font-style:normal}
+.cm-solo{padding:0}
+.cm-big{flex:1;display:grid;place-items:center;font-size:34px;background:rgba(109,94,252,.14)}
+.cm-cap{height:20%;background:var(--brand);opacity:.85}
 .mul-cap{position:absolute;left:clamp(24px,7vw,90px);bottom:8vh;text-align:left}
 .sc-multiply.on .mul-cap .cap-no,.sc-multiply.on .mul-cap .cap-ttl{animation:fadeUp2 .6s .3s both}
 
