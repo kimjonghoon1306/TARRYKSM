@@ -78,6 +78,8 @@ export default function Storefront({
 
   // 창업자가 섹션 빌더로 구성을 짰으면 그걸 우선 렌더(없으면 기본 진열)
   const hasSections = !!(sections && sections.length);
+  // 구성 중에 상품을 보여주는 블록(선반/그리드)이 하나라도 있는지 → 없으면 전체 그리드 자동 추가
+  const sectionsHaveProducts = !!sections?.some((s) => s.type === "shelf" || s.type === "grid");
   // 홈(기본) 뷰 = 전체 + 추천정렬 + 검색없음 → 리치 진열(신상·기획전·베스트)
   const isHome = activeCat === "전체" && !q.trim() && sort === "recommend";
 
@@ -275,7 +277,55 @@ export default function Storefront({
 
       <div className="sf-wrap">
         {hasSections ? (
-          sections!.map(renderSection)
+          <>
+            {/* 카테고리 칩 — 손님이 눌러 카테고리별로 둘러보기 */}
+            {products.length > 0 && cats.length > 1 && (
+              <div className="sf-toolbar">
+                <div className="sf-cats">
+                  {cats.map((c) => (
+                    <button
+                      key={c}
+                      className={"sf-chip" + (c === activeCat ? " on" : "")}
+                      onClick={() => setActiveCat(c)}
+                    >
+                      {c}
+                    </button>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {/* '전체'(+검색없음)이면 창업자가 구성한 블록, 아니면 해당 카테고리 그리드 */}
+            {activeCat === "전체" && !q.trim() ? (
+              <>
+                {sections!.map(renderSection)}
+                {/* 상품은 항상 보이게 — 구성에 상품 블록이 없으면 전체 그리드 자동 표시 */}
+                {!sectionsHaveProducts && products.length > 0 && (
+                  <section className="sf-shelf">
+                    <div className="sf-section">
+                      <h2>전체 상품</h2>
+                      <span className="sf-count">{products.length}개</span>
+                    </div>
+                    <div className="sf-grid">{products.map(renderCard)}</div>
+                  </section>
+                )}
+              </>
+            ) : shown.length === 0 ? (
+              <div className="sf-empty">
+                <div className="sf-empty-ico">🔍</div>
+                <b>{q.trim() ? "검색 결과가 없어요" : "이 카테고리에 상품이 없어요"}</b>
+                <span>다른 분류를 둘러보세요.</span>
+              </div>
+            ) : (
+              <>
+                <div className="sf-section">
+                  <h2>{activeCat === "전체" ? "검색 결과" : activeCat}</h2>
+                  <span className="sf-count">{shown.length}개</span>
+                </div>
+                <div className="sf-grid">{shown.map(renderCard)}</div>
+              </>
+            )}
+          </>
         ) : (
         <>
         {/* 카테고리 + 정렬 */}
