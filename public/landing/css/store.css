@@ -204,3 +204,11 @@
   animation:stToast .26s var(--ease)}
 .st-toast b{font-weight:700}
 @keyframes stToast{from{opacity:0;transform:translate(-50%,12px)}to{opacity:1;transform:translate(-50%,0)}}
+
+/* ── AI 제품 사진: 이모지 자리에 실제 이미지가 있으면 채움 ── */
+.pc-media .pc-img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;z-index:0}
+.pc-badge,.pc-fav{z-index:2}
+.cp-thumb .cp-img{width:100%;height:100%;object-fit:cover;border-radius:inherit}
+.dp-media .dp-img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
+.dp-rel-img{width:100%;aspect-ratio:1/1;object-fit:cover;border-radius:calc(var(--s-r) * .5);display:block;margin-bottom:6px}
+.skm-tile .skm-tile-img{width:100%;height:100%;object-fit:cover;border-radius:inherit}

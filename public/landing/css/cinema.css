@@ -189,3 +189,7 @@
   .cine-store{width:clamp(240px,78vw,360px)}
   .sc-cap{padding-bottom:13vh}
 }
+
+/* ── 인트로 매장 목업: 이모지 타일 → 실제 제품 사진 ── */
+.cs-tile b.cs-photo{width:100%;height:100%}
+.cs-tile b.cs-photo .cs-img{width:100%;height:100%;object-fit:cover;border-radius:13px;display:block}

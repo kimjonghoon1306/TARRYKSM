@@ -38,7 +38,7 @@ function productCard(p,i,st){
     <div class="pc-media">
       ${p.tag ? `<span class="pc-badge">${p.tag}</span>` : ''}
       <span class="pc-fav ${fav?'on':''}" data-act="fav" data-i="${i}">${fav?'♥':'♡'}</span>
-      <span class="pc-emoji">${p.e}</span>
+      ${p.img ? `<img class="pc-img" src="${p.img}" alt="${p.n}" loading="lazy">` : `<span class="pc-emoji">${p.e}</span>`}
     </div>
     <div class="pc-body">
       <div class="pc-brand">${p.b}</div>
@@ -77,7 +77,7 @@ function cartHTML(st){
   const rows = st.cart.map(c=>{
     const p = st.products[c.i];
     return `<div class="cp-row">
-      <div class="cp-thumb">${p.e}</div>
+      <div class="cp-thumb">${p.img ? `<img class="cp-img" src="${p.img}" alt="">` : p.e}</div>
       <div class="cp-info"><b>${p.n}</b><span>${won(p.p)}</span></div>
       <div class="cp-qty">
         <button data-act="dec" data-i="${c.i}">−</button>
@@ -103,14 +103,14 @@ function detailHTML(i,st){
       <div class="dp-rev-top"><b>${rv.n}</b><span class="pc-stars">${stars(rv.s)}</span></div>
       <p>${rv.t}</p></div>`).join('');
   const related = relatedProducts(st,i).map(({p:rp,j})=>`<button class="dp-rel" data-act="open" data-i="${j}">
-      <span class="dp-rel-em">${rp.e}</span>
+      ${rp.img ? `<img class="dp-rel-img" src="${rp.img}" alt="">` : `<span class="dp-rel-em">${rp.e}</span>`}
       <b>${rp.n}</b>
       <span class="dp-rel-p">${won(rp.p)}</span></button>`).join('');
   return `<button class="dp-x" data-act="close">✕</button>
     <div class="dp-scroll">
       <div class="dp-media">
         ${p.tag ? `<span class="pc-badge">${p.tag}</span>` : ''}
-        <span class="dp-emoji">${p.e}</span>
+        ${p.img ? `<img class="dp-img" src="${p.img}" alt="${p.n}">` : `<span class="dp-emoji">${p.e}</span>`}
       </div>
       <div class="dp-body">
         <div class="pc-brand">${p.b} · ${p.cat}</div>
@@ -351,6 +351,6 @@ function buildMini(skinId){
   return `
     <div class="skm-top"><span class="skm-logo">${s.brand}</span><span class="skm-dot"></span></div>
     <div class="skm-hero">${s.heroTitle}</div>
-    <div class="skm-tiles"><div class="skm-tile">${it[0].e}</div><div class="skm-tile">${it[1].e}</div><div class="skm-tile">${it[2].e}</div></div>
+    <div class="skm-tiles">${[0,1,2].map(k=>`<div class="skm-tile">${it[k].img?`<img class="skm-tile-img" src="${it[k].img}" alt="">`:it[k].e}</div>`).join('')}</div>
     <span class="skm-pill">${s.cta}</span>`;
 }
