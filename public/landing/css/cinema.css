@@ -193,3 +193,10 @@
 /* ── 인트로 매장 목업: 이모지 타일 → 실제 제품 사진 ── */
 .cs-tile b.cs-photo{width:100%;height:100%}
 .cs-tile b.cs-photo .cs-img{width:100%;height:100%;object-fit:cover;border-radius:13px;display:block}
+
+/* ── 무한증식 씬: 미니 쇼핑몰 카드 타일도 실제 사진 ── */
+.cm-img{width:100%;height:100%;object-fit:cover;display:block;border-radius:inherit}
+.cm-tiles i{padding:0;overflow:hidden}
+.cm-hero-lg{overflow:hidden}.cm-hero-lg b{width:100%;height:100%;display:block}
+.cm-big{overflow:hidden}
+.cm-rows span{padding-left:0;overflow:hidden}

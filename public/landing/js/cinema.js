@@ -25,14 +25,22 @@ function buildCineProgress(){
 function buildCineMalls(){
   const el = document.getElementById('cineMalls');
   if(!el) return;
-  const emo = ['🕯️','👟','🧴','👜','⌚','🎧','🕶️','☕','🧢','🌿','💄','📷','🎒','🕰️','🥑','🍞','🐟','🥩','🍎','🥬'];
+  const IMG = [
+    '/landing/img/products/candle.webp','/landing/img/products/sneaker.webp','/landing/img/products/serum.webp',
+    '/landing/img/products/tote.webp','/landing/img/products/watch.webp','/landing/img/products/earbuds.webp',
+    '/landing/img/products/sunglasses.webp','/landing/img/products/mug.webp','/landing/img/products/cap.webp',
+    '/landing/img/products/plant.webp','/landing/img/food/fruit_apple.webp','/landing/img/food/fruit_strawberry.webp',
+    '/landing/img/food/bakery_bread.webp','/landing/img/food/bakery_croissant.webp','/landing/img/food/seafood_hairtail.webp',
+    '/landing/img/food/meat_beef.webp','/landing/img/food/produce_broccoli.webp','/landing/img/food/dairy_milk.webp',
+    '/landing/img/food/gourmet_wine.webp','/landing/img/food/traditional_kimchi.webp'
+  ];
   const N = 14;
   let html = '';
   for(let i=0;i<N;i++){
     const hue = Math.round((360/N)*i);
     const d = (i*0.05).toFixed(2);
     const v = i % 6;                                   // 6가지 레이아웃 변형
-    const e = (k)=> emo[(i*3+k) % emo.length];
+    const e = (k)=> `<img class="cm-img" src="${IMG[(i*3+k) % IMG.length]}" alt="">`;
     let inner;
     if(v===0){            // 클래식: 바 + 히어로 + 타일2
       inner = `<div class="cm-bar"></div><div class="cm-body"><div class="cm-hero"></div><div class="cm-tiles"><i>${e(0)}</i><i>${e(1)}</i></div></div>`;
