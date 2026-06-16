@@ -143,6 +143,10 @@ function detailHTML(i,st){
 function buildStore(st){
   const s = SKIN_BY_ID[st.skin] || SKINS[0];
   const brand = st.brand;
+  // 대문 배너 대표 이미지 — 스킨마다 다른 상품이 들어가도록
+  const _ti = themeFor(s.id).items;
+  const _si = SKINS.findIndex(x => x.id === s.id);
+  const heroImg = ((_ti[(_si < 0 ? 0 : _si) % _ti.length]) || {}).img || '';
   return `<div class="store" data-skin="${s.id}">
     <div class="st-bar">
       <div class="stb-logo">${brand}</div>
@@ -158,7 +162,7 @@ function buildStore(st){
       <h1 class="sth-title">${s.heroTitle}</h1>
       <p class="sth-sub">${s.heroSub}</p>
       <button class="sth-cta" data-act="scroll-shelf">${s.cta} →</button>
-      <div class="sth-art">${s.emoji}</div>
+      ${heroImg ? `<img class="sth-photo" src="${heroImg}" alt="">` : `<div class="sth-art">${s.emoji}</div>`}
     </div>
 
     <div class="st-searchbar">

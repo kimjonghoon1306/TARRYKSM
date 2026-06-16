@@ -212,3 +212,8 @@
 .dp-media .dp-img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
 .dp-rel-img{width:100%;aspect-ratio:1/1;object-fit:cover;border-radius:calc(var(--s-r) * .5);display:block;margin-bottom:6px}
 .skm-tile .skm-tile-img{width:100%;height:100%;object-fit:cover;border-radius:inherit}
+/* 대문 배너 대표 사진 — 우측에 깔고 왼쪽은 페이드(텍스트 가독성 유지) */
+.sth-photo{position:absolute;right:0;top:0;height:100%;width:48%;object-fit:cover;
+  -webkit-mask-image:linear-gradient(to right,transparent,#000 40%);mask-image:linear-gradient(to right,transparent,#000 40%)}
+.st-hero .sth-badge,.st-hero .sth-title,.st-hero .sth-sub,.st-hero .sth-cta{position:relative;z-index:1}
+.device.mobile .sth-photo{width:42%}
