@@ -254,6 +254,12 @@ const SKIN_THEME = {
 };
 const LIFESTYLE = { cats: CATS, items: PRODUCTS };
 function themeFor(skinId){ return THEMES[SKIN_THEME[skinId]] || LIFESTYLE; }
+// 스킨 대표 썸네일 — 그 스킨 업태에 맞는 상품 사진 (스킨마다 다르게)
+function skinThumb(skinId){
+  const items = themeFor(skinId).items;
+  const idx = SKINS.findIndex(s => s.id === skinId);
+  return ((items[(idx < 0 ? 0 : idx) % items.length]) || {}).img || '';
+}
 
 /* 별점 → ★ 문자열 (반올림 정수 칸) */
 const stars = r => '★★★★★☆☆☆☆☆'.slice(5 - Math.round(r), 10 - Math.round(r));

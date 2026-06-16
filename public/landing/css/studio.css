@@ -52,7 +52,8 @@
 .skm-tile{flex:1;height:40px;border-radius:calc(var(--s-r) * .5);background:var(--s-surf);border:1px solid var(--s-line);display:grid;place-items:center;font-size:16px}
 .skm-pill{position:absolute;bottom:12px;right:12px;font-size:8px;font-weight:700;padding:3px 8px;border-radius:99px;background:var(--s-brand);color:var(--s-brand-ink)}
 .sk-meta{display:flex;align-items:center;gap:9px;padding:11px 13px}
-.skm-em{font-size:17px}
+.skm-em{font-size:17px;display:inline-flex}
+.skm-em .skm-em-img{width:22px;height:22px;border-radius:6px;object-fit:cover;display:block}
 .sk-meta-t{flex:1;line-height:1.25}
 .sk-meta-t b{display:block;font-family:var(--font-display);font-weight:600;font-size:13px}
 .sk-meta-t i{font-style:normal;font-size:10.5px;color:var(--sub)}

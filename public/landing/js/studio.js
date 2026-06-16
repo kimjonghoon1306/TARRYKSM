@@ -12,7 +12,7 @@ function renderStudio(){
     <div class="sk-card ${s.id===activeSkin?'active':''}" onclick="applySkin('${s.id}')">
       <div class="sk-mini" data-skin="${s.id}">${buildMini(s.id)}</div>
       <div class="sk-meta">
-        <span class="skm-em">${s.emoji}</span>
+        <span class="skm-em">${skinThumb(s.id) ? `<img class="skm-em-img" src="${skinThumb(s.id)}" alt="">` : s.emoji}</span>
         <span class="sk-meta-t"><b>${s.name}</b><i>${s.vibe}</i></span>
       </div>
     </div>`).join('');
@@ -104,7 +104,7 @@ function renderMalls(){
       return `<div class="mall-card" onclick="openEditor(${i})">
         <div class="sk-mini" data-skin="${m.skin}">${buildMini(m.skin)}</div>
         <div class="mc-foot">
-          <span class="skm-em">${s.emoji}</span>
+          <span class="skm-em">${skinThumb(s.id) ? `<img class="skm-em-img" src="${skinThumb(s.id)}" alt="">` : s.emoji}</span>
           <span class="mc-info"><b>${m.name}</b><i>${s.name} · ${s.vibe}</i></span>
           <span class="mc-edit">${T('ml_edit')} ↗</span>
         </div>

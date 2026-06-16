@@ -4,6 +4,24 @@ import { useState } from "react";
 import { SKINS, SKIN_BY_ID } from "@/lib/skins";
 import { setStoreSkin } from "@/app/dashboard/actions";
 
+// 스킨별 대표 미리보기 사진 (public/landing/img 재사용)
+const FOOD = "/landing/img/food";
+const PROD = "/landing/img/products";
+const SKIN_THUMB: Record<string, string> = {
+  // 식품 특화
+  harvest: `${FOOD}/produce_spinach.webp`, ocean: `${FOOD}/seafood_hairtail.webp`,
+  butcher: `${FOOD}/meat_beef.webp`, bakery: `${FOOD}/bakery_bread.webp`,
+  orchard: `${FOOD}/fruit_apple.webp`, hanok: `${FOOD}/traditional_doenjang.webp`,
+  market: `${FOOD}/banchan_anchovy.webp`, sprout: `${FOOD}/produce_ssam.webp`,
+  dairy: `${FOOD}/dairy_milk.webp`, gourmet: `${FOOD}/gourmet_giftset.webp`,
+  // 범용
+  mono: `${PROD}/candle.webp`, noir: `${PROD}/watch.webp`, bloom: `${PROD}/serum.webp`,
+  citrus: `${PROD}/sneaker.webp`, azure: `${PROD}/earbuds.webp`, mocha: `${PROD}/mug.webp`,
+  grape: `${PROD}/sunglasses.webp`, pine: `${PROD}/plant.webp`, midnight: `${PROD}/earbuds.webp`,
+  coral: `${PROD}/cap.webp`, lavender: `${PROD}/serum.webp`, slate: `${PROD}/tote.webp`,
+  berry: `${PROD}/sunglasses.webp`, crimson: `${PROD}/sneaker.webp`,
+};
+
 export default function SkinPicker({
   storeId,
   currentSkin,
@@ -75,13 +93,20 @@ export default function SkinPicker({
                   }
                 >
                   <div
-                    className="mb-3 flex h-16 w-full items-center justify-center rounded-xl"
+                    className="mb-3 h-16 w-full overflow-hidden rounded-xl"
                     style={{ background: sk.bg }}
                   >
-                    <span
-                      className="h-7 w-7 rounded-full"
-                      style={{ background: sk.color, boxShadow: `0 4px 12px -2px ${sk.color}` }}
-                    />
+                    {SKIN_THUMB[sk.id] ? (
+                      // eslint-disable-next-line @next/next/no-img-element
+                      <img src={SKIN_THUMB[sk.id]} alt="" className="h-full w-full object-cover" />
+                    ) : (
+                      <span className="flex h-full w-full items-center justify-center">
+                        <span
+                          className="h-7 w-7 rounded-full"
+                          style={{ background: sk.color, boxShadow: `0 4px 12px -2px ${sk.color}` }}
+                        />
+                      </span>
+                    )}
                   </div>
                   <div className="flex items-center justify-between">
                     <b className="text-sm">{sk.name}</b>
