@@ -1,5 +1,6 @@
 import { createServerClient } from "@supabase/ssr";
 import { cookies } from "next/headers";
+import { toSessionCookie } from "./cookies";
 
 // 서버 컴포넌트 / 서버 액션 / 라우트 핸들러용 Supabase 클라이언트
 export async function createClient() {
@@ -16,7 +17,7 @@ export async function createClient() {
         setAll(cookiesToSet) {
           try {
             cookiesToSet.forEach(({ name, value, options }) =>
-              cookieStore.set(name, value, options)
+              cookieStore.set(name, value, toSessionCookie(options))
             );
           } catch {
             // 서버 컴포넌트에서 set 호출 시 무시 (미들웨어가 세션 갱신 담당)

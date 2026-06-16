@@ -1,6 +1,7 @@
 import { NextResponse, type NextRequest } from "next/server";
 import { createServerClient } from "@supabase/ssr";
 import { resolveCustomDomain } from "@/lib/supabase/middleware";
+import { toSessionCookie } from "@/lib/supabase/cookies";
 import { PLATFORM_ROOTS } from "@/lib/domains";
 
 // Next.js 16: 'middleware' 컨벤션이 'proxy'로 변경됨
@@ -60,7 +61,7 @@ export async function proxy(request: NextRequest) {
           cookiesToSet.forEach(({ name, value }) => request.cookies.set(name, value));
           response = NextResponse.next({ request });
           cookiesToSet.forEach(({ name, value, options }) =>
-            response.cookies.set(name, value, options)
+            response.cookies.set(name, value, toSessionCookie(options))
           );
         },
       },
