@@ -174,8 +174,9 @@ export default function BrandingTutorial() {
                 <div className="h-7">
                   {show(1) ? (
                     <span className={"tut-pop inline-flex items-center gap-1.5 " + (show(1) ? "in" : "")}>
-                      <span className="grid h-7 w-7 place-items-center rounded-lg bg-gradient-to-br from-violet-500 to-pink-500 text-sm">
-                        🍓
+                      <span className="grid h-7 w-7 place-items-center overflow-hidden rounded-lg bg-gradient-to-br from-violet-500 to-pink-500 text-sm">
+                        {/* eslint-disable-next-line @next/next/no-img-element */}
+                        <img src="/landing/img/food/fruit_strawberry.webp" alt="" className="h-full w-full object-cover" />
                       </span>
                       <span className="text-sm font-extrabold">베리팜</span>
                     </span>
@@ -195,6 +196,10 @@ export default function BrandingTutorial() {
                     : "bg-black/[0.03] dark:bg-white/[0.05]")
                 }
               >
+                {show(2) && (
+                  // eslint-disable-next-line @next/next/no-img-element
+                  <img src="/landing/img/food/fruit_strawberry.webp" alt="" className="pointer-events-none absolute inset-0 h-full w-full object-cover" />
+                )}
                 {show(2) && (
                   <span className="pointer-events-none absolute inset-0 bg-gradient-to-t from-black/45 to-transparent" />
                 )}
@@ -225,9 +230,14 @@ export default function BrandingTutorial() {
 
               {/* 아래 상품 살짝(맥락용) */}
               <div className="grid grid-cols-3 gap-2 p-3">
-                {["🍓", "🍎", "🍊"].map((e, i) => (
-                  <div key={i} className="grid h-12 place-items-center rounded-lg bg-black/[0.04] text-xl dark:bg-white/[0.06]">
-                    {e}
+                {[
+                  "/landing/img/food/fruit_strawberry.webp",
+                  "/landing/img/food/fruit_apple.webp",
+                  "/landing/img/food/fruit_tangerine.webp",
+                ].map((src, i) => (
+                  <div key={i} className="grid h-12 place-items-center overflow-hidden rounded-lg bg-black/[0.04] text-xl dark:bg-white/[0.06]">
+                    {/* eslint-disable-next-line @next/next/no-img-element */}
+                    <img src={src} alt="" className="h-full w-full object-cover" />
                   </div>
                 ))}
               </div>

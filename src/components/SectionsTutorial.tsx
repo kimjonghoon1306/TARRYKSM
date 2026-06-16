@@ -70,12 +70,12 @@ const STEPS = [
 ];
 
 const DEMO = [
-  { e: "🍓", n: "제철 딸기", p: "8,900" },
-  { e: "🍎", n: "유기농 사과", p: "12,000" },
-  { e: "🥬", n: "친환경 채소", p: "5,500" },
-  { e: "🍊", n: "달콤 한라봉", p: "19,000" },
-  { e: "🥚", n: "방사 유정란", p: "9,800" },
-  { e: "🍯", n: "야생화 꿀", p: "24,000" },
+  { e: "🍓", img: "/landing/img/food/fruit_strawberry.webp", n: "제철 딸기", p: "8,900" },
+  { e: "🍎", img: "/landing/img/food/fruit_apple.webp", n: "유기농 사과", p: "12,000" },
+  { e: "🥬", img: "/landing/img/food/produce_ssam.webp", n: "친환경 채소", p: "5,500" },
+  { e: "🍊", img: "/landing/img/food/fruit_tangerine.webp", n: "달콤 한라봉", p: "19,000" },
+  { e: "🥚", img: "/landing/img/food/food_egg.webp", n: "방사 유정란", p: "9,800" },
+  { e: "🍯", img: "/landing/img/food/food_honey.webp", n: "야생화 꿀", p: "24,000" },
 ];
 
 export default function SectionsTutorial() {
@@ -212,8 +212,13 @@ export default function SectionsTutorial() {
                         className={"tut-pop flex-1 " + (show(2) ? "in" : "")}
                         style={{ transitionDelay: `${i * 130}ms` }}
                       >
-                        <div className="grid h-12 place-items-center rounded-lg bg-black/[0.04] text-xl dark:bg-white/[0.06]">
-                          {p.e}
+                        <div className="grid h-12 place-items-center overflow-hidden rounded-lg bg-black/[0.04] text-xl dark:bg-white/[0.06]">
+                          {p.img ? (
+                            // eslint-disable-next-line @next/next/no-img-element
+                            <img src={p.img} alt="" className="h-full w-full object-cover" />
+                          ) : (
+                            p.e
+                          )}
                         </div>
                         <div className="mt-0.5 truncate text-[8px]">{p.n}</div>
                         <div className="text-[8px] font-bold">₩{p.p}</div>
@@ -243,8 +248,13 @@ export default function SectionsTutorial() {
                         className={"tut-pop " + (show(4) ? "in" : "")}
                         style={{ transitionDelay: `${i * 70}ms` }}
                       >
-                        <div className="grid h-11 place-items-center rounded-lg bg-black/[0.04] text-lg dark:bg-white/[0.06]">
-                          {p.e}
+                        <div className="grid h-11 place-items-center overflow-hidden rounded-lg bg-black/[0.04] text-lg dark:bg-white/[0.06]">
+                          {p.img ? (
+                            // eslint-disable-next-line @next/next/no-img-element
+                            <img src={p.img} alt="" className="h-full w-full object-cover" />
+                          ) : (
+                            p.e
+                          )}
                         </div>
                       </div>
                     ))}
