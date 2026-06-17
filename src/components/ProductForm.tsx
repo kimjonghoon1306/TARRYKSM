@@ -4,6 +4,7 @@ import { useState } from "react";
 import { addProduct } from "@/app/dashboard/[id]/products/actions";
 import { SKIN_BY_ID } from "@/lib/skins";
 import OptionsEditor from "@/components/OptionsEditor";
+import ProductImagePicker from "@/components/ProductImagePicker";
 
 const CATS = ["전체", "패션", "리빙", "뷰티", "액세서리", "테크"];
 const INPUT =
@@ -20,11 +21,6 @@ export default function ProductForm({ storeId, skin }: { storeId: string; skin: 
   const [desc, setDesc] = useState("");
   const [imgUrl, setImgUrl] = useState<string | null>(null);
 
-  function onFile(e: React.ChangeEvent<HTMLInputElement>) {
-    const f = e.target.files?.[0];
-    setImgUrl(f ? URL.createObjectURL(f) : null);
-  }
-
   return (
     <div className="grid gap-5 lg:grid-cols-[1fr_360px]">
       {/* 입력 폼 */}
@@ -32,13 +28,7 @@ export default function ProductForm({ storeId, skin }: { storeId: string; skin: 
         <input type="hidden" name="store_id" value={storeId} />
         <div className="sm:col-span-2">
           <L label="상품 사진 (선택 — 없으면 이모지 사용)">
-            <input
-              name="image"
-              type="file"
-              accept="image/*"
-              onChange={onFile}
-              className="w-full rounded-lg border border-black/10 bg-white px-3 py-2 text-sm text-neutral-600 outline-none file:mr-3 file:rounded-md file:border-0 file:bg-violet-500 file:px-3 file:py-1.5 file:text-sm file:font-semibold file:text-white dark:border-white/10 dark:bg-white/[0.04] dark:text-neutral-300"
-            />
+            <ProductImagePicker onChange={(u) => setImgUrl(u || null)} />
           </L>
         </div>
         <L label="이모지(사진 없을 때 대체)">

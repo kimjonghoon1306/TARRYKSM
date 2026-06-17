@@ -60,6 +60,13 @@ async function uploadImage(
   return data.publicUrl;
 }
 
+// 무료 라이브러리에서 고른 이미지 경로만 허용 (임의 URL 주입 방지)
+function stockImageUrl(v: FormDataEntryValue | null): string | null {
+  const s = String(v || "").trim();
+  if (!s) return null;
+  return /^\/landing\/img\/(food|products)\/[a-z0-9_]+\.webp$/i.test(s) ? s : null;
+}
+
 export async function addProduct(formData: FormData) {
   const storeId = String(formData.get("store_id") || "");
   const { supabase, ok } = await assertOwner(storeId);
@@ -70,7 +77,9 @@ export async function addProduct(formData: FormData) {
   const price = parseInt(String(formData.get("price") || "0"), 10) || 0;
   const stockRaw = String(formData.get("stock") || "").trim();
   const stock = stockRaw === "" ? null : Math.max(0, parseInt(stockRaw, 10) || 0);
-  const imageUrl = await uploadImage(supabase, storeId, formData.get("image"));
+  // 업로드 파일 우선, 없으면 무료 라이브러리에서 고른 이미지 경로 사용
+  const stockUrl = stockImageUrl(formData.get("stock_image_url"));
+  const imageUrl = (await uploadImage(supabase, storeId, formData.get("image"))) || stockUrl;
 
   await supabase.from("products").insert({
     store_id: storeId,
@@ -100,7 +109,8 @@ export async function updateProduct(formData: FormData) {
   const price = parseInt(String(formData.get("price") || "0"), 10) || 0;
   const stockRaw = String(formData.get("stock") || "").trim();
   const stock = stockRaw === "" ? null : Math.max(0, parseInt(stockRaw, 10) || 0);
-  const imageUrl = await uploadImage(supabase, storeId, formData.get("image"));
+  const stockUrl = stockImageUrl(formData.get("stock_image_url"));
+  const imageUrl = (await uploadImage(supabase, storeId, formData.get("image"))) || stockUrl;
 
   const patch: Record<string, unknown> = {
     name,
@@ -113,7 +123,7 @@ export async function updateProduct(formData: FormData) {
     tag: String(formData.get("tag") || "").trim() || null,
     description: String(formData.get("description") || "").trim() || null,
   };
-  // 새 이미지를 올렸을 때만 교체. "이미지 제거" 체크 시 null.
+  // 새 이미지(업로드 또는 라이브러리 선택) 있으면 교체. "이미지 제거" 시 null.
   if (imageUrl) patch.image_url = imageUrl;
   else if (String(formData.get("remove_image") || "") === "1") patch.image_url = null;
 
