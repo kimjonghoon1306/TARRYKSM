@@ -1033,7 +1033,7 @@ export default function Storefront({
       )}
 
       {authOpen && slug && (
-        <CustomerAuthSheet storeId={store.id} slug={slug} onClose={() => setAuthOpen(false)} />
+        <CustomerAuthSheet storeId={store.id} storeName={store.name} slug={slug} onClose={() => setAuthOpen(false)} />
       )}
 
       <div className={"sf-toast" + (toast ? " on" : "")}>{toast}</div>
