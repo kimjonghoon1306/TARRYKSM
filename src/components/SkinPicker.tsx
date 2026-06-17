@@ -1,6 +1,7 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import { createPortal } from "react-dom";
 import { SKINS, SKIN_BY_ID } from "@/lib/skins";
 import { setStoreSkin } from "@/app/dashboard/actions";
 
@@ -40,8 +41,14 @@ export default function SkinPicker({
   storeName?: string;
 }) {
   const [selected, setSelected] = useState(currentSkin);
+  const [previewOpen, setPreviewOpen] = useState(false);
+  const [device, setDevice] = useState<"mobile" | "tablet" | "desktop">("desktop");
+  const [mounted, setMounted] = useState(false);
+  useEffect(() => setMounted(true), []);
   const changed = selected !== currentSkin;
   const sel = SKIN_BY_ID[selected];
+  const DEVICE_W = { mobile: 390, tablet: 720, desktop: 980 } as const;
+  const DEVICE_COLS = { mobile: 2, tablet: 3, desktop: 4 } as const;
   const foodSkins = SKINS.filter((s) => s.group === "food");
   const generalSkins = SKINS.filter((s) => s.group === "general");
 
@@ -79,47 +86,16 @@ export default function SkinPicker({
           </div>
         )}
 
-        {/* 실시간 미리보기 — 스킨 고르면 이렇게 보여요 */}
+        {/* 미리보기 버튼 (누르면 모달로 크게) */}
         {sel && (
           <div className="mt-3">
-            <div className="mb-1.5 text-[11px] font-semibold text-neutral-400">👀 이 스킨으로 보면</div>
-            <div style={{ borderRadius: 14, overflow: "hidden", border: "1px solid rgba(0,0,0,.08)", background: sel.bg, boxShadow: "0 8px 22px -14px rgba(0,0,0,.4)" }}>
-              {/* 상단바 */}
-              <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: "9px 13px", color: sel.color, borderBottom: `1px solid ${hexA(sel.color, 0.12)}` }}>
-                <b style={{ fontWeight: 800, fontSize: 13, letterSpacing: 0.3 }}>{storeName || "MY SHOP"}</b>
-                <span style={{ fontSize: 12 }}>🔍 🛒</span>
-              </div>
-              {/* 히어로 */}
-              <div style={{ position: "relative", height: 84, overflow: "hidden", background: hexA(sel.color, 0.14) }}>
-                {SKIN_THUMB[sel.id] && (
-                  // eslint-disable-next-line @next/next/no-img-element
-                  <img src={SKIN_THUMB[sel.id]} alt="" style={{ position: "absolute", inset: 0, width: "100%", height: "100%", objectFit: "cover", opacity: 0.9 }} />
-                )}
-                <div style={{ position: "absolute", inset: 0, display: "flex", flexDirection: "column", justifyContent: "flex-end", padding: 12, background: "linear-gradient(to top, rgba(0,0,0,.45), transparent)" }}>
-                  <div style={{ color: "#fff", fontWeight: 800, fontSize: 14 }}>새로 들어왔어요</div>
-                </div>
-              </div>
-              {/* 상품 2개 */}
-              <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 8, padding: 12 }}>
-                {[0, 1].map((i) => (
-                  <div key={i} style={{ borderRadius: 10, overflow: "hidden", border: `1px solid ${hexA(sel.color, 0.15)}` }}>
-                    <div style={{ aspectRatio: "1 / 1", background: hexA(sel.color, 0.1), display: "grid", placeItems: "center", overflow: "hidden" }}>
-                      {SKIN_THUMB[sel.id] && (
-                        // eslint-disable-next-line @next/next/no-img-element
-                        <img src={SKIN_THUMB[sel.id]} alt="" style={{ width: "100%", height: "100%", objectFit: "cover" }} />
-                      )}
-                    </div>
-                    <div style={{ padding: "7px 8px", color: sel.color }}>
-                      <div style={{ fontSize: 11, fontWeight: 700, opacity: 0.85 }}>상품 이름</div>
-                      <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginTop: 4 }}>
-                        <b style={{ fontSize: 12 }}>₩12,000</b>
-                        <span style={{ fontSize: 10, fontWeight: 700, padding: "3px 8px", borderRadius: 6, background: sel.color, color: sel.bg }}>담기</span>
-                      </div>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </div>
+            <button
+              type="button"
+              onClick={() => setPreviewOpen(true)}
+              className="w-full rounded-xl border border-violet-300 bg-violet-50 px-4 py-2.5 text-sm font-bold text-violet-600 transition hover:bg-violet-100 dark:border-violet-500/40 dark:bg-violet-500/10 dark:text-violet-300"
+            >
+              👀 이 스킨으로 미리보기
+            </button>
           </div>
         )}
       </div>
@@ -191,6 +167,71 @@ export default function SkinPicker({
           </div>
         </div>
       ))}
+
+      {/* 미리보기 모달 (Portal · 버튼 누를 때만) */}
+      {previewOpen && sel && mounted && createPortal(
+        <div
+          onClick={() => setPreviewOpen(false)}
+          style={{ position: "fixed", inset: 0, zIndex: 9999, display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", gap: 14, padding: 16, background: "rgba(0,0,0,0.7)" }}
+        >
+          {/* 기기 선택 */}
+          <div onClick={(e) => e.stopPropagation()} style={{ display: "flex", gap: 6, background: "rgba(255,255,255,0.15)", padding: 5, borderRadius: 999 }}>
+            {([["mobile", "📱 모바일"], ["tablet", "📲 태블릿"], ["desktop", "🖥 데스크탑"]] as const).map(([d, label]) => (
+              <button key={d} type="button" onClick={() => setDevice(d)}
+                style={{ borderRadius: 999, padding: "7px 16px", fontSize: 13, fontWeight: 700, cursor: "pointer", border: "none",
+                  background: device === d ? "#fff" : "transparent", color: device === d ? "#111" : "#fff" }}>
+                {label}
+              </button>
+            ))}
+          </div>
+
+          {/* 스토어프런트 미리보기 (선택 기기 너비) */}
+          <div
+            onClick={(e) => e.stopPropagation()}
+            style={{ width: `min(${DEVICE_W[device]}px, 94vw)`, maxHeight: "78vh", overflowY: "auto", borderRadius: 16, border: "1px solid rgba(0,0,0,.1)", background: sel.bg, boxShadow: "0 25px 60px rgba(0,0,0,.5)" }}
+          >
+            <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: "12px 18px", color: sel.color, borderBottom: `1px solid ${hexA(sel.color, 0.14)}` }}>
+              <b style={{ fontWeight: 800, fontSize: 16, letterSpacing: 0.3 }}>{storeName || "MY SHOP"}</b>
+              <span style={{ fontSize: 14 }}>🔍 🛒</span>
+            </div>
+            <div style={{ position: "relative", height: device === "mobile" ? 150 : 220, overflow: "hidden", background: hexA(sel.color, 0.14) }}>
+              {SKIN_THUMB[sel.id] && (
+                // eslint-disable-next-line @next/next/no-img-element
+                <img src={SKIN_THUMB[sel.id]} alt="" style={{ position: "absolute", inset: 0, width: "100%", height: "100%", objectFit: "cover", opacity: 0.92 }} />
+              )}
+              <div style={{ position: "absolute", inset: 0, display: "flex", flexDirection: "column", justifyContent: "flex-end", padding: 18, background: "linear-gradient(to top, rgba(0,0,0,.5), transparent)" }}>
+                <div style={{ color: "#fff", fontWeight: 800, fontSize: 22 }}>새로 들어왔어요</div>
+                <span style={{ marginTop: 8, alignSelf: "flex-start", padding: "7px 16px", borderRadius: 8, background: sel.color, color: sel.bg, fontSize: 13, fontWeight: 800 }}>둘러보기</span>
+              </div>
+            </div>
+            <div style={{ display: "grid", gridTemplateColumns: `repeat(${DEVICE_COLS[device]}, 1fr)`, gap: 12, padding: 16 }}>
+              {Array.from({ length: DEVICE_COLS[device] * 2 }).map((_, i) => (
+                <div key={i} style={{ borderRadius: 12, overflow: "hidden", border: `1px solid ${hexA(sel.color, 0.15)}` }}>
+                  <div style={{ aspectRatio: "1 / 1", overflow: "hidden", background: hexA(sel.color, 0.1) }}>
+                    {SKIN_THUMB[sel.id] && (
+                      // eslint-disable-next-line @next/next/no-img-element
+                      <img src={SKIN_THUMB[sel.id]} alt="" style={{ width: "100%", height: "100%", objectFit: "cover" }} />
+                    )}
+                  </div>
+                  <div style={{ padding: "9px 10px", color: sel.color }}>
+                    <div style={{ fontSize: 12, fontWeight: 700, opacity: 0.85 }}>상품 이름</div>
+                    <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginTop: 5 }}>
+                      <b style={{ fontSize: 13 }}>₩12,000</b>
+                      <span style={{ fontSize: 11, fontWeight: 700, padding: "4px 10px", borderRadius: 7, background: sel.color, color: sel.bg }}>담기</span>
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          <button type="button" onClick={() => setPreviewOpen(false)}
+            style={{ color: "#fff", fontSize: 14, fontWeight: 700, padding: "9px 20px", borderRadius: 999, border: "1px solid rgba(255,255,255,0.45)", background: "transparent", cursor: "pointer" }}>
+            ✕ 닫기
+          </button>
+        </div>,
+        document.body
+      )}
     </form>
   );
 }
