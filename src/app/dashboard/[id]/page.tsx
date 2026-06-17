@@ -2,7 +2,7 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { domainToUnicode } from "node:url";
 import { createClient } from "@/lib/supabase/server";
-import { setStoreDomain, togglePublish, setStoreSlug, setStorePayment } from "../actions";
+import { setStoreDomain, togglePublish, setStoreSlug, setStorePayment, setStoreBusiness } from "../actions";
 import { PRIMARY_DOMAIN } from "@/lib/domains";
 import DomainHelp from "@/components/DomainHelp";
 import BrandingForm from "@/components/BrandingForm";
@@ -22,6 +22,13 @@ type Store = {
   pay_bank: string | null;
   pay_note: string | null;
   footer_text: string | null;
+  biz_company: string | null;
+  biz_owner: string | null;
+  biz_number: string | null;
+  biz_mailorder: string | null;
+  biz_address: string | null;
+  biz_phone: string | null;
+  biz_email: string | null;
 };
 
 export default async function StoreAdmin({
@@ -36,7 +43,7 @@ export default async function StoreAdmin({
   const supabase = await createClient();
   const { data: store } = await supabase
     .from("stores")
-    .select("id,name,skin,slug,published,custom_domain,logo_url,hero_image_url,hero_title,hero_subtitle,pay_bank,pay_note,footer_text")
+    .select("id,name,skin,slug,published,custom_domain,logo_url,hero_image_url,hero_title,hero_subtitle,pay_bank,pay_note,footer_text,biz_company,biz_owner,biz_number,biz_mailorder,biz_address,biz_phone,biz_email")
     .eq("id", id)
     .maybeSingle();
   if (!store) notFound();
@@ -314,6 +321,49 @@ export default async function StoreAdmin({
             (아임웹·식스샵과 동일한 방식) 지금은 무통장입금으로 주문을 받을 수 있어요.
           </p>
         </div>
+      </section>
+
+      {/* 사업자 정보 (쇼핑몰 하단 표시) */}
+      <section className={card + " mt-4"}>
+        <h2 className="mb-1 font-semibold">🏢 사업자 정보 <span className="text-xs font-normal text-neutral-400">(쇼핑몰 맨 아래에 표시)</span></h2>
+        <p className="mb-4 text-xs text-neutral-500">
+          전자상거래법상 쇼핑몰 하단에 표시해야 하는 정보예요. 입력하면 손님 화면 맨 아래에 자동으로 깔끔하게 표시됩니다. (비우면 표시 안 함)
+        </p>
+        <form action={setStoreBusiness} className="grid gap-3 sm:grid-cols-2">
+          <input type="hidden" name="id" value={s.id} />
+          {[
+            { k: "biz_company", l: "상호 (상점·법인명)", v: s.biz_company, ph: "예: 온종일팜" },
+            { k: "biz_owner", l: "대표자명", v: s.biz_owner, ph: "예: 홍길동" },
+            { k: "biz_number", l: "사업자등록번호", v: s.biz_number, ph: "예: 123-45-67890" },
+            { k: "biz_mailorder", l: "통신판매업 신고번호", v: s.biz_mailorder, ph: "예: 2026-서울강남-01234" },
+            { k: "biz_phone", l: "고객센터 전화", v: s.biz_phone, ph: "예: 1588-0000" },
+            { k: "biz_email", l: "이메일", v: s.biz_email, ph: "예: help@shop.com" },
+          ].map((f) => (
+            <div key={f.k}>
+              <label className="mb-1.5 block text-xs font-semibold text-neutral-500">{f.l}</label>
+              <input
+                name={f.k}
+                defaultValue={f.v || ""}
+                placeholder={f.ph}
+                className="w-full rounded-xl border border-black/10 bg-white px-4 py-2.5 text-sm outline-none focus:border-violet-500 focus:ring-2 focus:ring-violet-500/25 dark:border-white/10 dark:bg-white/[0.04]"
+              />
+            </div>
+          ))}
+          <div className="sm:col-span-2">
+            <label className="mb-1.5 block text-xs font-semibold text-neutral-500">사업장 주소</label>
+            <input
+              name="biz_address"
+              defaultValue={s.biz_address || ""}
+              placeholder="예: 서울특별시 강남구 테헤란로 123, 4층"
+              className="w-full rounded-xl border border-black/10 bg-white px-4 py-2.5 text-sm outline-none focus:border-violet-500 focus:ring-2 focus:ring-violet-500/25 dark:border-white/10 dark:bg-white/[0.04]"
+            />
+          </div>
+          <div className="sm:col-span-2">
+            <button className="rounded-xl bg-gradient-to-r from-violet-500 to-pink-500 px-5 py-2.5 text-sm font-semibold text-white shadow-lg shadow-violet-500/25 transition hover:brightness-105">
+              사업자 정보 저장
+            </button>
+          </div>
+        </form>
       </section>
 
       {/* 대문 구성(섹션 빌더) */}

@@ -52,6 +52,13 @@ type Store = {
   pay_bank?: string | null;
   pay_note?: string | null;
   footer_text?: string | null;
+  biz_company?: string | null;
+  biz_owner?: string | null;
+  biz_number?: string | null;
+  biz_mailorder?: string | null;
+  biz_address?: string | null;
+  biz_phone?: string | null;
+  biz_email?: string | null;
 };
 
 const won = (n: number) => "₩" + n.toLocaleString("ko-KR");
@@ -607,6 +614,26 @@ export default function Storefront({
         )}
         </>
         )}
+
+        {/* 사업자 정보 (입력된 항목만 표시) */}
+        {(() => {
+          const biz: string[] = [];
+          if (store.biz_company) biz.push(`상호 ${store.biz_company}`);
+          if (store.biz_owner) biz.push(`대표 ${store.biz_owner}`);
+          if (store.biz_number) biz.push(`사업자등록번호 ${store.biz_number}`);
+          if (store.biz_mailorder) biz.push(`통신판매업신고 ${store.biz_mailorder}`);
+          if (store.biz_address) biz.push(`주소 ${store.biz_address}`);
+          if (store.biz_phone) biz.push(`고객센터 ${store.biz_phone}`);
+          if (store.biz_email) biz.push(store.biz_email);
+          if (!biz.length) return null;
+          return (
+            <div className="sf-biz">
+              {biz.map((line, i) => (
+                <span key={i} className="sf-biz-item">{line}</span>
+              ))}
+            </div>
+          );
+        })()}
 
         <div className="sf-foot" style={{ whiteSpace: "pre-line" }}>
           {store.footer_text && store.footer_text.trim()

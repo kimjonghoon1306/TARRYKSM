@@ -202,6 +202,33 @@ export async function setStorePayment(formData: FormData) {
   redirect(`/dashboard/${id}?pmsg=` + encodeURIComponent("결제 설정을 저장했어요"));
 }
 
+// 사업자 정보 — 쇼핑몰 하단에 표시되는 법적 의무 표시 항목
+export async function setStoreBusiness(formData: FormData) {
+  const supabase = await createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+  if (!user) redirect("/login");
+  const id = String(formData.get("id") || "");
+  if (!id) return;
+
+  const f = (k: string) => String(formData.get(k) || "").trim() || null;
+  await supabase
+    .from("stores")
+    .update({
+      biz_company: f("biz_company"),
+      biz_owner: f("biz_owner"),
+      biz_number: f("biz_number"),
+      biz_mailorder: f("biz_mailorder"),
+      biz_address: f("biz_address"),
+      biz_phone: f("biz_phone"),
+      biz_email: f("biz_email"),
+    })
+    .eq("id", id);
+  revalidatePath(`/dashboard/${id}`);
+  redirect(`/dashboard/${id}?pmsg=` + encodeURIComponent("사업자 정보를 저장했어요"));
+}
+
 // 커스텀 도메인 연결/해제. 입력 정규화(프로토콜·경로·www 제거).
 export async function setStoreDomain(formData: FormData) {
   const supabase = await createClient();

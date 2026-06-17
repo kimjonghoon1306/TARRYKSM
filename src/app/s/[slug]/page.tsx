@@ -15,6 +15,13 @@ type Store = {
   pay_bank: string | null;
   pay_note: string | null;
   footer_text: string | null;
+  biz_company: string | null;
+  biz_owner: string | null;
+  biz_number: string | null;
+  biz_mailorder: string | null;
+  biz_address: string | null;
+  biz_phone: string | null;
+  biz_email: string | null;
 };
 
 export default async function StorefrontPage({
@@ -27,7 +34,7 @@ export default async function StorefrontPage({
 
   const { data: store } = await supabase
     .from("stores")
-    .select("id,name,skin,logo_url,hero_image_url,hero_title,hero_subtitle,pay_bank,pay_note,footer_text")
+    .select("id,name,skin,logo_url,hero_image_url,hero_title,hero_subtitle,pay_bank,pay_note,footer_text,biz_company,biz_owner,biz_number,biz_mailorder,biz_address,biz_phone,biz_email")
     .eq("slug", slug)
     .eq("published", true)
     .maybeSingle();
@@ -61,6 +68,13 @@ export default async function StorefrontPage({
           pay_bank: s.pay_bank,
           pay_note: s.pay_note,
           footer_text: s.footer_text,
+          biz_company: s.biz_company,
+          biz_owner: s.biz_owner,
+          biz_number: s.biz_number,
+          biz_mailorder: s.biz_mailorder,
+          biz_address: s.biz_address,
+          biz_phone: s.biz_phone,
+          biz_email: s.biz_email,
         }}
         products={items}
         sections={sections}
