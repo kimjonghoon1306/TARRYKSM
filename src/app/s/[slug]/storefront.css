@@ -199,12 +199,13 @@
 
 /* PC: 시원하게 큰 2단(이미지 | 정보) 레이아웃 */
 @media (min-width: 860px) {
-  .sf-sheet { width: min(960px, 92vw); max-height: 88vh; display: grid; grid-template-columns: 1fr 1fr; align-items: stretch; }
-  .sf-sheet-img { aspect-ratio: auto; height: 100%; min-height: 540px; border-radius: 0; }
-  .sf-sheet-body { padding: 40px 42px; overflow-y: auto; max-height: 88vh; }
-  .sf-sheet-body h2 { font-size: 30px; }
-  .sf-detail-price { font-size: 26px; }
-  .sf-x { z-index: 2; }
+  .sf-sheet { width: min(940px, 92vw); height: min(620px, 86vh); max-height: 86vh; display: grid; grid-template-columns: 46% 54%; align-items: stretch; overflow: hidden; }
+  .sf-sheet-img { aspect-ratio: auto; height: 100%; min-height: 0; border-radius: 0; }
+  .sf-sheet-img .sf-thumb-img { width: 100%; height: 100%; object-fit: cover; }
+  .sf-sheet-body { padding: 38px 40px; overflow-y: auto; height: 100%; max-height: none; box-sizing: border-box; }
+  .sf-sheet-body h2 { font-size: 27px; }
+  .sf-detail-price { font-size: 24px; }
+  .sf-x { z-index: 3; background: rgba(0,0,0,.45); color: #fff; }
 }
 .sf-sheet::-webkit-scrollbar { width: 0; }
 .sf-sheet.on { opacity: 1; pointer-events: auto; transform: translate(-50%, -50%) scale(1); }
