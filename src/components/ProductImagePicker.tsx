@@ -1,6 +1,7 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
+import { createPortal } from "react-dom";
 import { STOCK_IMAGES, STOCK_GROUPS } from "@/lib/stockImages";
 
 // 상품 사진 입력: ① 직접 업로드  ② 무료 이미지 라이브러리에서 고르기  ③ 제거
@@ -20,6 +21,8 @@ export default function ProductImagePicker({
   const [group, setGroup] = useState<(typeof STOCK_GROUPS)[number]>("전체");
   const [pressed, setPressed] = useState<string>("");
   const [fromLibrary, setFromLibrary] = useState(false);
+  const [mounted, setMounted] = useState(false);
+  useEffect(() => setMounted(true), []);
 
   const preview = uploadPreview || picked || (removed ? "" : initialUrl || "");
 
@@ -96,11 +99,11 @@ export default function ProductImagePicker({
         </div>
       </div>
 
-      {/* 라이브러리 모달 */}
-      {open && (
+      {/* 라이브러리 모달 — Portal로 body 최상위에 렌더(부모 stacking context/transform 갇힘 방지) */}
+      {open && mounted && createPortal(
         <div
           onClick={() => setOpen(false)}
-          style={{ position: "fixed", inset: 0, zIndex: 50, display: "flex", alignItems: "center", justifyContent: "center", padding: 12, background: "rgba(0,0,0,0.6)" }}
+          style={{ position: "fixed", inset: 0, zIndex: 9999, display: "flex", alignItems: "center", justifyContent: "center", padding: 12, background: "rgba(0,0,0,0.6)" }}
         >
           <div
             onClick={(e) => e.stopPropagation()}
@@ -192,7 +195,8 @@ export default function ProductImagePicker({
               })}
             </div>
           </div>
-        </div>
+        </div>,
+        document.body
       )}
     </div>
   );

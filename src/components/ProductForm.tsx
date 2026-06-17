@@ -1,6 +1,7 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import { createPortal } from "react-dom";
 import { addProduct } from "@/app/dashboard/[id]/products/actions";
 import { SKIN_BY_ID } from "@/lib/skins";
 import OptionsEditor from "@/components/OptionsEditor";
@@ -22,6 +23,8 @@ export default function ProductForm({ storeId, skin }: { storeId: string; skin: 
   const [desc, setDesc] = useState("");
   const [imgUrl, setImgUrl] = useState<string | null>(null);
   const [big, setBig] = useState(false);
+  const [mounted, setMounted] = useState(false);
+  useEffect(() => setMounted(true), []);
 
   // 소비자에게 보이는 상품 카드 (미리보기) — 사이드패널·전체화면 공용
   const Preview = ({ full }: { full?: boolean }) => (
@@ -127,10 +130,10 @@ export default function ProductForm({ storeId, skin }: { storeId: string; skin: 
         </p>
       </div>
 
-      {/* 전체화면 미리보기 모달 */}
-      {big && (
+      {/* 전체화면 미리보기 모달 — Portal */}
+      {big && mounted && createPortal(
         <div onClick={() => setBig(false)}
-          style={{ position: "fixed", inset: 0, zIndex: 50, display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", gap: 16, padding: 16, background: "rgba(0,0,0,0.7)" }}>
+          style={{ position: "fixed", inset: 0, zIndex: 9999, display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", gap: 16, padding: 16, background: "rgba(0,0,0,0.7)" }}>
           <div onClick={(e) => e.stopPropagation()}>
             <Preview full />
           </div>
@@ -138,7 +141,8 @@ export default function ProductForm({ storeId, skin }: { storeId: string; skin: 
             style={{ color: "#fff", fontSize: 14, fontWeight: 700, padding: "8px 18px", borderRadius: 999, border: "1px solid rgba(255,255,255,0.4)", cursor: "pointer", background: "transparent" }}>
             ✕ 닫기
           </button>
-        </div>
+        </div>,
+        document.body
       )}
     </div>
   );
