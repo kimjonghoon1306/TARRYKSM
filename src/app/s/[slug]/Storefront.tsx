@@ -666,9 +666,11 @@ export default function Storefront({
           <div className="sf-sheet-body">
             {detail.brand && <div className="sf-brand">{detail.brand}</div>}
             <h2>{detail.name}</h2>
+            <div className="sf-detail-price">{won(detail.price)}{dOpts.length > 0 && <span className="sf-detail-from"> 부터</span>}</div>
             <div className="sf-sheet-desc">{detail.description || "정성껏 준비한 상품입니다."}</div>
 
             {/* 옵션 선택 */}
+            {dOpts.length > 0 && <div className="sf-opt-guide">옵션을 선택해 주세요</div>}
             {dOpts.map((g) => (
               <div key={g.name} className="sf-opt">
                 <div className="sf-opt-name">{g.name}</div>
