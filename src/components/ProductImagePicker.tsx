@@ -97,13 +97,13 @@ export default function ProductImagePicker({
                 </button>
               ))}
             </div>
-            <div className="grid grid-cols-3 gap-3 overflow-y-auto p-5 sm:grid-cols-4 md:grid-cols-5">
+            <div className="grid grid-cols-2 gap-3 overflow-y-auto p-5 sm:grid-cols-3 md:grid-cols-4">
               {list.map((img) => (
                 <button key={img.src} type="button" onClick={() => pick(img.src)}
-                  className="group relative aspect-square overflow-hidden rounded-xl border border-black/10 transition hover:border-violet-500 hover:ring-2 hover:ring-violet-500/30 dark:border-white/10">
+                  className="group relative block aspect-square w-full overflow-hidden rounded-xl border border-black/10 bg-black/[0.03] transition hover:border-violet-500 hover:ring-2 hover:ring-violet-500/30 dark:border-white/10 dark:bg-white/[0.04]">
                   {/* eslint-disable-next-line @next/next/no-img-element */}
-                  <img src={img.src} alt={img.cat} loading="lazy" className="h-full w-full object-cover transition group-hover:scale-105" />
-                  <span className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/70 to-transparent px-2 py-1 text-[10px] font-semibold text-white">{img.cat}</span>
+                  <img src={img.src} alt={img.cat} loading="lazy" className="absolute inset-0 h-full w-full object-cover transition group-hover:scale-105" />
+                  <span className="pointer-events-none absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/70 to-transparent px-2 py-1 text-left text-[11px] font-semibold text-white">{img.cat}</span>
                 </button>
               ))}
             </div>

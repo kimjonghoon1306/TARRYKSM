@@ -43,8 +43,14 @@ window.openCreate = function (skin) {
   location.href = '/dashboard/stores/new?skin=' + encodeURIComponent(s);
 };
 
-/* app.js init이 호출 — 인페이지 인증 없음 */
-window.initAuth = function () {};
+/* app.js init이 호출 — Next.js(Supabase) 로그인 세션 쿠키를 보고 로그인 상태 판별.
+   @supabase/ssr 세션 쿠키 `sb-<ref>-auth-token`(분할 시 .0/.1)이 있으면 로그인으로 간주. */
+window.initAuth = function () {
+  try {
+    var loggedIn = /(^|;\s*)sb-[a-z0-9-]+-auth-token(\.\d+)?=/.test(document.cookie || '');
+    window.currentUserObj = loggedIn ? { loggedIn: true } : null;
+  } catch (e) { window.currentUserObj = null; }
+};
 
 /* ── 비밀 입구: 로고 4번 연속 클릭 → 관리자 로그인 ──
    (대문에 버튼 노출 없이, 아는 사람만 들어가는 숨은 입구) */
