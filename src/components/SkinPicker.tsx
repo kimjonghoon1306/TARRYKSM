@@ -123,7 +123,13 @@ export default function SkinPicker({
                       )}
                     </div>
                   </div>
-                  <div className="text-xs text-neutral-400">{sk.vibe}</div>
+                  <div className="flex items-center gap-1.5 text-xs text-neutral-400">
+                    <span
+                      className="inline-block h-3 w-3 flex-none rounded-full ring-1 ring-black/10 dark:ring-white/15"
+                      style={{ background: sk.color }}
+                    />
+                    {sk.vibe}
+                  </div>
                   <div className="mt-1 line-clamp-1 text-[11px] text-neutral-400/80">{sk.recommend}</div>
                 </button>
               );
