@@ -74,14 +74,17 @@ export default async function PrettyStorefront({
   if (!store) notFound();
   const s = store as Store;
 
-  const { data: products } = await supabase
-    .from("products")
-    .select("id,emoji,image_url,name,brand,price,category,description,tag,stock,options,created_at")
-    .eq("store_id", s.id)
-    .order("position", { ascending: true });
+  // store.id 확정 후 나머지 3개는 병렬 조회 (순차 왕복 → 동시 = 체감 속도↑)
+  const [{ data: products }, sections, reviewsByProduct] = await Promise.all([
+    supabase
+      .from("products")
+      .select("id,emoji,image_url,name,brand,price,category,description,tag,stock,options,created_at")
+      .eq("store_id", s.id)
+      .order("position", { ascending: true }),
+    fetchSections(supabase, s.id),
+    fetchReviewsByProduct(supabase, s.id),
+  ]);
   const items = (products ?? []) as Product[];
-  const sections = await fetchSections(supabase, s.id);
-  const reviewsByProduct = await fetchReviewsByProduct(supabase, s.id);
 
   return (
     <>

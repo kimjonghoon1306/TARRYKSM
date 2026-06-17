@@ -42,14 +42,16 @@ export default async function StorefrontPage({
   if (!store) notFound();
   const s = store as Store;
 
-  const { data: products } = await supabase
-    .from("products")
-    .select("id,emoji,image_url,name,brand,price,category,description,tag,stock,options,created_at")
-    .eq("store_id", s.id)
-    .order("position", { ascending: true });
+  const [{ data: products }, sections, reviewsByProduct] = await Promise.all([
+    supabase
+      .from("products")
+      .select("id,emoji,image_url,name,brand,price,category,description,tag,stock,options,created_at")
+      .eq("store_id", s.id)
+      .order("position", { ascending: true }),
+    fetchSections(supabase, s.id),
+    fetchReviewsByProduct(supabase, s.id),
+  ]);
   const items = (products ?? []) as Product[];
-  const sections = await fetchSections(supabase, s.id);
-  const reviewsByProduct = await fetchReviewsByProduct(supabase, s.id);
 
   return (
     <>
