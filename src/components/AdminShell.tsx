@@ -176,7 +176,7 @@ export default function AdminShell({
   return (
     <div className="min-h-screen bg-neutral-50 text-neutral-900 dark:bg-transparent dark:text-neutral-100">
       {/* 데스크탑 사이드바 */}
-      <aside className="fixed inset-y-0 left-0 z-30 hidden w-64 flex-col border-r border-black/5 bg-white p-4 dark:border-white/10 dark:bg-[#191a30] lg:flex">
+      <aside className="fixed inset-y-0 left-0 z-30 hidden w-64 flex-col overflow-y-auto border-r border-black/5 bg-white p-4 dark:border-white/10 dark:bg-[#191a30] lg:flex">
         {Side}
       </aside>
 
@@ -197,7 +197,7 @@ export default function AdminShell({
       {open && (
         <div className="fixed inset-0 z-40 lg:hidden">
           <div className="absolute inset-0 bg-black/50" onClick={() => setOpen(false)} />
-          <aside className="absolute inset-y-0 left-0 flex w-64 flex-col bg-white p-4 dark:bg-[#191a30]">
+          <aside className="absolute inset-y-0 left-0 flex w-64 flex-col overflow-y-auto bg-white p-4 dark:bg-[#191a30]">
             {Side}
           </aside>
         </div>
