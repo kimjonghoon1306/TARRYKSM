@@ -965,13 +965,25 @@ export default function Storefront({
                   rows={2}
                 />
 
+                {/* 입금 계좌 안내 — 주문 전에 미리 보고 계좌이체 */}
+                {store.pay_bank && (
+                  <div className="sf-pay-box" style={{ marginTop: 14 }}>
+                    <div className="sf-pay-label">💳 입금 계좌 (무통장입금)</div>
+                    <div className="sf-pay-bank">{store.pay_bank}</div>
+                    <div className="sf-pay-amt">입금액 {won(payable)}</div>
+                    {store.pay_note && <div className="sf-pay-note">{store.pay_note}</div>}
+                  </div>
+                )}
+
                 {orderErr && <div className="sf-co-err">{orderErr}</div>}
 
                 <button className="sf-checkout" disabled={placing} onClick={submitOrder}>
                   {placing ? "접수 중…" : `${won(payable)} 주문 접수하기`}
                 </button>
                 <p className="sf-co-note">
-                  💳 결제는 사장님과 별도로 진행돼요. (지금은 주문 접수까지)
+                  {store.pay_bank
+                    ? "💳 위 계좌로 입금 후 주문 접수해 주세요. 사장님이 확인 후 연락드려요."
+                    : "💳 결제는 사장님과 별도로 진행돼요. (지금은 주문 접수까지)"}
                 </p>
               </>
             )}
