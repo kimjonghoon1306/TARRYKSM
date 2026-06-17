@@ -122,3 +122,9 @@ body {
     transition: 0s;
   }
 }
+
+/* 모바일: 스토어프런트 하단 고정바(장바구니·주문)와 온봇이 안 겹치게.
+   하단바가 있으면 body에 sf-has-mobilebar 클래스가 붙어 온봇을 위로 올림. */
+@media (max-width: 640px) {
+  body.sf-has-mobilebar .onbot-fab { bottom: 84px; }
+}

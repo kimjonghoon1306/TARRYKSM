@@ -231,7 +231,7 @@ export default function OnBot() {
         type="button"
         aria-label="온봇 도우미 열기"
         onClick={() => setOpen((v) => !v)}
-        className="fixed bottom-5 right-5 z-[120] flex items-center gap-2 rounded-full bg-white/90 py-1.5 pl-1.5 pr-4 shadow-xl shadow-violet-500/20 ring-1 ring-black/5 backdrop-blur transition hover:-translate-y-0.5 hover:shadow-2xl dark:bg-[#191a30]/90 dark:ring-white/10"
+        className="onbot-fab fixed bottom-5 right-5 z-[120] flex items-center gap-2 rounded-full bg-white/90 py-1.5 pl-1.5 pr-4 shadow-xl shadow-violet-500/20 ring-1 ring-black/5 backdrop-blur transition hover:-translate-y-0.5 hover:shadow-2xl dark:bg-[#191a30]/90 dark:ring-white/10"
       >
         <span className="relative inline-grid place-items-center">
           <DesignerAvatar size={38} />

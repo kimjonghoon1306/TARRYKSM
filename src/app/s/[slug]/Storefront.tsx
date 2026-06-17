@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import type { Section } from "@/lib/sections";
 import { placeOrder, submitReview, checkCoupon } from "./actions";
 import "./storefront.css";
@@ -161,6 +161,13 @@ export default function Storefront({
   const cartLines = Object.values(cart);
   const cartCount = cartLines.reduce((a, l) => a + l.qty, 0);
   const total = cartLines.reduce((sum, l) => sum + l.unit * l.qty, 0);
+
+  // 모바일 하단바가 보일 때 body에 클래스 → 온봇을 위로 올려 안 가리게
+  const mobilebarOn = cartCount > 0 && !cartOpen && !checkout && !detail;
+  useEffect(() => {
+    document.body.classList.toggle("sf-has-mobilebar", mobilebarOn);
+    return () => document.body.classList.remove("sf-has-mobilebar");
+  }, [mobilebarOn]);
 
   function flash(msg: string) {
     setToast(msg);
@@ -993,7 +1000,7 @@ export default function Storefront({
       )}
 
       {/* 모바일 하단 고정 바 — 담은 게 있을 때만, 폰에서만 (장바구니·바로주문) */}
-      {cartCount > 0 && !cartOpen && !checkout && !detail && (
+      {mobilebarOn && (
         <div className="sf-mobilebar">
           <button className="sf-mb-cart" onClick={() => setCartOpen(true)}>
             🛒 장바구니 <b>{cartCount}</b>

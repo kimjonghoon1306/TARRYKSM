@@ -76,9 +76,9 @@ export default async function OrdersPage() {
               <div className="text-xs text-neutral-500">새 주문</div>
               <div className="mt-1 text-2xl font-bold text-violet-500">{newCount}</div>
             </div>
-            <div className={card}>
+            <div className={card + " min-w-0"}>
               <div className="text-xs text-neutral-500">주문 금액(취소 제외)</div>
-              <div className="mt-1 text-2xl font-bold">{won(revenue)}</div>
+              <div className="mt-1 break-all text-xl font-bold leading-tight sm:text-2xl">{won(revenue)}</div>
             </div>
           </div>
 
