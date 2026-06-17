@@ -132,17 +132,17 @@ export default function BrandingForm({
 
       <div className="sm:col-span-2">
         <label className="mb-1.5 block text-xs font-semibold text-neutral-500">
-          하단 푸터 (회사정보·안내문)
+          하단 푸터 문구
         </label>
         <textarea
           name="footer_text"
           defaultValue={footerText || ""}
-          rows={3}
-          placeholder={`© ${storeName} · 온종일로 만든 쇼핑몰\n(비우면 위 기본 문구가 표시됩니다. 상호·사업자번호·연락처 등 자유롭게 입력하세요.)`}
+          rows={2}
+          placeholder={`© ${storeName} · 온종일로 만든 쇼핑몰`}
           className={input}
         />
         <p className="mt-1 text-xs text-neutral-400">
-          비워두면 <b>“© {storeName} · 온종일로 만든 쇼핑몰”</b>이 기본으로 표시돼요. 직접 입력하면 그 내용으로 바뀝니다.
+          비워두면 <b>“© {storeName} · 온종일로 만든 쇼핑몰”</b>이 기본으로 표시돼요. (사업자 정보는 아래 전용 칸에서 입력)
         </p>
       </div>
 
