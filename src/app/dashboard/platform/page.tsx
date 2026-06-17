@@ -81,6 +81,14 @@ export default async function PlatformPage() {
         >
           💰 정산
         </Link>
+        <Link
+          href="/?studio=1"
+          target="_blank"
+          rel="noopener"
+          className="rounded-xl bg-gradient-to-r from-violet-500 to-pink-500 px-4 py-2.5 text-sm font-semibold text-white shadow-sm transition hover:brightness-105"
+        >
+          🎨 회원 스튜디오 열기 ↗
+        </Link>
       </div>
 
       {/* 지표 */}
