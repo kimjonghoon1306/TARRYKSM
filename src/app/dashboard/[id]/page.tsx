@@ -8,6 +8,7 @@ import DomainHelp from "@/components/DomainHelp";
 import BrandingForm from "@/components/BrandingForm";
 import StorePreviewButton from "@/components/StorePreviewButton";
 import { SaveButton, SavedToast } from "@/components/SaveBar";
+import PaymentMethods from "@/components/PaymentMethods";
 import BrandingTutorial from "@/components/BrandingTutorial";
 
 type Store = {
@@ -23,6 +24,9 @@ type Store = {
   hero_subtitle: string | null;
   pay_bank: string | null;
   pay_note: string | null;
+  pay_bank_on: boolean | null;
+  pay_card_on: boolean | null;
+  pay_vbank_on: boolean | null;
   footer_text: string | null;
   biz_company: string | null;
   biz_owner: string | null;
@@ -45,7 +49,7 @@ export default async function StoreAdmin({
   const supabase = await createClient();
   const { data: store } = await supabase
     .from("stores")
-    .select("id,name,skin,slug,published,custom_domain,logo_url,hero_image_url,hero_title,hero_subtitle,pay_bank,pay_note,footer_text,biz_company,biz_owner,biz_number,biz_mailorder,biz_address,biz_phone,biz_email")
+    .select("id,name,skin,slug,published,custom_domain,logo_url,hero_image_url,hero_title,hero_subtitle,pay_bank,pay_note,pay_bank_on,pay_card_on,pay_vbank_on,footer_text,biz_company,biz_owner,biz_number,biz_mailorder,biz_address,biz_phone,biz_email")
     .eq("id", id)
     .maybeSingle();
   if (!store) notFound();
@@ -295,6 +299,13 @@ export default async function StoreAdmin({
         )}
         <form action={setStorePayment} className="space-y-3">
           <input type="hidden" name="id" value={s.id} />
+
+          {/* 결제 수단 선택 + 안내 */}
+          <div>
+            <label className="mb-1.5 block text-xs font-semibold text-neutral-500">손님에게 보여줄 결제 수단 (켜고 끄기)</label>
+            <PaymentMethods bankOn={s.pay_bank_on !== false} cardOn={!!s.pay_card_on} vbankOn={!!s.pay_vbank_on} />
+          </div>
+
           <div>
             <label className="mb-1.5 block text-xs font-semibold text-neutral-500">입금 계좌 (무통장입금)</label>
             <input

@@ -196,8 +196,14 @@ export async function setStorePayment(formData: FormData) {
 
   const payBank = String(formData.get("pay_bank") || "").trim() || null;
   const payNote = String(formData.get("pay_note") || "").trim() || null;
+  const bankOn = String(formData.get("pay_bank_on") || "") === "1";
+  const cardOn = String(formData.get("pay_card_on") || "") === "1";
+  const vbankOn = String(formData.get("pay_vbank_on") || "") === "1";
 
-  await supabase.from("stores").update({ pay_bank: payBank, pay_note: payNote }).eq("id", id);
+  await supabase
+    .from("stores")
+    .update({ pay_bank: payBank, pay_note: payNote, pay_bank_on: bankOn, pay_card_on: cardOn, pay_vbank_on: vbankOn })
+    .eq("id", id);
   revalidatePath(`/dashboard/${id}`);
   redirect(`/dashboard/${id}?pmsg=` + encodeURIComponent("결제 설정을 저장했어요"));
 }

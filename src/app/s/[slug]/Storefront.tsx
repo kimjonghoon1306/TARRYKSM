@@ -51,6 +51,7 @@ type Store = {
   hero_subtitle?: string | null;
   pay_bank?: string | null;
   pay_note?: string | null;
+  pay_bank_on?: boolean | null;
   footer_text?: string | null;
   biz_company?: string | null;
   biz_owner?: string | null;
@@ -847,7 +848,7 @@ export default function Storefront({
                   <br />
                   주문해 주셔서 감사합니다.
                 </p>
-                {store.pay_bank && (
+                {store.pay_bank && store.pay_bank_on !== false && (
                   <div className="sf-pay-box">
                     <div className="sf-pay-label">💳 입금 계좌</div>
                     <div className="sf-pay-bank">{store.pay_bank}</div>
@@ -966,7 +967,7 @@ export default function Storefront({
                 />
 
                 {/* 입금 계좌 안내 — 주문 전에 미리 보고 계좌이체 */}
-                {store.pay_bank && (
+                {store.pay_bank && store.pay_bank_on !== false && (
                   <div className="sf-pay-box" style={{ marginTop: 14 }}>
                     <div className="sf-pay-label">💳 입금 계좌 (무통장입금)</div>
                     <div className="sf-pay-bank">{store.pay_bank}</div>
