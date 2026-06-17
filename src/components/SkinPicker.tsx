@@ -94,7 +94,7 @@ export default function SkinPicker({
               onClick={() => setPreviewOpen(true)}
               className="w-full rounded-xl border border-violet-300 bg-violet-50 px-4 py-2.5 text-sm font-bold text-violet-600 transition hover:bg-violet-100 dark:border-violet-500/40 dark:bg-violet-500/10 dark:text-violet-300"
             >
-              👀 이 스킨으로 미리보기
+              🔍 미리보기
             </button>
           </div>
         )}

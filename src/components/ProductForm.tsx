@@ -118,7 +118,7 @@ export default function ProductForm({ storeId, skin }: { storeId: string; skin: 
       {/* 소비자 미리보기 */}
       <div>
         <div className="mb-2 flex items-center justify-between">
-          <span className="text-xs font-semibold text-neutral-500">👀 소비자에게 이렇게 보여요 (실시간)</span>
+          <span className="text-xs font-semibold text-neutral-500">🔍 미리보기 · 실시간</span>
           <button type="button" onClick={() => setBig(true)}
             className="rounded-lg border border-black/10 px-2.5 py-1 text-xs font-semibold text-neutral-600 transition hover:border-violet-500 hover:text-violet-600 dark:border-white/15 dark:text-neutral-300">
             🔍 전체화면
