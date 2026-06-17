@@ -85,12 +85,12 @@ function setDevice(mode){
 function renderMalls(){
   const view = document.getElementById('view');
   let body;
-  if(SB_ENABLED && !currentUserObj){
+  if(!currentUserObj){
     body = `<div class="empty">
       <div class="empty-ico">🔑</div>
       <h3>로그인하고 내 쇼핑몰을 만들어보세요</h3>
       <p>로그인하면 만든 쇼핑몰이 저장돼 어디서든 이어집니다</p>
-      <button class="btn solid" style="margin-top:16px" onclick="openAuth('login')">로그인 / 회원가입</button>
+      <button class="btn solid" style="margin-top:16px" onclick="openAuthPopup()">로그인 / 회원가입</button>
     </div>`;
   } else if(malls.length === 0){
     body = `<div class="empty">
@@ -123,6 +123,7 @@ function renderMalls(){
 let editingIndex = -1;
 
 function openEditor(i){
+  if(window.needLogin && window.needLogin()) return;   // 비로그인 → 로그인 팝업
   editingIndex = i;
   const m = malls[i];
   if(!m) return;
@@ -156,6 +157,7 @@ function editorSetSkin(id){
   renderEditorPreview();
 }
 async function saveEditor(){
+  if(window.needLogin && window.needLogin()){ closeEditor(); return; }  // 비로그인 → 로그인 팝업
   const m = malls[editingIndex];
   if(m){
     const nm = (document.getElementById('edName').value || '').trim();
@@ -201,12 +203,13 @@ function openCreate(preset){
 function closeCreate(){ document.getElementById('createModal').classList.remove('on'); }
 
 async function createMall(){
+  if(!currentUserObj){ closeCreate(); openAuthPopup(); return; }   // 비로그인 → 로그인/회원가입 팝업
   const inp = document.getElementById('mallName');
   const name = (inp.value || '').trim();
   if(!name){ inp.style.borderColor = 'var(--danger)'; inp.focus(); return; }
 
   if(SB_ENABLED){
-    if(!currentUserObj){ closeCreate(); openAuth('login'); toast('🔑 로그인 후 쇼핑몰을 만들 수 있어요'); return; }
+    if(!currentUserObj){ closeCreate(); openAuthPopup(); return; }
     try{
       const store = await dbCreateStore(name, createSkin);
       malls.unshift(store);

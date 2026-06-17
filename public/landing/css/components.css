@@ -91,3 +91,8 @@
 /* 토스트 */
 .toast{position:fixed;bottom:90px;left:50%;transform:translateX(-50%);z-index:300;display:flex;align-items:center;gap:10px;padding:13px 22px;border-radius:99px;background:var(--surf);border:1px solid var(--line-2);box-shadow:var(--shadow);font-size:13.5px;font-weight:600;white-space:nowrap;animation:fadeUp .3s var(--ease)}
 .toast b{color:var(--brand-2)}
+
+/* 로그인/회원가입 안내 팝업 */
+.modal-foot a.btn{display:flex;align-items:center;justify-content:center;text-decoration:none}
+.auth-modal{max-width:380px}
+.auth-desc{margin:0;font-size:13.5px;line-height:1.6;color:var(--txt-2)}

@@ -12,10 +12,29 @@ window.currentUserObj = null;
 window.openAuth = function () { location.href = '/login'; };
 window.openAdmin = function () { location.href = '/dashboard'; };
 
-/* 새 쇼핑몰 만들기 / "이 스킨으로 제작하기" → 그 스킨으로 만들기 화면으로.
-   현재 미리보기 중인 스킨을 넘겨서 대시보드에서 이름만 입력하면 생성됨.
-   (로그인 안 했으면 /dashboard 게이트가 알아서 /login으로 보냄) */
+/* ── 로그인/회원가입 안내 팝업 ──
+   대문(구경 모드)에선 currentUserObj가 항상 비어 있으므로,
+   "만들기·저장" 같은 기능 사용 시도는 전부 이 팝업으로 안내한다. */
+window.openAuthPopup = function () {
+  var m = document.getElementById('authModal');
+  if (m) { m.classList.add('on'); }
+  else { location.href = '/signup'; } // 팝업 마크업 없으면 회원가입으로 폴백
+};
+window.closeAuthPopup = function () {
+  var m = document.getElementById('authModal');
+  if (m) m.classList.remove('on');
+};
+/* 로그인돼 있으면 false(통과), 아니면 팝업 띄우고 true(차단) */
+window.needLogin = function () {
+  if (window.currentUserObj) return false;
+  window.openAuthPopup();
+  return true;
+};
+
+/* 새 쇼핑몰 만들기 / "이 스킨으로 제작하기" → 로그인 전엔 안내 팝업.
+   로그인 상태면 해당 스킨으로 만들기 화면으로 이동. */
 window.openCreate = function (skin) {
+  if (window.needLogin()) return;          // 비로그인 → 로그인/회원가입 팝업
   var s =
     skin ||
     (document.querySelector('.ps-swatch') &&
