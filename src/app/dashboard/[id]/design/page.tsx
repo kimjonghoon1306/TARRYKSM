@@ -49,7 +49,7 @@ export default async function DesignPage({
       )}
 
       <div className="mt-6">
-        <SkinPicker storeId={s.id} currentSkin={s.skin} />
+        <SkinPicker storeId={s.id} currentSkin={s.skin} storeName={s.name} />
       </div>
     </div>
   );

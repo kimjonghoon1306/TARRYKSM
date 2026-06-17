@@ -22,12 +22,22 @@ const SKIN_THUMB: Record<string, string> = {
   berry: `${PROD}/sunglasses.webp`, crimson: `${PROD}/sneaker.webp`,
 };
 
+// hex 색에 투명도 적용 (#rrggbb + alpha → rgba)
+function hexA(hex: string, a: number) {
+  const h = hex.replace("#", "");
+  const n = h.length === 3 ? h.split("").map((c) => c + c).join("") : h;
+  const r = parseInt(n.slice(0, 2), 16), g = parseInt(n.slice(2, 4), 16), b = parseInt(n.slice(4, 6), 16);
+  return `rgba(${r},${g},${b},${a})`;
+}
+
 export default function SkinPicker({
   storeId,
   currentSkin,
+  storeName,
 }: {
   storeId: string;
   currentSkin: string;
+  storeName?: string;
 }) {
   const [selected, setSelected] = useState(currentSkin);
   const changed = selected !== currentSkin;
@@ -66,6 +76,50 @@ export default function SkinPicker({
             <p className="mt-1 text-neutral-400">
               <b className="text-violet-500">추천 업태</b> · {sel.recommend}
             </p>
+          </div>
+        )}
+
+        {/* 실시간 미리보기 — 스킨 고르면 이렇게 보여요 */}
+        {sel && (
+          <div className="mt-3">
+            <div className="mb-1.5 text-[11px] font-semibold text-neutral-400">👀 이 스킨으로 보면</div>
+            <div style={{ borderRadius: 14, overflow: "hidden", border: "1px solid rgba(0,0,0,.08)", background: sel.bg, boxShadow: "0 8px 22px -14px rgba(0,0,0,.4)" }}>
+              {/* 상단바 */}
+              <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: "9px 13px", color: sel.color, borderBottom: `1px solid ${hexA(sel.color, 0.12)}` }}>
+                <b style={{ fontWeight: 800, fontSize: 13, letterSpacing: 0.3 }}>{storeName || "MY SHOP"}</b>
+                <span style={{ fontSize: 12 }}>🔍 🛒</span>
+              </div>
+              {/* 히어로 */}
+              <div style={{ position: "relative", height: 84, overflow: "hidden", background: hexA(sel.color, 0.14) }}>
+                {SKIN_THUMB[sel.id] && (
+                  // eslint-disable-next-line @next/next/no-img-element
+                  <img src={SKIN_THUMB[sel.id]} alt="" style={{ position: "absolute", inset: 0, width: "100%", height: "100%", objectFit: "cover", opacity: 0.9 }} />
+                )}
+                <div style={{ position: "absolute", inset: 0, display: "flex", flexDirection: "column", justifyContent: "flex-end", padding: 12, background: "linear-gradient(to top, rgba(0,0,0,.45), transparent)" }}>
+                  <div style={{ color: "#fff", fontWeight: 800, fontSize: 14 }}>새로 들어왔어요</div>
+                </div>
+              </div>
+              {/* 상품 2개 */}
+              <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 8, padding: 12 }}>
+                {[0, 1].map((i) => (
+                  <div key={i} style={{ borderRadius: 10, overflow: "hidden", border: `1px solid ${hexA(sel.color, 0.15)}` }}>
+                    <div style={{ aspectRatio: "1 / 1", background: hexA(sel.color, 0.1), display: "grid", placeItems: "center", overflow: "hidden" }}>
+                      {SKIN_THUMB[sel.id] && (
+                        // eslint-disable-next-line @next/next/no-img-element
+                        <img src={SKIN_THUMB[sel.id]} alt="" style={{ width: "100%", height: "100%", objectFit: "cover" }} />
+                      )}
+                    </div>
+                    <div style={{ padding: "7px 8px", color: sel.color }}>
+                      <div style={{ fontSize: 11, fontWeight: 700, opacity: 0.85 }}>상품 이름</div>
+                      <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginTop: 4 }}>
+                        <b style={{ fontSize: 12 }}>₩12,000</b>
+                        <span style={{ fontSize: 10, fontWeight: 700, padding: "3px 8px", borderRadius: 6, background: sel.color, color: sel.bg }}>담기</span>
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
           </div>
         )}
       </div>
