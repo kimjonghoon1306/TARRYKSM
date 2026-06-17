@@ -992,6 +992,24 @@ export default function Storefront({
         </div>
       )}
 
+      {/* 모바일 하단 고정 바 — 담은 게 있을 때만, 폰에서만 (장바구니·바로주문) */}
+      {cartCount > 0 && !cartOpen && !checkout && !detail && (
+        <div className="sf-mobilebar">
+          <button className="sf-mb-cart" onClick={() => setCartOpen(true)}>
+            🛒 장바구니 <b>{cartCount}</b>
+          </button>
+          <button
+            className="sf-mb-buy"
+            onClick={() => {
+              setCartOpen(false);
+              setCheckout(true);
+            }}
+          >
+            {won(total)} 주문하기
+          </button>
+        </div>
+      )}
+
       <div className={"sf-toast" + (toast ? " on" : "")}>{toast}</div>
     </div>
   );

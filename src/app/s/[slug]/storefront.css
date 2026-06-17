@@ -183,6 +183,21 @@
 .sf-toast { position: fixed; z-index: 60; left: 50%; bottom: 26px; transform: translateX(-50%) translateY(8px); background: var(--s-brand); color: var(--s-brand-ink); padding: 12px 20px; border-radius: var(--s-rpill); font-weight: 700; font-size: 14px; box-shadow: var(--s-shadow); opacity: 0; transition: .25s var(--ease); }
 .sf-toast.on { opacity: 1; transform: translateX(-50%) translateY(0); }
 
+/* 모바일 하단 고정 바 (장바구니·바로 주문) — 폰에서만 */
+.sf-mobilebar { display: none; }
+@media (max-width: 640px) {
+  .sf-mobilebar {
+    display: flex; gap: 10px; align-items: center;
+    position: fixed; left: 0; right: 0; bottom: 0; z-index: 45;
+    padding: 10px 14px calc(10px + env(safe-area-inset-bottom));
+    background: color-mix(in srgb, var(--s-surf) 94%, transparent);
+    backdrop-filter: blur(14px); border-top: 1px solid var(--s-line);
+  }
+  .sf-mb-cart { flex: 0 0 auto; padding: 13px 16px; border-radius: var(--s-rpill, 12px); border: 1px solid var(--s-line); background: var(--s-surf); color: var(--s-ink); font-size: 13.5px; font-weight: 700; }
+  .sf-mb-cart b { color: var(--s-brand); }
+  .sf-mb-buy { flex: 1; padding: 13px 16px; border-radius: var(--s-rpill, 12px); border: none; background: var(--s-brand); color: var(--s-brand-ink); font-size: 14.5px; font-weight: 800; }
+}
+
 /* ════════════════════════════════════════
    재미 요소 — 등장 애니메이션·이미지 줌·모션
 ════════════════════════════════════════ */
