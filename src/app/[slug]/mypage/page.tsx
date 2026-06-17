@@ -33,10 +33,10 @@ export default async function MyPage({ params }: { params: Promise<{ slug: strin
   const done = list.filter((o) => o.status === "완료").length;
 
   return (
-    <main style={{ minHeight: "100vh", background: "linear-gradient(180deg,#f6f4ff 0%,#faf9f6 340px)", padding: "0 0 80px" }}>
+    <main style={{ minHeight: "100vh", background: "linear-gradient(180deg,#f6f4ff 0%,#faf9f6 340px)", padding: "0 0 80px", color: "#1a1a1a" }}>
       <header style={{ display: "flex", alignItems: "center", gap: 12, padding: "16px 24px", background: "rgba(255,255,255,.8)", backdropFilter: "blur(12px)", position: "sticky", top: 0, zIndex: 10, borderBottom: "1px solid rgba(0,0,0,.05)" }}>
-        <Link href={`/${slug}`} style={{ fontSize: 14, color: "#888", textDecoration: "none", fontWeight: 600 }}>← {store.name}</Link>
-        <b style={{ position: "absolute", left: "50%", transform: "translateX(-50%)", fontSize: 16 }}>마이페이지</b>
+        <Link href={`/${slug}`} style={{ fontSize: 14, color: "#555", textDecoration: "none", fontWeight: 600 }}>← {store.name}</Link>
+        <b style={{ position: "absolute", left: "50%", transform: "translateX(-50%)", fontSize: 16, color: "#1a1a1a" }}>마이페이지</b>
         <span style={{ marginLeft: "auto" }}><CustomerLogoutButton slug={slug} /></span>
       </header>
 
@@ -65,7 +65,7 @@ export default async function MyPage({ params }: { params: Promise<{ slug: strin
           ].map((s) => (
             <div key={s.l} style={{ background: "#fff", borderRadius: 18, padding: "20px 18px", boxShadow: "0 8px 24px -18px rgba(0,0,0,.3)" }}>
               <div style={{ fontSize: 22 }}>{s.ico}</div>
-              <div style={{ fontSize: 12, color: "#999", marginTop: 8 }}>{s.l}</div>
+              <div style={{ fontSize: 12, color: "#6b7280", marginTop: 8 }}>{s.l}</div>
               <div style={{ fontSize: 19, fontWeight: 800, color: s.c, marginTop: 2 }}>{s.v}</div>
             </div>
           ))}
@@ -81,7 +81,7 @@ export default async function MyPage({ params }: { params: Promise<{ slug: strin
             <Link key={m.l} href={m.href} style={{ textDecoration: "none", color: "inherit", background: "#fff", borderRadius: 18, padding: "20px", boxShadow: "0 8px 24px -18px rgba(0,0,0,.3)", display: "block" }}>
               <div style={{ fontSize: 24 }}>{m.ico}</div>
               <div style={{ fontSize: 15, fontWeight: 800, marginTop: 8 }}>{m.l}</div>
-              <div style={{ fontSize: 12, color: "#999", marginTop: 2 }}>{m.d}</div>
+              <div style={{ fontSize: 12, color: "#6b7280", marginTop: 2 }}>{m.d}</div>
             </Link>
           ))}
         </div>
@@ -92,7 +92,7 @@ export default async function MyPage({ params }: { params: Promise<{ slug: strin
           <div style={{ background: "#fff", borderRadius: 20, padding: "60px 20px", textAlign: "center", boxShadow: "0 8px 24px -18px rgba(0,0,0,.3)" }}>
             <div style={{ fontSize: 44 }}>🛍</div>
             <div style={{ fontWeight: 800, fontSize: 16, marginTop: 12 }}>아직 주문 내역이 없어요</div>
-            <div style={{ fontSize: 13, color: "#aaa", marginTop: 5 }}>마음에 드는 상품을 담아보세요!</div>
+            <div style={{ fontSize: 13, color: "#8b8f98", marginTop: 5 }}>마음에 드는 상품을 담아보세요!</div>
             <Link href={`/${slug}`} style={{ display: "inline-block", marginTop: 18, padding: "12px 26px", borderRadius: 999, background: "linear-gradient(135deg,#8b5cf6,#ec4899)", color: "#fff", fontWeight: 800, fontSize: 14, textDecoration: "none" }}>쇼핑하러 가기 →</Link>
           </div>
         ) : (
@@ -101,7 +101,7 @@ export default async function MyPage({ params }: { params: Promise<{ slug: strin
               <div key={o.id} style={{ background: "#fff", borderRadius: 16, padding: "18px 20px", display: "flex", alignItems: "center", justifyContent: "space-between", boxShadow: "0 8px 24px -20px rgba(0,0,0,.3)" }}>
                 <div>
                   <div style={{ fontWeight: 800, fontSize: 15 }}>{won(o.total)}</div>
-                  <div style={{ fontSize: 12, color: "#999", marginTop: 3 }}>{fmt(o.created_at)}</div>
+                  <div style={{ fontSize: 12, color: "#6b7280", marginTop: 3 }}>{fmt(o.created_at)}</div>
                 </div>
                 <span style={{ fontSize: 12, fontWeight: 700, padding: "6px 14px", borderRadius: 999, background: o.status === "취소" ? "#fee2e2" : "#eef6ff", color: o.status === "취소" ? "#e11d48" : "#2563eb" }}>
                   {o.status}
