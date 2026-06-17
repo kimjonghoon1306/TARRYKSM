@@ -6,6 +6,7 @@ import { setStoreDomain, togglePublish, setStoreSlug, setStorePayment, setStoreB
 import { PRIMARY_DOMAIN } from "@/lib/domains";
 import DomainHelp from "@/components/DomainHelp";
 import BrandingForm from "@/components/BrandingForm";
+import StorePreviewButton from "@/components/StorePreviewButton";
 import BrandingTutorial from "@/components/BrandingTutorial";
 
 type Store = {
@@ -108,20 +109,23 @@ export default async function StoreAdmin({
             </span>
           </div>
         </div>
-        <form action={togglePublish}>
-          <input type="hidden" name="id" value={s.id} />
-          <input type="hidden" name="publish" value={s.published ? "0" : "1"} />
-          <button
-            className={
-              "rounded-xl px-4 py-2 text-sm font-semibold transition " +
-              (s.published
-                ? "border border-black/10 hover:border-rose-400 hover:text-rose-500 dark:border-white/15"
-                : "bg-gradient-to-r from-violet-500 to-pink-500 text-white shadow-lg shadow-violet-500/25 hover:brightness-105")
-            }
-          >
-            {s.published ? "비공개로 전환" : "🚀 발행하기"}
-          </button>
-        </form>
+        <div className="flex flex-wrap items-center gap-2">
+          <StorePreviewButton storeId={s.id} />
+          <form action={togglePublish}>
+            <input type="hidden" name="id" value={s.id} />
+            <input type="hidden" name="publish" value={s.published ? "0" : "1"} />
+            <button
+              className={
+                "rounded-xl px-4 py-2 text-sm font-semibold transition " +
+                (s.published
+                  ? "border border-black/10 hover:border-rose-400 hover:text-rose-500 dark:border-white/15"
+                  : "bg-gradient-to-r from-violet-500 to-pink-500 text-white shadow-lg shadow-violet-500/25 hover:brightness-105")
+              }
+            >
+              {s.published ? "비공개로 전환" : "🚀 발행하기"}
+            </button>
+          </form>
+        </div>
       </section>
 
       {/* 상단 꾸미기 — 로고·대문배너·제목 */}
