@@ -196,6 +196,16 @@
 .sf-scrim.on { opacity: 1; pointer-events: auto; }
 
 .sf-sheet { position: fixed; z-index: 50; left: 50%; top: 50%; transform: translate(-50%, calc(-50% + 26px)) scale(.97); width: min(560px, 94vw); max-height: 90vh; overflow: auto; background: var(--s-surf); color: var(--s-ink); border: 1px solid var(--s-line); border-radius: calc(var(--s-r) + 12px); opacity: 0; pointer-events: none; transition: opacity .3s var(--ease), transform .38s var(--ease); box-shadow: 0 40px 90px -30px rgba(0,0,0,.55); scrollbar-width: none; }
+
+/* PC: 시원하게 큰 2단(이미지 | 정보) 레이아웃 */
+@media (min-width: 860px) {
+  .sf-sheet { width: min(960px, 92vw); max-height: 88vh; display: grid; grid-template-columns: 1fr 1fr; align-items: stretch; }
+  .sf-sheet-img { aspect-ratio: auto; height: 100%; min-height: 540px; border-radius: 0; }
+  .sf-sheet-body { padding: 40px 42px; overflow-y: auto; max-height: 88vh; }
+  .sf-sheet-body h2 { font-size: 30px; }
+  .sf-detail-price { font-size: 26px; }
+  .sf-x { z-index: 2; }
+}
 .sf-sheet::-webkit-scrollbar { width: 0; }
 .sf-sheet.on { opacity: 1; pointer-events: auto; transform: translate(-50%, -50%) scale(1); }
 .sf-sheet-img { aspect-ratio: 4/3; display: grid; place-items: center; font-size: 96px; background: var(--s-brand-soft); overflow: hidden; position: relative; }
