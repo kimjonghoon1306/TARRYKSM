@@ -124,11 +124,17 @@ export default async function MemberDetail({ params }: { params: Promise<{ uid: 
                   </div>
                 </div>
                 <Link
+                  href={`/dashboard/${s.id}`}
+                  className="flex-none rounded-lg bg-gradient-to-r from-violet-500 to-pink-500 px-3 py-1.5 text-xs font-semibold text-white transition hover:brightness-105"
+                >
+                  관리 대시보드 ↗
+                </Link>
+                <Link
                   href={`/${s.slug}`}
                   target="_blank"
                   className="flex-none rounded-lg border border-black/10 px-3 py-1.5 text-xs transition hover:border-violet-500 dark:border-white/15"
                 >
-                  보기 ↗
+                  쇼핑몰 보기 ↗
                 </Link>
               </li>
             ))}
