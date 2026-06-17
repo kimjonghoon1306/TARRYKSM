@@ -3,10 +3,20 @@
 import { useState } from "react";
 import { createClient } from "@/lib/supabase/client";
 import { setStoreBranding } from "@/app/dashboard/actions";
+import { SKIN_BY_ID } from "@/lib/skins";
+
+// hex + alpha → rgba
+function hexA(hex: string, a: number) {
+  const h = (hex || "#888").replace("#", "");
+  const n = h.length === 3 ? h.split("").map((c) => c + c).join("") : h;
+  const r = parseInt(n.slice(0, 2), 16), g = parseInt(n.slice(2, 4), 16), b = parseInt(n.slice(4, 6), 16);
+  return `rgba(${r},${g},${b},${a})`;
+}
 
 export default function BrandingForm({
   storeId,
   storeName,
+  skin,
   logoUrl,
   heroUrl,
   heroTitle,
@@ -15,6 +25,7 @@ export default function BrandingForm({
 }: {
   storeId: string;
   storeName: string;
+  skin?: string;
   logoUrl: string | null;
   heroUrl: string | null;
   heroTitle: string | null;
@@ -23,8 +34,11 @@ export default function BrandingForm({
 }) {
   const [logo, setLogo] = useState(logoUrl || "");
   const [hero, setHero] = useState(heroUrl || "");
+  const [title, setTitle] = useState(heroTitle || "");
+  const [subtitle, setSubtitle] = useState(heroSubtitle || "");
   const [busy, setBusy] = useState<"" | "logo" | "hero">("");
   const [err, setErr] = useState("");
+  const sk = SKIN_BY_ID[skin || "mono"] || SKIN_BY_ID["mono"];
 
   // 브라우저 → Supabase Storage 직접 업로드 (서버 4.5MB 한도 우회)
   async function upload(file: File, folder: "logo" | "hero", set: (u: string) => void) {
@@ -123,11 +137,41 @@ export default function BrandingForm({
 
       <div className="sm:col-span-2">
         <label className="mb-1.5 block text-xs font-semibold text-neutral-500">대문 제목</label>
-        <input name="hero_title" defaultValue={heroTitle || ""} placeholder={storeName} className={input} />
+        <input name="hero_title" value={title} onChange={(e) => setTitle(e.target.value)} placeholder={storeName} className={input} />
       </div>
       <div className="sm:col-span-2">
         <label className="mb-1.5 block text-xs font-semibold text-neutral-500">대문 문구</label>
-        <input name="hero_subtitle" defaultValue={heroSubtitle || ""} placeholder="엄선한 상품을 한 곳에. 지금 둘러보세요." className={input} />
+        <input name="hero_subtitle" value={subtitle} onChange={(e) => setSubtitle(e.target.value)} placeholder="엄선한 상품을 한 곳에. 지금 둘러보세요." className={input} />
+      </div>
+
+      {/* 실시간 대문 미리보기 */}
+      <div className="sm:col-span-2">
+        <div className="mb-1.5 text-[11px] font-semibold text-neutral-400">🔍 미리보기 · 실시간</div>
+        <div style={{ borderRadius: 14, overflow: "hidden", border: "1px solid rgba(0,0,0,.08)", background: sk.bg, boxShadow: "0 8px 22px -14px rgba(0,0,0,.4)" }}>
+          {/* 상단바: 로고 or 상호 */}
+          <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: "10px 14px", color: sk.color, borderBottom: `1px solid ${hexA(sk.color, 0.12)}` }}>
+            {logo ? (
+              // eslint-disable-next-line @next/next/no-img-element
+              <img src={logo} alt="" style={{ height: 24, maxWidth: 120, objectFit: "contain" }} />
+            ) : (
+              <b style={{ fontWeight: 800, fontSize: 15, letterSpacing: 0.3 }}>{storeName}</b>
+            )}
+            <span style={{ fontSize: 13 }}>🔍 🛒</span>
+          </div>
+          {/* 히어로: 배너 + 제목/문구 */}
+          <div style={{ position: "relative", minHeight: 150, display: "flex", flexDirection: "column", justifyContent: "flex-end", padding: 18, overflow: "hidden", background: hexA(sk.color, 0.12) }}>
+            {hero && (
+              // eslint-disable-next-line @next/next/no-img-element
+              <img src={hero} alt="" style={{ position: "absolute", inset: 0, width: "100%", height: "100%", objectFit: "cover" }} />
+            )}
+            <div style={{ position: "absolute", inset: 0, background: hero ? "linear-gradient(to top, rgba(0,0,0,.55), rgba(0,0,0,.05))" : "transparent" }} />
+            <div style={{ position: "relative", color: hero ? "#fff" : sk.color }}>
+              <div style={{ fontWeight: 800, fontSize: 22, lineHeight: 1.2 }}>{title || storeName}</div>
+              <div style={{ fontSize: 13, marginTop: 6, opacity: 0.92 }}>{subtitle || "엄선한 상품을 한 곳에. 지금 둘러보세요."}</div>
+              <span style={{ marginTop: 12, display: "inline-block", padding: "8px 18px", borderRadius: 8, background: sk.color, color: sk.bg, fontSize: 13, fontWeight: 800 }}>둘러보기</span>
+            </div>
+          </div>
+        </div>
       </div>
 
       <div className="sm:col-span-2">

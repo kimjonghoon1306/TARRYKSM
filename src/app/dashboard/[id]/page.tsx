@@ -141,6 +141,7 @@ export default async function StoreAdmin({
         <BrandingForm
           storeId={s.id}
           storeName={s.name}
+          skin={s.skin}
           logoUrl={s.logo_url}
           heroUrl={s.hero_image_url}
           heroTitle={s.hero_title}
