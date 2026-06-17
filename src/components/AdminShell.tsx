@@ -218,6 +218,17 @@ export default function AdminShell({
           )}
         </Link>
         <ThemeToggle />
+        {email && (
+          <form action={signout}>
+            <button
+              aria-label="로그아웃"
+              title="로그아웃"
+              className="grid h-9 items-center gap-1.5 rounded-lg border border-black/10 px-3 text-sm font-medium text-neutral-600 transition hover:border-rose-400 hover:text-rose-500 dark:border-white/15 dark:text-neutral-300"
+            >
+              로그아웃
+            </button>
+          </form>
+        )}
       </div>
 
       {/* 콘텐츠 */}
