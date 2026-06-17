@@ -1,9 +1,24 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { useFormStatus } from "react-dom";
 import { createPortal } from "react-dom";
 import { SKINS, SKIN_BY_ID } from "@/lib/skins";
 import { setStoreSkin } from "@/app/dashboard/actions";
+
+// 저장 버튼 — 누르는 즉시 "저장 중…" + 비활성. (useFormStatus는 form 자식에서만 동작)
+function SaveButton({ changed }: { changed: boolean }) {
+  const { pending } = useFormStatus();
+  return (
+    <button
+      type="submit"
+      disabled={!changed || pending}
+      className="press-glow shrink-0 rounded-xl bg-gradient-to-r from-violet-500 to-pink-500 px-5 py-2.5 text-sm font-semibold text-white shadow-lg shadow-violet-500/25 transition hover:brightness-105 active:scale-[.93] disabled:opacity-50"
+    >
+      {pending ? "⏳ 저장 중…" : changed ? "💾 저장하기" : "저장됨"}
+    </button>
+  );
+}
 
 // 스킨별 대표 미리보기 사진 (public/landing/img 재사용)
 const FOOD = "/landing/img/food";
@@ -35,16 +50,27 @@ export default function SkinPicker({
   storeId,
   currentSkin,
   storeName,
+  savedMsg,
 }: {
   storeId: string;
   currentSkin: string;
   storeName?: string;
+  savedMsg?: string;
 }) {
   const [selected, setSelected] = useState(currentSkin);
   const [previewOpen, setPreviewOpen] = useState(false);
   const [device, setDevice] = useState<"mobile" | "tablet" | "desktop">("desktop");
   const [mounted, setMounted] = useState(false);
   useEffect(() => setMounted(true), []);
+  // 저장 성공 토스트 — ?msg= 받으면 떴다가 사라짐
+  const [toast, setToast] = useState<string>("");
+  useEffect(() => {
+    if (savedMsg) {
+      setToast(savedMsg);
+      const t = setTimeout(() => setToast(""), 2600);
+      return () => clearTimeout(t);
+    }
+  }, [savedMsg]);
   const changed = selected !== currentSkin;
   const sel = SKIN_BY_ID[selected];
   const DEVICE_W = { mobile: 390, tablet: 720, desktop: 980 } as const;
@@ -56,6 +82,17 @@ export default function SkinPicker({
     <form action={setStoreSkin}>
       <input type="hidden" name="id" value={storeId} />
       <input type="hidden" name="skin" value={selected} />
+
+      {/* 저장 성공 토스트 (화면 가운데 상단) */}
+      {toast && mounted && createPortal(
+        <div style={{ position: "fixed", top: 24, left: "50%", transform: "translateX(-50%)", zIndex: 10000,
+          display: "flex", alignItems: "center", gap: 8, padding: "12px 22px", borderRadius: 999,
+          background: "#16a34a", color: "#fff", fontSize: 14, fontWeight: 800, boxShadow: "0 10px 30px rgba(0,0,0,.3)",
+          animation: "none" }}>
+          ✓ {toast}
+        </div>,
+        document.body
+      )}
 
       {/* 상단 저장 바 + 선택 스킨 상세 설명 */}
       <div className="sticky top-2 z-10 mb-5 rounded-2xl border border-black/5 bg-white/90 p-3 shadow-sm backdrop-blur dark:border-white/10 dark:bg-[#191a30]/90">
@@ -69,13 +106,7 @@ export default function SkinPicker({
               <span className="text-neutral-500">현재 스킨: <b>{sel?.name}</b></span>
             )}
           </div>
-          <button
-            type="submit"
-            disabled={!changed}
-            className="press-glow shrink-0 rounded-xl bg-gradient-to-r from-violet-500 to-pink-500 px-5 py-2.5 text-sm font-semibold text-white shadow-lg shadow-violet-500/25 transition hover:brightness-105 active:scale-[.97] disabled:opacity-50"
-          >
-            저장하기
-          </button>
+          <SaveButton changed={changed} />
         </div>
         {sel && (
           <div className="mt-2 border-t border-black/5 pt-2 text-xs dark:border-white/10">

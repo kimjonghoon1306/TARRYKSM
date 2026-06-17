@@ -42,14 +42,8 @@ export default async function DesignPage({
         클릭 한 번으로 {s.name}의 색·서체·무드가 전부 바뀝니다.
       </p>
 
-      {msg && (
-        <p className="mt-4 rounded-lg bg-emerald-500/10 px-3 py-2 text-sm text-emerald-600 dark:text-emerald-400">
-          {msg}
-        </p>
-      )}
-
       <div className="mt-6">
-        <SkinPicker storeId={s.id} currentSkin={s.skin} storeName={s.name} />
+        <SkinPicker storeId={s.id} currentSkin={s.skin} storeName={s.name} savedMsg={msg} />
       </div>
     </div>
   );

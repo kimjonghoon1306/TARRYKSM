@@ -171,7 +171,7 @@ export async function setStoreSkin(formData: FormData) {
   await supabase.from("stores").update({ skin }).eq("id", id);
   revalidatePath(`/dashboard/${id}`);
   revalidatePath(`/dashboard/${id}/design`);
-  redirect(`/dashboard/${id}/design?msg=` + encodeURIComponent("스킨을 변경했어요"));
+  redirect(`/dashboard/${id}/design?msg=` + encodeURIComponent("스킨이 적용되었습니다"));
 }
 
 // 발행/비공개 토글 — 발행해야 스토어프런트(서브도메인·커스텀도메인)에 노출됨.
