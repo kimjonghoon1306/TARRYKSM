@@ -447,9 +447,9 @@ export default function Storefront({
             🔍
           </button>
           {customer ? (
-            <a className="sf-icon-btn" href={`/${slug}/mypage`} title="마이페이지" aria-label="마이페이지">👤</a>
+            <a className="sf-auth-btn" href={`/${slug}/mypage`}>마이페이지</a>
           ) : (
-            <button className="sf-icon-btn" onClick={() => setAuthOpen(true)} title="로그인" aria-label="로그인">👤</button>
+            <button className="sf-auth-btn" onClick={() => setAuthOpen(true)}>로그인</button>
           )}
           <button className="sf-cart-btn" onClick={() => setCartOpen(true)}>
             🛒 장바구니

@@ -123,8 +123,10 @@
 .sf-cart-badge { display: inline-grid; place-items: center; min-width: 18px; height: 18px; padding: 0 5px; border-radius: 99px; background: var(--s-brand-ink); color: var(--s-brand); font-size: 11px; font-weight: 800; }
 .sf-logo-img { height: 34px; max-width: 160px; object-fit: contain; }
 .sf-bar-tools { display: flex; align-items: center; gap: 8px; }
-.sf-icon-btn { width: 38px; height: 38px; border: 1px solid var(--s-line); border-radius: var(--s-rpill); background: var(--s-surf); color: var(--s-ink); font-size: 15px; cursor: pointer; transition: .16s var(--ease); }
+.sf-icon-btn { width: 38px; height: 38px; border: 1px solid var(--s-line); border-radius: var(--s-rpill); background: var(--s-surf); color: var(--s-ink); font-size: 15px; cursor: pointer; transition: .16s var(--ease); display: inline-grid; place-items: center; }
 .sf-icon-btn:hover { border-color: var(--s-brand); }
+.sf-auth-btn { display: inline-flex; align-items: center; height: 38px; padding: 0 15px; border: 1px solid var(--s-line); border-radius: var(--s-rpill); background: var(--s-surf); color: var(--s-ink); font-weight: 700; font-size: 13px; cursor: pointer; transition: .16s var(--ease); text-decoration: none; white-space: nowrap; }
+.sf-auth-btn:hover { border-color: var(--s-brand); color: var(--s-brand); }
 
 /* 검색바 */
 .sf-searchbar { position: sticky; top: 64px; z-index: 15; display: flex; gap: 8px; padding: 12px 20px; background: color-mix(in srgb, var(--s-surf) 92%, transparent); backdrop-filter: blur(12px); border-bottom: 1px solid var(--s-line); }
