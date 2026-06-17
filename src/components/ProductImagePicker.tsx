@@ -77,22 +77,32 @@ export default function ProductImagePicker({
         </div>
       </div>
 
-      {/* 라이브러리 모달 */}
+      {/* 라이브러리 모달 — 레이아웃은 인라인 스타일로 강제(빌드/Tailwind 영향 차단) */}
       {open && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4" onClick={() => setOpen(false)}>
-          <div className="absolute inset-0 bg-black/60 backdrop-blur-sm" />
-          <div className="relative flex max-h-[85vh] w-full max-w-3xl flex-col overflow-hidden rounded-2xl border border-white/10 bg-white shadow-2xl dark:bg-[#15161f]"
-            onClick={(e) => e.stopPropagation()}>
-            <div className="flex items-center gap-3 border-b border-black/10 px-5 py-4 dark:border-white/10">
-              <b className="text-base">🖼 무료 이미지 라이브러리</b>
-              <span className="text-xs text-neutral-400">클릭하면 상품 사진으로 적용돼요</span>
-              <button type="button" onClick={() => setOpen(false)} className="ml-auto text-neutral-400 hover:text-neutral-700 dark:hover:text-white">✕</button>
+        <div
+          onClick={() => setOpen(false)}
+          style={{ position: "fixed", inset: 0, zIndex: 50, display: "flex", alignItems: "center", justifyContent: "center", padding: 16, background: "rgba(0,0,0,0.6)" }}
+        >
+          <div
+            onClick={(e) => e.stopPropagation()}
+            className="bg-white dark:bg-[#15161f]"
+            style={{ position: "relative", display: "flex", flexDirection: "column", width: "100%", maxWidth: 760, maxHeight: "85vh", overflow: "hidden", borderRadius: 16, boxShadow: "0 25px 60px rgba(0,0,0,0.35)" }}
+          >
+            <div className="border-b border-black/10 dark:border-white/10" style={{ display: "flex", alignItems: "center", gap: 12, padding: "16px 20px", flex: "0 0 auto" }}>
+              <b style={{ fontSize: 16 }}>🖼 무료 이미지 라이브러리</b>
+              <span className="text-neutral-400" style={{ fontSize: 12 }}>클릭하면 상품 사진으로 적용돼요</span>
+              <button type="button" onClick={() => setOpen(false)} aria-label="닫기"
+                className="text-neutral-500 hover:text-neutral-800 dark:hover:text-white"
+                style={{ marginLeft: "auto", fontSize: 22, lineHeight: 1, cursor: "pointer", padding: "2px 8px" }}>✕</button>
             </div>
-            <div className="flex gap-2 px-5 pt-3">
+            <div style={{ display: "flex", gap: 8, padding: "12px 20px 0", flex: "0 0 auto" }}>
               {STOCK_GROUPS.map((g) => (
                 <button key={g} type="button" onClick={() => setGroup(g)}
-                  className={"rounded-full px-3 py-1.5 text-xs font-semibold transition " +
-                    (group === g ? "bg-violet-500 text-white" : "bg-black/[0.05] text-neutral-500 hover:bg-black/10 dark:bg-white/10 dark:text-neutral-300")}>
+                  className={group === g ? "text-white" : "text-neutral-500 hover:text-neutral-800 dark:text-neutral-300"}
+                  style={{
+                    borderRadius: 999, padding: "6px 14px", fontSize: 12, fontWeight: 700, cursor: "pointer",
+                    background: group === g ? "#8b5cf6" : "rgba(0,0,0,0.06)",
+                  }}>
                   {g}
                 </button>
               ))}
