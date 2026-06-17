@@ -24,16 +24,19 @@ const card =
 export default function SectionEditor({
   storeId,
   slug,
+  skin,
   initialSections,
   products,
   categories,
 }: {
   storeId: string;
   slug: string;
+  skin?: string;
   initialSections: Section[];
   products: Prod[];
   categories: string[];
 }) {
+  void skin; // 섹션 미리보기에서 사용 예정
   const [sections, setSections] = useState<Section[]>(initialSections);
   const [dirty, setDirty] = useState<Record<string, boolean>>({});
   const [open, setOpen] = useState<string | null>(initialSections[0]?.id ?? null);

@@ -9,7 +9,7 @@ export default async function SectionsPage({ params }: { params: Promise<{ id: s
 
   const { data: store } = await supabase
     .from("stores")
-    .select("id,name,slug")
+    .select("id,name,slug,skin")
     .eq("id", id)
     .maybeSingle();
   if (!store) notFound();
@@ -39,6 +39,7 @@ export default async function SectionsPage({ params }: { params: Promise<{ id: s
     <SectionEditor
       storeId={store.id as string}
       slug={store.slug as string}
+      skin={store.skin as string}
       initialSections={sections}
       products={products}
       categories={categories}

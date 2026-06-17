@@ -7,6 +7,7 @@ import { PRIMARY_DOMAIN } from "@/lib/domains";
 import DomainHelp from "@/components/DomainHelp";
 import BrandingForm from "@/components/BrandingForm";
 import StorePreviewButton from "@/components/StorePreviewButton";
+import { SaveButton, SavedToast } from "@/components/SaveBar";
 import BrandingTutorial from "@/components/BrandingTutorial";
 
 type Store = {
@@ -80,6 +81,7 @@ export default async function StoreAdmin({
 
   return (
     <div className="mx-auto max-w-4xl">
+      <SavedToast message={brmsg || pmsg || dmsg || smsg} />
       <Link href="/dashboard/stores" className="text-sm text-neutral-500 hover:text-violet-500">
         ← 쇼핑몰
       </Link>
@@ -210,9 +212,7 @@ export default async function StoreAdmin({
               className="w-full rounded-xl border border-black/10 bg-white px-4 py-2.5 text-sm outline-none focus:border-violet-500 focus:ring-2 focus:ring-violet-500/25 dark:border-white/10 dark:bg-white/[0.04]"
             />
           </div>
-          <button className="rounded-xl bg-gradient-to-r from-violet-500 to-pink-500 px-5 py-2.5 text-sm font-semibold text-white shadow-lg shadow-violet-500/25 transition hover:brightness-105">
-            저장
-          </button>
+          <SaveButton label="저장" />
         </form>
 
         {s.custom_domain && (
@@ -313,9 +313,7 @@ export default async function StoreAdmin({
               className="w-full rounded-xl border border-black/10 bg-white px-4 py-2.5 text-sm outline-none focus:border-violet-500 focus:ring-2 focus:ring-violet-500/25 dark:border-white/10 dark:bg-white/[0.04]"
             />
           </div>
-          <button className="rounded-xl bg-gradient-to-r from-violet-500 to-pink-500 px-5 py-2.5 text-sm font-semibold text-white shadow-lg shadow-violet-500/25 transition hover:brightness-105">
-            결제 설정 저장
-          </button>
+          <SaveButton label="결제 설정 저장" />
         </form>
 
         {/* 카드결제(PG) — 준비중 안내 */}
@@ -364,9 +362,7 @@ export default async function StoreAdmin({
             />
           </div>
           <div className="sm:col-span-2">
-            <button className="rounded-xl bg-gradient-to-r from-violet-500 to-pink-500 px-5 py-2.5 text-sm font-semibold text-white shadow-lg shadow-violet-500/25 transition hover:brightness-105">
-              사업자 정보 저장
-            </button>
+            <SaveButton label="사업자 정보 저장" />
           </div>
         </form>
       </section>
