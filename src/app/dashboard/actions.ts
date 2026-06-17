@@ -146,6 +146,7 @@ export async function setStoreBranding(formData: FormData) {
   const heroUrl = String(formData.get("hero_url") || "").trim() || null;
   const heroTitle = String(formData.get("hero_title") || "").trim() || null;
   const heroSubtitle = String(formData.get("hero_subtitle") || "").trim() || null;
+  const footerText = String(formData.get("footer_text") || "").trim() || null;
 
   await supabase
     .from("stores")
@@ -154,6 +155,7 @@ export async function setStoreBranding(formData: FormData) {
       hero_image_url: heroUrl,
       hero_title: heroTitle,
       hero_subtitle: heroSubtitle,
+      footer_text: footerText,
     })
     .eq("id", id);
   revalidatePath(`/dashboard/${id}`);

@@ -11,6 +11,7 @@ export default function BrandingForm({
   heroUrl,
   heroTitle,
   heroSubtitle,
+  footerText,
 }: {
   storeId: string;
   storeName: string;
@@ -18,6 +19,7 @@ export default function BrandingForm({
   heroUrl: string | null;
   heroTitle: string | null;
   heroSubtitle: string | null;
+  footerText: string | null;
 }) {
   const [logo, setLogo] = useState(logoUrl || "");
   const [hero, setHero] = useState(heroUrl || "");
@@ -129,11 +131,27 @@ export default function BrandingForm({
       </div>
 
       <div className="sm:col-span-2">
+        <label className="mb-1.5 block text-xs font-semibold text-neutral-500">
+          하단 푸터 (회사정보·안내문)
+        </label>
+        <textarea
+          name="footer_text"
+          defaultValue={footerText || ""}
+          rows={3}
+          placeholder={`© ${storeName} · 온종일로 만든 쇼핑몰\n(비우면 위 기본 문구가 표시됩니다. 상호·사업자번호·연락처 등 자유롭게 입력하세요.)`}
+          className={input}
+        />
+        <p className="mt-1 text-xs text-neutral-400">
+          비워두면 <b>“© {storeName} · 온종일로 만든 쇼핑몰”</b>이 기본으로 표시돼요. 직접 입력하면 그 내용으로 바뀝니다.
+        </p>
+      </div>
+
+      <div className="sm:col-span-2">
         <button
           disabled={busy !== ""}
           className="press-glow rounded-xl bg-gradient-to-r from-violet-500 to-pink-500 px-5 py-2.5 text-sm font-semibold text-white shadow-lg shadow-violet-500/25 transition hover:brightness-105 active:scale-[.98] disabled:opacity-50"
         >
-          상단 꾸미기 저장
+          상단·하단 꾸미기 저장
         </button>
       </div>
     </form>

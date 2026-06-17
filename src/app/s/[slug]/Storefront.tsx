@@ -51,6 +51,7 @@ type Store = {
   hero_subtitle?: string | null;
   pay_bank?: string | null;
   pay_note?: string | null;
+  footer_text?: string | null;
 };
 
 const won = (n: number) => "₩" + n.toLocaleString("ko-KR");
@@ -607,8 +608,10 @@ export default function Storefront({
         </>
         )}
 
-        <div className="sf-foot">
-          Powered by <b>ONJONGIL</b>
+        <div className="sf-foot" style={{ whiteSpace: "pre-line" }}>
+          {store.footer_text && store.footer_text.trim()
+            ? store.footer_text
+            : `© ${store.name} · 온종일로 만든 쇼핑몰`}
         </div>
       </div>
 

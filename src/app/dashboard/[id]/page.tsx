@@ -21,6 +21,7 @@ type Store = {
   hero_subtitle: string | null;
   pay_bank: string | null;
   pay_note: string | null;
+  footer_text: string | null;
 };
 
 export default async function StoreAdmin({
@@ -35,7 +36,7 @@ export default async function StoreAdmin({
   const supabase = await createClient();
   const { data: store } = await supabase
     .from("stores")
-    .select("id,name,skin,slug,published,custom_domain,logo_url,hero_image_url,hero_title,hero_subtitle,pay_bank,pay_note")
+    .select("id,name,skin,slug,published,custom_domain,logo_url,hero_image_url,hero_title,hero_subtitle,pay_bank,pay_note,footer_text")
     .eq("id", id)
     .maybeSingle();
   if (!store) notFound();
@@ -133,6 +134,7 @@ export default async function StoreAdmin({
           heroUrl={s.hero_image_url}
           heroTitle={s.hero_title}
           heroSubtitle={s.hero_subtitle}
+          footerText={s.footer_text}
         />
       </section>
 

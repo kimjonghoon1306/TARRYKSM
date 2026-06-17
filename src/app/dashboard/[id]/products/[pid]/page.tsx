@@ -4,6 +4,7 @@ import { createClient } from "@/lib/supabase/server";
 import { updateProduct } from "../actions";
 import OptionsEditor from "@/components/OptionsEditor";
 import ProductImagePicker from "@/components/ProductImagePicker";
+import PriceInput from "@/components/PriceInput";
 
 type Product = {
   id: string;
@@ -19,7 +20,7 @@ type Product = {
   options: { name: string; choices: { label: string; add: number }[] }[] | null;
 };
 
-const CATS = ["전체", "패션", "리빙", "뷰티", "액세서리", "테크"];
+const CATS = ["전체", "식품", "농산물", "수산물", "축산물", "베이커리", "가공·반찬", "패션", "리빙", "뷰티", "액세서리", "테크"];
 const INPUT =
   "w-full rounded-lg border border-black/10 bg-white px-3 py-2 text-sm outline-none focus:border-violet-500 focus:ring-2 focus:ring-violet-500/25 dark:border-white/10 dark:bg-white/[0.04]";
 
@@ -70,7 +71,7 @@ export default async function EditProduct({
           <input name="name" required defaultValue={p.name} className={INPUT} />
         </Field>
         <Field label="가격(원) *">
-          <input name="price" type="number" min={0} required defaultValue={p.price} className={INPUT} />
+          <PriceInput required defaultValue={p.price} className={INPUT} />
         </Field>
         <Field label="브랜드">
           <input name="brand" defaultValue={p.brand || ""} className={INPUT} />
