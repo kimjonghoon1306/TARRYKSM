@@ -5,6 +5,7 @@ import Link from "next/link";
 import { createClient } from "@/lib/supabase/client";
 import SectionsTutorial from "./SectionsTutorial";
 import { SECTION_META, type Section, type SectionConfig, type SectionType } from "@/lib/sections";
+import { SKIN_BY_ID } from "@/lib/skins";
 import {
   addSection,
   updateSectionConfig,
@@ -18,6 +19,79 @@ type Prod = { id: string; name: string; emoji: string | null; image_url: string 
 const input =
   "w-full rounded-xl border border-black/10 bg-white px-3.5 py-2.5 text-sm outline-none focus:border-violet-500 focus:ring-2 focus:ring-violet-500/25 dark:border-white/10 dark:bg-white/[0.04]";
 const label = "mb-1.5 block text-xs font-semibold text-neutral-500";
+
+function hexA(hex: string, a: number) {
+  const h = (hex || "#888").replace("#", "");
+  const n = h.length === 3 ? h.split("").map((c) => c + c).join("") : h;
+  const r = parseInt(n.slice(0, 2), 16), g = parseInt(n.slice(2, 4), 16), b = parseInt(n.slice(4, 6), 16);
+  return `rgba(${r},${g},${b},${a})`;
+}
+
+// 블록이 대문에서 어떻게 보일지 미니 미리보기 (스킨 색 반영)
+function BlockPreview({
+  section, products, sk,
+}: {
+  section: Section;
+  products: Prod[];
+  sk: { color: string; bg: string };
+}) {
+  const c = section.config;
+  const wrap: React.CSSProperties = { borderRadius: 12, overflow: "hidden", border: "1px solid rgba(0,0,0,.08)", background: sk.bg };
+  const imgs = products.filter((p) => p.image_url).slice(0, 4);
+  const thumb = (i: number): React.CSSProperties => ({
+    aspectRatio: "1 / 1", borderRadius: 8, overflow: "hidden", background: hexA(sk.color, 0.1),
+    backgroundImage: imgs[i]?.image_url ? `url(${imgs[i].image_url})` : undefined,
+    backgroundSize: "cover", backgroundPosition: "center",
+    display: "grid", placeItems: "center", fontSize: 22,
+  });
+
+  if (section.type === "banner") {
+    return (
+      <div style={wrap}>
+        <div style={{ position: "relative", minHeight: 110, display: "flex", flexDirection: "column", justifyContent: "center", alignItems: "center", textAlign: "center", padding: 18, color: c.image_url ? "#fff" : sk.color, background: c.image_url ? undefined : hexA(sk.color, 0.12), backgroundImage: c.image_url ? `url(${c.image_url})` : undefined, backgroundSize: "cover", backgroundPosition: "center" }}>
+          {c.image_url && <div style={{ position: "absolute", inset: 0, background: "rgba(0,0,0,.4)" }} />}
+          <div style={{ position: "relative" }}>
+            {c.eyebrow && <div style={{ fontSize: 10, fontWeight: 700, letterSpacing: 1, opacity: 0.85 }}>{c.eyebrow}</div>}
+            <div style={{ fontSize: 19, fontWeight: 800, marginTop: 2 }}>{c.title || "기획전 제목"}</div>
+            {c.subtitle && <div style={{ fontSize: 12, marginTop: 4, opacity: 0.9 }}>{c.subtitle}</div>}
+            <span style={{ marginTop: 10, display: "inline-block", padding: "6px 16px", borderRadius: 7, background: sk.color, color: sk.bg, fontSize: 12, fontWeight: 800 }}>{c.cta_label || "보러가기"}</span>
+          </div>
+        </div>
+      </div>
+    );
+  }
+  if (section.type === "text") {
+    return (
+      <div style={wrap}>
+        <div style={{ padding: 20, textAlign: (c.align as React.CSSProperties["textAlign"]) || "center", color: sk.color }}>
+          <div style={{ fontSize: 17, fontWeight: 800 }}>{c.title || "제목"}</div>
+          <div style={{ fontSize: 13, marginTop: 6, opacity: 0.75, whiteSpace: "pre-line" }}>{c.body || "내용을 입력하세요."}</div>
+        </div>
+      </div>
+    );
+  }
+  // shelf / grid — 상품 진열
+  const cols = section.type === "grid" ? 4 : 4;
+  return (
+    <div style={wrap}>
+      <div style={{ padding: 14 }}>
+        <div style={{ display: "flex", alignItems: "baseline", justifyContent: "space-between", marginBottom: 10, color: sk.color }}>
+          <b style={{ fontSize: 14, fontWeight: 800 }}>{c.title || (section.type === "grid" ? "전체 상품" : "상품 선반")}</b>
+          {section.type === "shelf" && <span style={{ fontSize: 11, opacity: 0.6 }}>더보기 →</span>}
+        </div>
+        <div style={{ display: "grid", gridTemplateColumns: `repeat(${cols}, 1fr)`, gap: 8 }}>
+          {Array.from({ length: cols }).map((_, i) => (
+            <div key={i}>
+              <div style={thumb(i)}>{imgs[i]?.image_url ? "" : "🛍"}</div>
+              <div style={{ fontSize: 10, fontWeight: 700, color: sk.color, marginTop: 4, opacity: 0.85 }}>{imgs[i]?.name || "상품"}</div>
+              <div style={{ fontSize: 11, fontWeight: 800, color: sk.color }}>₩12,000</div>
+            </div>
+          ))}
+        </div>
+      </div>
+    </div>
+  );
+}
 const card =
   "rounded-2xl border border-black/5 bg-white shadow-sm dark:border-white/10 dark:bg-white/[0.03]";
 
@@ -36,7 +110,7 @@ export default function SectionEditor({
   products: Prod[];
   categories: string[];
 }) {
-  void skin; // 섹션 미리보기에서 사용 예정
+  const sk = SKIN_BY_ID[skin || "mono"] || SKIN_BY_ID["mono"];
   const [sections, setSections] = useState<Section[]>(initialSections);
   const [dirty, setDirty] = useState<Record<string, boolean>>({});
   const [open, setOpen] = useState<string | null>(initialSections[0]?.id ?? null);
@@ -250,6 +324,11 @@ export default function SectionEditor({
               {/* 설정 폼 */}
               {isOpen && (
                 <div className="border-t border-black/5 px-4 py-4 dark:border-white/10">
+                  {/* 실시간 미리보기 */}
+                  <div className="mb-4">
+                    <div className="mb-1.5 text-[11px] font-semibold text-neutral-400">🔍 미리보기 · 실시간</div>
+                    <BlockPreview section={s} products={products} sk={sk} />
+                  </div>
                   <Fields
                     section={s}
                     products={products}
