@@ -1,8 +1,8 @@
 "use client";
 
 import Link from "next/link";
-import { usePathname } from "next/navigation";
-import { useState } from "react";
+import { usePathname, useRouter } from "next/navigation";
+import { useRef, useState } from "react";
 import ThemeToggle from "./ThemeToggle";
 import { signout } from "@/app/auth/actions";
 
@@ -33,12 +33,39 @@ export default function AdminShell({
   children: React.ReactNode;
 }) {
   const path = usePathname();
+  const router = useRouter();
   const [open, setOpen] = useState(false);
   const isAdmin = role === "admin";
 
+  // 🔒 비밀 입구: 로고를 빠르게 5번 탭 → 관리자(없으면 관리자 로그인). 단일 클릭은 평소대로 대시보드.
+  const tapRef = useRef<{ n: number; t: number; timer: ReturnType<typeof setTimeout> | null }>({ n: 0, t: 0, timer: null });
+  function onLogoTap() {
+    const now = Date.now();
+    const r = tapRef.current;
+    r.n = now - r.t < 700 ? r.n + 1 : 1;
+    r.t = now;
+    if (r.timer) clearTimeout(r.timer);
+    if (r.n >= 5) {
+      r.n = 0;
+      router.push(isAdmin ? "/dashboard/platform" : "/login?admin=1");
+      return;
+    }
+    r.timer = setTimeout(() => {
+      if (tapRef.current.n >= 1) {
+        tapRef.current.n = 0;
+        router.push("/dashboard");
+      }
+    }, 480);
+  }
+
   const Side = (
     <>
-      <Link href="/dashboard" className="flex items-center gap-2.5 px-2 py-1">
+      <button
+        type="button"
+        onClick={onLogoTap}
+        title="ONJONGIL"
+        className="flex items-center gap-2.5 px-2 py-1 text-left"
+      >
         <span className="grid h-9 w-9 place-items-center rounded-xl bg-gradient-to-br from-violet-500 to-pink-500 font-bold text-white">
           O
         </span>
@@ -48,7 +75,7 @@ export default function AdminShell({
             {isAdmin ? "CONTROL TOWER" : "STORE ADMIN"}
           </i>
         </span>
-      </Link>
+      </button>
 
       {/* 역할 배지 */}
       <div
