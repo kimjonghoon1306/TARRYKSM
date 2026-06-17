@@ -111,6 +111,12 @@ export async function placeOrder(
     orderRow.discount = discount;
     orderRow.coupon_code = appliedCode;
   }
+  // 로그인한 손님이면 주문에 연결 (마이페이지 주문내역에 표시)
+  try {
+    const { getCustomer } = await import("@/app/[slug]/customer-actions");
+    const cust = await getCustomer();
+    if (cust && cust.store_id === storeId) orderRow.customer_id = cust.id;
+  } catch { /* 비회원 주문은 그대로 */ }
 
   // id를 미리 생성해 insert (RLS상 anon은 insert 후 되읽기(select)가 막힐 수 있어 select 생략)
   const orderId = crypto.randomUUID();

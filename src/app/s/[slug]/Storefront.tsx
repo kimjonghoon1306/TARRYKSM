@@ -3,6 +3,7 @@
 import { useEffect, useMemo, useState } from "react";
 import type { Section } from "@/lib/sections";
 import { placeOrder, submitReview, checkCoupon } from "./actions";
+import CustomerAuthSheet from "@/components/CustomerAuthSheet";
 import "./storefront.css";
 
 export type Review = {
@@ -71,18 +72,25 @@ const SORTS = [
   { id: "name", label: "이름순" },
 ];
 
+export type CustomerInfo = { id: string; name: string; email: string; points: number } | null;
+
 export default function Storefront({
   store,
   products,
   sections,
   reviewsByProduct,
+  customer,
+  slug,
 }: {
   store: Store;
   products: Product[];
   sections?: Section[];
   reviewsByProduct?: Record<string, Review[]>;
+  customer?: CustomerInfo;
+  slug?: string;
 }) {
   const [cart, setCart] = useState<Record<string, CartLine>>({});
+  const [authOpen, setAuthOpen] = useState(false); // 로그인/회원가입 시트
   const [detail, setDetail] = useState<Product | null>(null);
   const [detailQty, setDetailQty] = useState(1);
   const [detailOpts, setDetailOpts] = useState<Record<string, string>>({});
@@ -438,6 +446,11 @@ export default function Storefront({
           <button className="sf-icon-btn" aria-label="검색" onClick={() => setSearchOn((v) => !v)}>
             🔍
           </button>
+          {customer ? (
+            <a className="sf-icon-btn" href={`/${slug}/mypage`} title="마이페이지" aria-label="마이페이지">👤</a>
+          ) : (
+            <button className="sf-icon-btn" onClick={() => setAuthOpen(true)} title="로그인" aria-label="로그인">👤</button>
+          )}
           <button className="sf-cart-btn" onClick={() => setCartOpen(true)}>
             🛒 장바구니
             {cartCount > 0 && <span className="sf-cart-badge">{cartCount}</span>}
@@ -1017,6 +1030,10 @@ export default function Storefront({
             {won(total)} 주문하기
           </button>
         </div>
+      )}
+
+      {authOpen && slug && (
+        <CustomerAuthSheet storeId={store.id} slug={slug} onClose={() => setAuthOpen(false)} />
       )}
 
       <div className={"sf-toast" + (toast ? " on" : "")}>{toast}</div>
