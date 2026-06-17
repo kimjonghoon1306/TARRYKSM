@@ -112,16 +112,15 @@ export async function placeOrder(
     orderRow.coupon_code = appliedCode;
   }
 
-  const { data: order, error: oerr } = await supabase
-    .from("orders")
-    .insert(orderRow)
-    .select("id")
-    .maybeSingle();
-  if (oerr || !order) return { ok: false, error: "주문 접수에 실패했어요. 잠시 후 다시 시도해 주세요." };
+  // id를 미리 생성해 insert (RLS상 anon은 insert 후 되읽기(select)가 막힐 수 있어 select 생략)
+  const orderId = crypto.randomUUID();
+  orderRow.id = orderId;
+  const { error: oerr } = await supabase.from("orders").insert(orderRow);
+  if (oerr) return { ok: false, error: "주문 접수에 실패했어요. 잠시 후 다시 시도해 주세요." };
 
   const { error: ierr } = await supabase.from("order_items").insert(
     lines.map((l) => ({
-      order_id: order.id,
+      order_id: orderId,
       product_id: l.product_id,
       name: l.name,
       price: l.price,
@@ -145,7 +144,7 @@ export async function placeOrder(
     await supabase.rpc("redeem_coupon", { p_store_id: storeId, p_code: appliedCode });
   }
 
-  return { ok: true, orderId: order.id as string };
+  return { ok: true, orderId };
 }
 
 // 손님 리뷰 작성 (발행몰이면 비로그인 가능). reviews 테이블이 없으면 안내.
