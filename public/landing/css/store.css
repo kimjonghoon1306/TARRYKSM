@@ -59,6 +59,10 @@
 .sh-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:16px}
 /* 모바일 = 쿠팡식 2열 고정 (한 줄에 상품 2개씩). 데스크탑은 넓게 auto-fill 유지 */
 .device.mobile .sh-grid{grid-template-columns:repeat(2,1fr);gap:11px}
+/* 모바일 미리보기 상단바 = 실제 폰과 동일: 상단 카테고리 링크(신상·베스트…)는 숨기고 로고·카트만.
+   (디바이스는 392px '컨테이너'라 뷰포트 미디어쿼리가 안 먹어, 좁은 폭에서 nav가 세로로 깨졌음) */
+.device.mobile .st-bar .stb-nav{display:none}
+.device.mobile .st-bar .stb-actions{margin-left:auto}
 
 /* 상품 카드 — 모든 상품 동일 규격 = 이질감 제거 */
 .pcard{cursor:pointer;border-radius:var(--s-r);overflow:hidden;background:var(--s-surf);border:1px solid var(--s-line);transition:transform .22s var(--ease),box-shadow .22s}
