@@ -55,11 +55,11 @@ window.secretAdmin = function () {
   clearTimeout(_adminTimer);
   _adminTimer = setTimeout(function () { _adminTaps = 0; }, 1500); // 1.5초 내 연타
 
-  const left = 4 - _adminTaps;
-  if (_adminTaps >= 2 && _adminTaps < 4 && typeof toast === 'function') {
+  const left = 5 - _adminTaps;
+  if (_adminTaps >= 2 && _adminTaps < 5 && typeof toast === 'function') {
     toast('🔑 ' + left + '번 더…');
   }
-  if (_adminTaps >= 4) {
+  if (_adminTaps >= 5) {
     _adminTaps = 0;
     if (typeof toast === 'function') toast('🔓 관리자 로그인');
     setTimeout(function () { location.href = '/login?admin=1'; }, 250);  // 관리자 로그인 변형

@@ -12,12 +12,21 @@ export default async function LoginPage({
 }) {
   const sp = await searchParams;
   const isAdmin = sp.admin === "1"; // 비밀 입구(로고 연타) → 관리자 로그인 변형
-  // 이미 로그인된 사용자는 대시보드로 (로그인 화면 재노출 방지)
+  // 이미 로그인된 사용자 처리
   const supabase = await createClient();
   const {
     data: { user },
   } = await supabase.auth.getUser();
-  if (user) redirect("/dashboard");
+  if (user) {
+    const { data: prof } = await supabase
+      .from("profiles")
+      .select("role")
+      .eq("id", user.id)
+      .maybeSingle();
+    if (prof?.role === "admin") redirect("/dashboard/platform"); // 관리자는 컨트롤타워로 바로
+    if (!isAdmin) redirect("/dashboard"); // 일반 로그인 화면 재노출 방지
+    // 관리자 입구(admin=1)인데 아직 founder면 → 관리자 로그인 폼 노출(다른 관리자 계정으로 진입 가능)
+  }
   return (
     <AuthShell
       title={isAdmin ? "🔐 관리자 로그인" : "로그인"}
