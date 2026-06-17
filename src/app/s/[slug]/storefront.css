@@ -16,7 +16,7 @@
    유광 스윕 + 호버 떠오름 + 누름 + 부드러운 전환
 ════════════════════════════════════════ */
 .sf .sf-add, .sf .sf-cart-btn, .sf .sf-checkout, .sf .sf-mb-buy,
-.sf .sf-promo-cta, .sf .sf-sheet-buy {
+.sf .sf-promo-cta {
   position: relative;
   overflow: hidden;
   isolation: isolate;
@@ -24,23 +24,23 @@
 }
 /* 유광(광택) 스윕 — 마우스 올리면 빛이 지나감 */
 .sf .sf-add::after, .sf .sf-cart-btn::after, .sf .sf-checkout::after, .sf .sf-mb-buy::after,
-.sf .sf-promo-cta::after, .sf .sf-sheet-buy::after {
+.sf .sf-promo-cta::after {
   content: ""; position: absolute; top: 0; left: -120%; width: 60%; height: 100%; z-index: 1;
   background: linear-gradient(100deg, transparent, rgba(255,255,255,.55), transparent);
   transform: skewX(-18deg); pointer-events: none; transition: none;
 }
 .sf .sf-add:hover::after, .sf .sf-cart-btn:hover::after, .sf .sf-checkout:hover::after,
-.sf .sf-mb-buy:hover::after, .sf .sf-promo-cta:hover::after, .sf .sf-sheet-buy:hover::after {
+.sf .sf-mb-buy:hover::after, .sf .sf-promo-cta:hover::after {
   left: 130%; transition: left .65s var(--ease);
 }
 /* 호버 = 살짝 떠오름 + 윤기, 누르면 = 쏙 들어감 */
 .sf .sf-add:hover, .sf .sf-cart-btn:hover, .sf .sf-checkout:hover, .sf .sf-mb-buy:hover,
-.sf .sf-promo-cta:hover, .sf .sf-sheet-buy:hover {
+.sf .sf-promo-cta:hover {
   transform: translateY(-2px); filter: brightness(1.07) saturate(1.05);
   box-shadow: 0 12px 26px -10px var(--s-brand);
 }
 .sf .sf-add:active, .sf .sf-cart-btn:active, .sf .sf-checkout:active, .sf .sf-mb-buy:active,
-.sf .sf-promo-cta:active, .sf .sf-sheet-buy:active {
+.sf .sf-promo-cta:active {
   transform: translateY(0) scale(.96); transition-duration: .08s;
 }
 /* 큰 결제 버튼엔 은은한 펄스(시선 유도) */
@@ -145,7 +145,6 @@
 .sf-tag { position: absolute; top: 10px; left: 10px; z-index: 1; padding: 3px 9px; border-radius: var(--s-rpill); background: var(--s-brand); color: var(--s-brand-ink); font-size: 10px; font-weight: 800; letter-spacing: .03em; }
 .sf-thumb { position: relative; }
 .sf-bottom { display: flex; align-items: center; justify-content: space-between; gap: 8px; margin-top: 4px; }
-.sf-sheet-buy { display: flex; align-items: center; justify-content: space-between; gap: 14px; flex-wrap: wrap; }
 
 .sf-hero { position: relative; margin: 18px; padding: 60px 36px; border-radius: calc(var(--s-r) * 1.6); background: var(--s-hero); overflow: hidden; }
 .sf-hero.has-img { background-size: cover; background-position: center; min-height: 280px; display: flex; align-items: flex-end; }
