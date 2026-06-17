@@ -359,6 +359,25 @@ export default function Storefront({
     );
   }
 
+  // 선반(추천) 전용 미니 카드 — 이미지+이름만, 가로 스크롤. 누르면 상세로.
+  function renderShelfCard(p: Product) {
+    const soldOut = p.stock === 0;
+    return (
+      <button key={p.id} className={"sf-rail-card" + (soldOut ? " sf-soldout" : "")} onClick={() => openDetail(p)}>
+        <div className="sf-rail-thumb">
+          {soldOut && <span className="sf-tag sf-tag-soldout">품절</span>}
+          {p.image_url ? (
+            // eslint-disable-next-line @next/next/no-img-element
+            <img src={p.image_url} alt={p.name} className="sf-thumb-img" />
+          ) : (
+            <span className="sf-rail-emoji">{p.emoji || "📦"}</span>
+          )}
+        </div>
+        <div className="sf-rail-name">{p.name}</div>
+      </button>
+    );
+  }
+
   // 섹션 빌더 블록 렌더 (창업자가 구성한 대문)
   function renderSection(s: Section) {
     const c = s.config || {};
@@ -409,7 +428,7 @@ export default function Storefront({
             <h2>{c.title || "상품"}</h2>
             {c.subtitle && <span className="sf-shelf-sub">{c.subtitle}</span>}
           </div>
-          <div className="sf-grid">{items.map(renderCard)}</div>
+          <div className="sf-shelf-rail">{items.map(renderShelfCard)}</div>
         </section>
       );
     }
@@ -580,7 +599,7 @@ export default function Storefront({
                   <h2>🆕 신상품</h2>
                   <span className="sf-shelf-sub">방금 들어온 따끈한 신상</span>
                 </div>
-                <div className="sf-grid">{newItems.map(renderCard)}</div>
+                <div className="sf-shelf-rail">{newItems.map(renderShelfCard)}</div>
               </section>
             )}
 
@@ -605,7 +624,7 @@ export default function Storefront({
                   <h2>🔥 베스트</h2>
                   <span className="sf-shelf-sub">가장 사랑받는 상품</span>
                 </div>
-                <div className="sf-grid">{bestItems.map(renderCard)}</div>
+                <div className="sf-shelf-rail">{bestItems.map(renderShelfCard)}</div>
               </section>
             )}
 
