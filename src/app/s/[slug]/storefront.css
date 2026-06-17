@@ -255,6 +255,19 @@
   .sf-mb-cart { flex: 0 0 auto; padding: 13px 16px; border-radius: var(--s-rpill, 12px); border: 1px solid var(--s-line); background: var(--s-surf); color: var(--s-ink); font-size: 13.5px; font-weight: 700; }
   .sf-mb-cart b { color: var(--s-brand); }
   .sf-mb-buy { flex: 1; padding: 13px 16px; border-radius: var(--s-rpill, 12px); border: none; background: var(--s-brand); color: var(--s-brand-ink); font-size: 14.5px; font-weight: 800; }
+
+  /* 상단바 압축 — 좁은 폭에서 버튼 넘침 방지 */
+  .sf-bar { padding: 11px 14px; gap: 8px; }
+  .sf-bar-tools { gap: 6px; }
+  .sf-logo { font-size: 17px; }
+  .sf-logo-img { height: 28px; max-width: 120px; }
+  .sf-auth-btn { padding: 0 12px; height: 36px; font-size: 12.5px; }
+  .sf-icon-btn { width: 36px; height: 36px; }
+  /* 장바구니: 텍스트 숨기고 아이콘+뱃지만 (공간 절약) */
+  .sf-cart-btn { padding: 0; width: 36px; height: 36px; justify-content: center; gap: 0; position: relative; }
+  .sf-cart-label { display: none; }
+  .sf-cart-ico { font-size: 15px; }
+  .sf-cart-btn .sf-cart-badge { position: absolute; top: -4px; right: -4px; }
 }
 
 /* ════════════════════════════════════════

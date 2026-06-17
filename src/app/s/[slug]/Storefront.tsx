@@ -452,7 +452,7 @@ export default function Storefront({
             <button className="sf-auth-btn" onClick={() => setAuthOpen(true)}>로그인</button>
           )}
           <button className="sf-cart-btn" onClick={() => setCartOpen(true)}>
-            🛒 장바구니
+            <span className="sf-cart-ico">🛒</span><span className="sf-cart-label"> 장바구니</span>
             {cartCount > 0 && <span className="sf-cart-badge">{cartCount}</span>}
           </button>
         </div>
