@@ -11,6 +11,46 @@
   --s-radd: 10px; --s-rpill: 99px;
 }
 
+/* ════════════════════════════════════════
+   ✨ 모든 쇼핑몰 공통 버튼 효과 (자동 적용)
+   유광 스윕 + 호버 떠오름 + 누름 + 부드러운 전환
+════════════════════════════════════════ */
+.sf .sf-add, .sf .sf-cart-btn, .sf .sf-checkout, .sf .sf-mb-buy,
+.sf .sf-promo-cta, .sf .sf-sheet-buy {
+  position: relative;
+  overflow: hidden;
+  isolation: isolate;
+  transition: transform .18s var(--ease), box-shadow .22s var(--ease), filter .18s var(--ease);
+}
+/* 유광(광택) 스윕 — 마우스 올리면 빛이 지나감 */
+.sf .sf-add::after, .sf .sf-cart-btn::after, .sf .sf-checkout::after, .sf .sf-mb-buy::after,
+.sf .sf-promo-cta::after, .sf .sf-sheet-buy::after {
+  content: ""; position: absolute; top: 0; left: -120%; width: 60%; height: 100%; z-index: 1;
+  background: linear-gradient(100deg, transparent, rgba(255,255,255,.55), transparent);
+  transform: skewX(-18deg); pointer-events: none; transition: none;
+}
+.sf .sf-add:hover::after, .sf .sf-cart-btn:hover::after, .sf .sf-checkout:hover::after,
+.sf .sf-mb-buy:hover::after, .sf .sf-promo-cta:hover::after, .sf .sf-sheet-buy:hover::after {
+  left: 130%; transition: left .65s var(--ease);
+}
+/* 호버 = 살짝 떠오름 + 윤기, 누르면 = 쏙 들어감 */
+.sf .sf-add:hover, .sf .sf-cart-btn:hover, .sf .sf-checkout:hover, .sf .sf-mb-buy:hover,
+.sf .sf-promo-cta:hover, .sf .sf-sheet-buy:hover {
+  transform: translateY(-2px); filter: brightness(1.07) saturate(1.05);
+  box-shadow: 0 12px 26px -10px var(--s-brand);
+}
+.sf .sf-add:active, .sf .sf-cart-btn:active, .sf .sf-checkout:active, .sf .sf-mb-buy:active,
+.sf .sf-promo-cta:active, .sf .sf-sheet-buy:active {
+  transform: translateY(0) scale(.96); transition-duration: .08s;
+}
+/* 큰 결제 버튼엔 은은한 펄스(시선 유도) */
+@keyframes sf-cta-pulse { 0%,100% { box-shadow: 0 8px 22px -12px var(--s-brand); } 50% { box-shadow: 0 8px 30px -8px var(--s-brand); } }
+.sf .sf-checkout, .sf .sf-mb-buy { animation: sf-cta-pulse 2.4s ease-in-out infinite; }
+@media (prefers-reduced-motion: reduce) {
+  .sf .sf-checkout, .sf .sf-mb-buy { animation: none; }
+  .sf [class*="sf-"]:hover::after { transition: none; }
+}
+
 /* 1 · MONO */
 .sf[data-skin="mono"] { --s-bg:#f4f3ef;--s-surf:#fff;--s-ink:#15150f;--s-sub:#7a7a70;--s-line:#e2e0d7;--s-brand:#15150f;--s-brand-ink:#fff;--s-brand-soft:#eceae3;--s-hero:#ebe9e1;--s-r:4px;--s-radd:4px;--s-rpill:4px;--s-ls:.04em;--s-fd:'Space Grotesk',sans-serif;--s-fb:'Inter',sans-serif; }
 .sf[data-skin="mono"] .sf-logo, .sf[data-skin="mono"] .sf-hero h1 { text-transform: uppercase; }
