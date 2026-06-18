@@ -504,12 +504,12 @@ function Fields({
         </div>
         <div className="grid gap-4 sm:grid-cols-2">
           <div>
-            <label className={label}>진열 기준</label>
+            <label className={label}>어떤 상품을 보여줄까요?</label>
             <select className={input} value={src} onChange={(e) => onPatch({ source: e.target.value as SectionConfig["source"] })}>
-              <option value="new">🆕 신상품 (최신순)</option>
-              <option value="best">🔥 베스트 (인기 태그)</option>
-              <option value="category">📁 특정 카테고리</option>
-              <option value="manual">✋ 직접 선택</option>
+              <option value="new">🆕 신상품 — 최근 올린 상품 자동</option>
+              <option value="best">🔥 베스트 — 인기 상품 자동</option>
+              <option value="category">📁 특정 카테고리 상품</option>
+              <option value="manual">✋ 내가 직접 고르기</option>
             </select>
           </div>
           <div>
@@ -523,6 +523,19 @@ function Fields({
               onChange={(e) => onPatch({ limit: parseInt(e.target.value, 10) || 8 })}
             />
           </div>
+        </div>
+        {/* 진열 기준 안내 — 처음 보는 사람도 이해하게 */}
+        <div style={{ fontSize: 12.5, lineHeight: 1.65, color: "#6b7280", background: "rgba(139,92,246,0.07)", borderRadius: 10, padding: "11px 13px" }}>
+          {src === "new" && "🆕 최근 등록한 상품이 자동으로 채워져요. 새 상품을 올리면 알아서 바뀌어요."}
+          {src === "best" && "🔥 '베스트·인기·추천' 태그가 붙은 상품이 자동으로 채워져요."}
+          {src === "category" && "📁 아래에서 고른 카테고리의 상품이 자동으로 채워져요."}
+          {src === "manual" && "✋ 아래 목록에서 이 선반에 넣을 상품을 직접 골라요. (상품을 탭하면 선택/해제)"}
+          {src !== "manual" && (
+            <>
+              <br />
+              👉 원하는 상품만 골라 넣고 싶으면 위에서 <b>✋ 내가 직접 고르기</b>를 선택하세요.
+            </>
+          )}
         </div>
         {src === "category" && (
           <CategorySelect categories={categories} value={c.category || ""} onChange={(v) => onPatch({ category: v })} />
