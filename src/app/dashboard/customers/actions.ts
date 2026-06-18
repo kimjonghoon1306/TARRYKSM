@@ -36,6 +36,31 @@ export async function getCustomerPointsLog(customerId: string): Promise<PointLog
   return (data as PointLog[] | null) ?? [];
 }
 
+// 한 쇼핑몰의 쿠폰 목록 (발급 드롭다운용 — RLS상 소유자만 읽힘)
+export type StoreCoupon = { id: string; code: string; kind: string; value: number };
+export async function listStoreCoupons(storeId: string): Promise<StoreCoupon[]> {
+  const supabase = await createClient();
+  const { data } = await supabase
+    .from("coupons")
+    .select("id,code,kind,value,active")
+    .eq("store_id", storeId)
+    .eq("active", true)
+    .order("created_at", { ascending: false });
+  return ((data as (StoreCoupon & { active: boolean })[] | null) ?? []).map(
+    ({ id, code, kind, value }) => ({ id, code, kind, value })
+  );
+}
+
+// 창업자가 회원에게 쿠폰 발급 (쿠폰함에 담김)
+export async function issueCoupon(customerId: string, couponId: string): Promise<{ ok: boolean; error?: string }> {
+  if (!couponId) return { ok: false, error: "쿠폰을 선택해 주세요." };
+  const supabase = await createClient();
+  const { error } = await supabase.rpc("issue_coupon_to_customer", { p_customer: customerId, p_coupon: couponId });
+  if (error) return { ok: false, error: "발급에 실패했어요. (쿠폰 SQL 실행/권한 확인)" };
+  revalidatePath("/dashboard/customers");
+  return { ok: true };
+}
+
 // 창업자가 회원에게 적립금 지급(+)/차감(-)
 export async function adjustCustomerPoints(
   customerId: string,

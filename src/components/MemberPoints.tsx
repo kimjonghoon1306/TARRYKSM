@@ -4,8 +4,11 @@ import { useState, useTransition } from "react";
 import {
   adjustCustomerPoints,
   getCustomerPointsLog,
+  listStoreCoupons,
+  issueCoupon,
   type Member,
   type PointLog,
+  type StoreCoupon,
 } from "@/app/dashboard/customers/actions";
 
 const won = (n: number) => "₩" + (n || 0).toLocaleString("ko-KR");
@@ -71,6 +74,9 @@ function Row({
   const [memo, setMemo] = useState("");
   const [msg, setMsg] = useState<{ ok: boolean; text: string } | null>(null);
   const [log, setLog] = useState<PointLog[] | null>(null);
+  const [coupons, setCoupons] = useState<StoreCoupon[] | null>(null);
+  const [selCoupon, setSelCoupon] = useState("");
+  const [cMsg, setCMsg] = useState<{ ok: boolean; text: string } | null>(null);
   const [pending, start] = useTransition();
 
   function apply(sign: 1 | -1) {
@@ -95,10 +101,29 @@ function Row({
 
   function toggle() {
     onToggle();
-    if (!isOpen && log === null) {
-      start(async () => setLog(await getCustomerPointsLog(m.id)));
+    if (!isOpen) {
+      start(async () => {
+        if (log === null) setLog(await getCustomerPointsLog(m.id));
+        if (coupons === null) setCoupons(await listStoreCoupons(m.store_id));
+      });
     }
   }
+
+  function giveCoupon() {
+    setCMsg(null);
+    if (!selCoupon) {
+      setCMsg({ ok: false, text: "쿠폰을 선택해 주세요." });
+      return;
+    }
+    start(async () => {
+      const res = await issueCoupon(m.id, selCoupon);
+      setCMsg({ ok: res.ok, text: res.ok ? "쿠폰을 발급했어요 ✓ (회원 쿠폰함에 담김)" : res.error || "실패" });
+      if (res.ok) setSelCoupon("");
+    });
+  }
+
+  const couponLabel = (c: StoreCoupon) =>
+    `${c.code} — ${c.kind === "amount" ? c.value.toLocaleString("ko-KR") + "원" : c.value + "%"} 할인`;
 
   const card =
     "rounded-2xl border border-black/5 bg-white shadow-sm dark:border-white/10 dark:bg-white/[0.03]";
@@ -197,6 +222,44 @@ function Row({
                 );
               })}
             </div>
+          )}
+
+          {/* 쿠폰 발급 */}
+          <div className="mb-2 mt-4 text-xs font-semibold text-neutral-500">쿠폰 발급</div>
+          {coupons === null ? (
+            <div className="text-xs text-neutral-400">불러오는 중…</div>
+          ) : coupons.length === 0 ? (
+            <div className="text-xs text-neutral-400">
+              발급할 쿠폰이 없어요. 먼저 쇼핑몰 관리 → 🎟️ 쿠폰에서 쿠폰을 만들어 주세요.
+            </div>
+          ) : (
+            <>
+              <div className="flex flex-wrap items-center gap-2">
+                <select
+                  value={selCoupon}
+                  onChange={(e) => setSelCoupon(e.target.value)}
+                  className="min-w-[180px] flex-1 rounded-xl border border-black/10 bg-white px-3 py-2 text-sm outline-none dark:border-white/10 dark:bg-white/[0.04]"
+                >
+                  <option value="">쿠폰 선택…</option>
+                  {coupons.map((c) => (
+                    <option key={c.id} value={c.id}>{couponLabel(c)}</option>
+                  ))}
+                </select>
+                <button
+                  type="button"
+                  disabled={pending}
+                  onClick={giveCoupon}
+                  className="rounded-xl bg-violet-500 px-4 py-2 text-sm font-semibold text-white transition hover:brightness-105 disabled:opacity-50"
+                >
+                  🎟️ 발급
+                </button>
+              </div>
+              {cMsg && (
+                <p className={"mt-2 text-xs font-semibold " + (cMsg.ok ? "text-emerald-600" : "text-rose-500")}>
+                  {cMsg.text}
+                </p>
+              )}
+            </>
           )}
         </div>
       )}

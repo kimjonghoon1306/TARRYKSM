@@ -532,6 +532,12 @@ textarea.sf-co-input { resize: vertical; min-height: 56px; }
 .sf-coupon-msg { margin-top: 6px; font-size: 12px; }
 .sf-coupon-msg.ok { color: #16a34a; }
 .sf-coupon-msg.err { color: #e0245e; }
+.sf-mycoupons { margin-top: 10px; }
+.sf-mycoupons-label { font-size: 12px; font-weight: 700; color: var(--s-muted, #888); margin-bottom: 6px; }
+.sf-mycoupons-chips { display: flex; flex-wrap: wrap; gap: 6px; }
+.sf-mycoupon-chip { border: 1px dashed var(--s-brand); background: color-mix(in srgb, var(--s-brand) 10%, transparent); color: var(--s-brand); border-radius: 999px; padding: 6px 12px; font-size: 12px; font-weight: 700; cursor: pointer; }
+.sf-mycoupon-chip:hover { background: color-mix(in srgb, var(--s-brand) 18%, transparent); }
+.sf-mycoupon-chip:disabled { opacity: .55; cursor: default; }
 
 /* ── 찜 ♥ 버튼 ── */
 .sf-fav {

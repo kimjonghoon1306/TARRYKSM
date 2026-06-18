@@ -167,6 +167,10 @@ export async function placeOrder(
   // 쿠폰 사용횟수 +1 (적용된 경우만, RPC 없으면 무시)
   if (appliedCode) {
     await supabase.rpc("redeem_coupon", { p_store_id: storeId, p_code: appliedCode });
+    // 로그인 손님이면 쿠폰함의 해당 쿠폰도 사용처리 (RPC 없으면 무시)
+    if (token) {
+      await supabase.rpc("mark_my_coupon_used", { p_token: token, p_code: appliedCode });
+    }
   }
 
   // 적립금 차감 (주문 성공 후, 세션 토큰으로 서버 재검증·차감·내역기록. RPC 없으면 무시)

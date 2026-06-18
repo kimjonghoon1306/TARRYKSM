@@ -4,7 +4,7 @@ import { createClient } from "@/lib/supabase/server";
 import { fetchSections } from "@/lib/sections";
 import { fetchReviewsByProduct } from "@/lib/reviews";
 import Storefront, { type Product } from "../s/[slug]/Storefront";
-import { getCustomer, getWishlistIds } from "./customer-actions";
+import { getCustomer, getWishlistIds, getMyCoupons } from "./customer-actions";
 
 // 각 쇼핑몰 링크 공유 시: 가게 이름·로고(파비콘)·배너(미리보기 이미지)
 export async function generateMetadata({
@@ -72,7 +72,7 @@ export default async function PrettyStorefront({
   const supabase = await createClient();
 
   // 쇼핑몰 정보 + 손님 로그인 + 찜목록을 한 번에 병렬 조회 (서로 독립 → 순차 왕복 제거)
-  const [{ data: store }, cust, wishlistIdsRaw] = await Promise.all([
+  const [{ data: store }, cust, wishlistIdsRaw, myCouponsRaw] = await Promise.all([
     supabase
       .from("stores")
       .select("id,name,skin,logo_url,hero_image_url,hero_title,hero_subtitle,pay_bank,pay_note,pay_bank_on,points_on,footer_text,biz_company,biz_owner,biz_number,biz_mailorder,biz_address,biz_phone,biz_email")
@@ -81,6 +81,7 @@ export default async function PrettyStorefront({
       .maybeSingle(),
     getCustomer(),
     getWishlistIds(),
+    getMyCoupons(),
   ]);
   if (!store) notFound();
   const s = store as Store;
@@ -98,6 +99,12 @@ export default async function PrettyStorefront({
   const items = (products ?? []) as Product[];
   const customer = cust && cust.store_id === s.id ? { id: cust.id, name: cust.name, email: cust.email, points: cust.points } : null;
   const wishlistIds = customer ? wishlistIdsRaw : [];
+  // 결제 화면에서 쓸 수 있는 보유 쿠폰 (미사용·유효·기간내)
+  const myCoupons = customer
+    ? myCouponsRaw
+        .filter((c) => !c.used && c.active && (!c.expires_at || new Date(c.expires_at) > new Date()))
+        .map((c) => ({ code: c.code, kind: c.kind, value: c.value, min_order: c.min_order }))
+    : [];
 
   return (
     <>
@@ -109,6 +116,7 @@ export default async function PrettyStorefront({
         slug={slug}
         customer={customer}
         wishlistIds={wishlistIds}
+        myCoupons={myCoupons}
         openAuth={openAuth}
         store={{
           id: s.id,

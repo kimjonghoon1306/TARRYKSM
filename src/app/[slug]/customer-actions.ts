@@ -134,6 +134,66 @@ export async function customerFindEmail(storeId: string, name: string, phone: st
   return { ok: true, email: masked };
 }
 
+// ── 내 정보 수정 (로그인 손님) ──
+
+// 이름·연락처 수정
+export async function customerUpdateProfile(input: { name: string; phone: string }): Promise<Res> {
+  const t = (await cookies()).get(COOKIE)?.value;
+  if (!t) return { ok: false, error: "로그인이 필요해요." };
+  const name = input.name.trim();
+  if (!name) return { ok: false, error: "이름을 입력해 주세요." };
+  const supabase = await createClient();
+  const { data, error } = await supabase.rpc("customer_update_profile", {
+    p_token: t,
+    p_name: name,
+    p_phone: input.phone.trim(),
+  });
+  if (error || !data) return { ok: false, error: "수정에 실패했어요. 잠시 후 다시 시도해 주세요." };
+  return { ok: true };
+}
+
+// 비밀번호 변경 (현재 비번 확인 후 새 비번으로)
+export async function customerChangePassword(input: { current: string; next: string }): Promise<Res> {
+  const t = (await cookies()).get(COOKIE)?.value;
+  if (!t) return { ok: false, error: "로그인이 필요해요." };
+  if (input.next.length < 6) return { ok: false, error: "새 비밀번호는 6자 이상이어야 해요." };
+  const cust = await getCustomer();
+  if (!cust) return { ok: false, error: "로그인이 필요해요." };
+  const supabase = await createClient();
+  // 현재 비번 검증 (저장 해시를 받아 같은 salt로 재해시 비교)
+  const { data: hd } = await supabase.rpc("customer_get_hash", { p_store: cust.store_id, p_email: cust.email });
+  const row = hd && hd.length ? (hd[0] as { password_hash: string }) : null;
+  if (!row || !verifyPw(input.current, row.password_hash)) {
+    return { ok: false, error: "현재 비밀번호가 올바르지 않아요." };
+  }
+  const { data, error } = await supabase.rpc("customer_change_password", {
+    p_token: t,
+    p_newhash: hashPw(input.next),
+  });
+  if (error || !data) return { ok: false, error: "변경에 실패했어요. 잠시 후 다시 시도해 주세요." };
+  return { ok: true };
+}
+
+// ── 쿠폰함 (로그인 손님) ──
+export type MyCoupon = {
+  id: string;
+  code: string;
+  kind: string;
+  value: number;
+  min_order: number;
+  expires_at: string | null;
+  active: boolean;
+  used: boolean;
+  used_at: string | null;
+};
+export async function getMyCoupons(): Promise<MyCoupon[]> {
+  const t = (await cookies()).get(COOKIE)?.value;
+  if (!t) return [];
+  const supabase = await createClient();
+  const { data } = await supabase.rpc("my_coupons", { p_token: t });
+  return (data as MyCoupon[] | null) ?? [];
+}
+
 // 비밀번호 재설정 (이메일+이름+전화 일치 시)
 export async function customerResetPw(
   storeId: string,

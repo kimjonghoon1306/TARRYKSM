@@ -121,6 +121,7 @@ export default function Storefront({
   customer,
   slug,
   wishlistIds,
+  myCoupons,
   openAuth,
 }: {
   store: Store;
@@ -130,6 +131,7 @@ export default function Storefront({
   customer?: CustomerInfo;
   slug?: string;
   wishlistIds?: string[];
+  myCoupons?: { code: string; kind: string; value: number; min_order: number }[];
   openAuth?: "login" | "signup";
 }) {
   const [cart, setCart] = useState<Record<string, CartLine>>({});
@@ -356,16 +358,18 @@ export default function Storefront({
   const pointsUsed = pointsEnabled ? Math.max(0, Math.min(Math.trunc(Number(pointsInput) || 0), pointsMax)) : 0;
   const payable = afterCoupon - pointsUsed;
 
-  async function applyCoupon() {
+  async function applyCoupon(codeArg?: string) {
     setCouponErr(false);
     setCouponMsg("");
-    if (!couponInput.trim()) {
+    const code = (codeArg ?? couponInput).trim();
+    if (!code) {
       setCouponErr(true);
       setCouponMsg("쿠폰 코드를 입력해 주세요.");
       return;
     }
+    if (codeArg) setCouponInput(codeArg);
     setCouponBusy(true);
-    const res = await checkCoupon(store.id, couponInput, total);
+    const res = await checkCoupon(store.id, code, total);
     setCouponBusy(false);
     if (!res.ok) {
       setCouponErr(true);
@@ -374,7 +378,7 @@ export default function Storefront({
       setCouponCode("");
       return;
     }
-    setCouponCode(res.code || couponInput.trim());
+    setCouponCode(res.code || code);
     setCouponDiscount(res.discount || 0);
     setCouponMsg(`쿠폰 적용! -${won(res.discount || 0)}`);
   }
@@ -1099,13 +1103,32 @@ export default function Storefront({
                       <button
                         type="button"
                         className="sf-coupon-btn"
-                        onClick={applyCoupon}
+                        onClick={() => applyCoupon()}
                         disabled={couponBusy}
                       >
                         {couponBusy ? "확인 중…" : "적용"}
                       </button>
                     )}
                   </div>
+                  {/* 보유 쿠폰 — 눌러서 바로 적용 */}
+                  {!couponCode && myCoupons && myCoupons.length > 0 && (
+                    <div className="sf-mycoupons">
+                      <div className="sf-mycoupons-label">🎟️ 내 쿠폰</div>
+                      <div className="sf-mycoupons-chips">
+                        {myCoupons.map((c) => (
+                          <button
+                            key={c.code}
+                            type="button"
+                            className="sf-mycoupon-chip"
+                            onClick={() => applyCoupon(c.code)}
+                            disabled={couponBusy}
+                          >
+                            {c.kind === "amount" ? won(c.value) : `${c.value}%`} · {c.code}
+                          </button>
+                        ))}
+                      </div>
+                    </div>
+                  )}
                   {couponMsg && (
                     <div className={"sf-coupon-msg" + (couponErr ? " err" : " ok")}>{couponMsg}</div>
                   )}

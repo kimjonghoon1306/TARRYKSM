@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
-import { getCustomer, getWishlistProducts } from "../customer-actions";
+import { getCustomer, getWishlistProducts, getMyCoupons } from "../customer-actions";
 import CustomerLogoutButton from "@/components/CustomerLogoutButton";
 
 export const dynamic = "force-dynamic";
@@ -43,12 +43,14 @@ export default async function MyPage({ params }: { params: Promise<{ slug: strin
     );
   }
 
-  // 주문내역 + 찜한 상품 병렬 조회
-  const [{ data: orders }, wish] = await Promise.all([
+  // 주문내역 + 찜한 상품 + 쿠폰함 병렬 조회
+  const [{ data: orders }, wish, coupons] = await Promise.all([
     supabase.from("orders").select("id,total,status,created_at").eq("customer_id", cust.id).order("created_at", { ascending: false }),
     getWishlistProducts(),
+    getMyCoupons(),
   ]);
   const list = orders ?? [];
+  const usableCoupons = coupons.filter((c) => !c.used && c.active && (!c.expires_at || new Date(c.expires_at) > new Date()));
 
   const initial = (cust.name || "회").slice(0, 1);
   const totalSpent = list.filter((o) => o.status !== "취소").reduce((s, o) => s + (o.total || 0), 0);
@@ -98,7 +100,7 @@ export default async function MyPage({ params }: { params: Promise<{ slug: strin
           {[
             { l: "쇼핑 계속하기", d: "신상품 보러가기", ico: "🛒", href: `/${slug}` },
             { l: "고객센터", d: store.name, ico: "💬", href: `/${slug}` },
-            { l: "내 정보", d: cust.email, ico: "👤", href: `/${slug}/mypage` },
+            { l: "내 정보 수정", d: "이름·연락처·비밀번호", ico: "👤", href: `/${slug}/mypage/edit` },
           ].map((m) => (
             <Link key={m.l} href={m.href} style={{ textDecoration: "none", color: "inherit", background: "#fff", borderRadius: 18, padding: "20px", boxShadow: "0 8px 24px -18px rgba(0,0,0,.3)", display: "block" }}>
               <div style={{ fontSize: 24 }}>{m.ico}</div>
@@ -107,6 +109,37 @@ export default async function MyPage({ params }: { params: Promise<{ slug: strin
             </Link>
           ))}
         </div>
+
+        {/* 쿠폰함 */}
+        <h2 style={{ fontSize: 16, fontWeight: 800, margin: "34px 4px 14px" }}>
+          🎟️ 내 쿠폰함{usableCoupons.length > 0 && <span style={{ color: "#6d28d9", marginLeft: 6 }}>{usableCoupons.length}</span>}
+        </h2>
+        {coupons.length === 0 ? (
+          <div style={{ background: "#fff", borderRadius: 20, padding: "40px 20px", textAlign: "center", boxShadow: "0 8px 24px -18px rgba(0,0,0,.3)" }}>
+            <div style={{ fontSize: 40 }}>🎟️</div>
+            <div style={{ fontWeight: 800, fontSize: 15, marginTop: 10 }}>받은 쿠폰이 없어요</div>
+            <div style={{ fontSize: 13, color: "#8b8f98", marginTop: 5 }}>쿠폰을 받으면 여기에 모이고, 주문할 때 사용할 수 있어요.</div>
+          </div>
+        ) : (
+          <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill,minmax(220px,1fr))", gap: 12 }}>
+            {coupons.map((c) => {
+              const expired = !!c.expires_at && new Date(c.expires_at) <= new Date();
+              const dead = c.used || expired || !c.active;
+              const disc = c.kind === "amount" ? won(c.value) : `${c.value}%`;
+              return (
+                <div key={c.id} style={{ position: "relative", overflow: "hidden", borderRadius: 16, padding: "18px 18px", color: "#fff", background: dead ? "#9ca3af" : "linear-gradient(135deg,#4f46e5,#6d28d9)", boxShadow: "0 8px 24px -18px rgba(79,70,229,.5)", opacity: dead ? 0.7 : 1 }}>
+                  <div style={{ fontSize: 22, fontWeight: 900, letterSpacing: "-.5px" }}>{disc} 할인</div>
+                  <div style={{ fontSize: 13, opacity: 0.92, marginTop: 4, fontFamily: "monospace" }}>코드 {c.code}</div>
+                  {c.min_order > 0 && <div style={{ fontSize: 11.5, opacity: 0.85, marginTop: 3 }}>{won(c.min_order)} 이상 주문 시</div>}
+                  <div style={{ fontSize: 11.5, opacity: 0.85, marginTop: 3 }}>
+                    {c.used ? "사용 완료" : expired ? "기간 만료" : !c.active ? "사용 불가" : c.expires_at ? `~${fmt(c.expires_at)}까지` : "기간 제한 없음"}
+                  </div>
+                  {c.used && <div style={{ position: "absolute", right: 10, top: 10, fontSize: 11, fontWeight: 800, background: "rgba(0,0,0,.25)", padding: "3px 8px", borderRadius: 999 }}>완료</div>}
+                </div>
+              );
+            })}
+          </div>
+        )}
 
         {/* 찜한 상품 */}
         <h2 style={{ fontSize: 16, fontWeight: 800, margin: "34px 4px 14px" }}>
