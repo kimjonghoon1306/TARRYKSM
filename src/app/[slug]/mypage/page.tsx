@@ -16,11 +16,13 @@ export default async function MyPage({ params }: { params: Promise<{ slug: strin
   const { slug } = await params;
   const supabase = await createClient();
 
-  const { data: store } = await supabase
-    .from("stores").select("id,name,skin").eq("slug", slug).eq("published", true).maybeSingle();
+  // 쇼핑몰 + 손님 정보 병렬 조회 (독립 → 순차 왕복 제거)
+  const [{ data: store }, cust] = await Promise.all([
+    supabase.from("stores").select("id,name,skin").eq("slug", slug).eq("published", true).maybeSingle(),
+    getCustomer(),
+  ]);
   if (!store) notFound();
 
-  const cust = await getCustomer();
   // 비로그인 손님 → 그냥 튕기지 말고 로그인/회원가입 안내
   if (!cust || cust.store_id !== store.id) {
     return (
@@ -41,13 +43,12 @@ export default async function MyPage({ params }: { params: Promise<{ slug: strin
     );
   }
 
-  // 내 주문 내역 (customer_id 연결분)
-  const { data: orders } = await supabase
-    .from("orders").select("id,total,status,created_at").eq("customer_id", cust.id).order("created_at", { ascending: false });
+  // 주문내역 + 찜한 상품 병렬 조회
+  const [{ data: orders }, wish] = await Promise.all([
+    supabase.from("orders").select("id,total,status,created_at").eq("customer_id", cust.id).order("created_at", { ascending: false }),
+    getWishlistProducts(),
+  ]);
   const list = orders ?? [];
-
-  // 찜한 상품
-  const wish = await getWishlistProducts();
 
   const initial = (cust.name || "회").slice(0, 1);
   const totalSpent = list.filter((o) => o.status !== "취소").reduce((s, o) => s + (o.total || 0), 0);

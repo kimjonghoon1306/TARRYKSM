@@ -71,16 +71,21 @@ export default async function PrettyStorefront({
   const openAuth = sp.auth === "signup" ? "signup" : sp.auth === "login" ? "login" : undefined;
   const supabase = await createClient();
 
-  const { data: store } = await supabase
-    .from("stores")
-    .select("id,name,skin,logo_url,hero_image_url,hero_title,hero_subtitle,pay_bank,pay_note,pay_bank_on,points_on,footer_text,biz_company,biz_owner,biz_number,biz_mailorder,biz_address,biz_phone,biz_email")
-    .eq("slug", slug)
-    .eq("published", true)
-    .maybeSingle();
+  // 쇼핑몰 정보 + 손님 로그인 + 찜목록을 한 번에 병렬 조회 (서로 독립 → 순차 왕복 제거)
+  const [{ data: store }, cust, wishlistIdsRaw] = await Promise.all([
+    supabase
+      .from("stores")
+      .select("id,name,skin,logo_url,hero_image_url,hero_title,hero_subtitle,pay_bank,pay_note,pay_bank_on,points_on,footer_text,biz_company,biz_owner,biz_number,biz_mailorder,biz_address,biz_phone,biz_email")
+      .eq("slug", slug)
+      .eq("published", true)
+      .maybeSingle(),
+    getCustomer(),
+    getWishlistIds(),
+  ]);
   if (!store) notFound();
   const s = store as Store;
 
-  // store.id 확정 후 나머지 3개는 병렬 조회 (순차 왕복 → 동시 = 체감 속도↑)
+  // store.id 확정 후 상품/섹션/리뷰 병렬 조회
   const [{ data: products }, sections, reviewsByProduct] = await Promise.all([
     supabase
       .from("products")
@@ -91,9 +96,8 @@ export default async function PrettyStorefront({
     fetchReviewsByProduct(supabase, s.id),
   ]);
   const items = (products ?? []) as Product[];
-  const cust = await getCustomer();
   const customer = cust && cust.store_id === s.id ? { id: cust.id, name: cust.name, email: cust.email, points: cust.points } : null;
-  const wishlistIds = customer ? await getWishlistIds() : [];
+  const wishlistIds = customer ? wishlistIdsRaw : [];
 
   return (
     <>
