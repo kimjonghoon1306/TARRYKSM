@@ -15,7 +15,9 @@ import {
   ensureDefaultSections,
 } from "@/app/dashboard/[id]/sections/actions";
 
-type Prod = { id: string; name: string; emoji: string | null; image_url: string | null; category: string | null };
+type Prod = { id: string; name: string; emoji: string | null; image_url: string | null; category: string | null; tag?: string | null; created_at?: string | null };
+
+const BEST_RE = /best|베스트|인기|추천|hot|스테디/i;
 
 const input =
   "w-full rounded-xl border border-black/10 bg-white px-3.5 py-2.5 text-sm outline-none focus:border-violet-500 focus:ring-2 focus:ring-violet-500/25 dark:border-white/10 dark:bg-white/[0.04]";
@@ -38,7 +40,20 @@ function BlockPreview({
 }) {
   const c = section.config;
   const wrap: React.CSSProperties = { borderRadius: 12, overflow: "hidden", border: "1px solid rgba(0,0,0,.08)", background: sk.bg };
-  const imgs = products.filter((p) => p.image_url).slice(0, 4);
+  // 진열 기준 반영: 직접선택=고른 상품, 카테고리=그 분류, 베스트=인기태그, 신상=최신순
+  let pool = products;
+  if (section.type === "shelf" || section.type === "grid") {
+    if (c.source === "manual") {
+      pool = (c.product_ids || []).map((id) => products.find((p) => p.id === id)).filter((p): p is Prod => !!p);
+    } else if (c.source === "category" && c.category) {
+      pool = products.filter((p) => p.category === c.category);
+    } else if (c.source === "best") {
+      pool = products.filter((p) => p.tag && BEST_RE.test(p.tag));
+    } else if (c.source === "new" || section.type === "shelf") {
+      pool = [...products].sort((a, b) => (b.created_at || "").localeCompare(a.created_at || ""));
+    }
+  }
+  const imgs = pool.filter((p) => p.image_url).slice(0, 4);
   const thumb = (i: number): React.CSSProperties => ({
     aspectRatio: "1 / 1", borderRadius: 8, overflow: "hidden", background: hexA(sk.color, 0.1),
     backgroundImage: imgs[i]?.image_url ? `url(${imgs[i].image_url})` : undefined,
