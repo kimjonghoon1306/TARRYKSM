@@ -36,7 +36,7 @@ export default async function MyPage({ params }: { params: Promise<{ slug: strin
   const done = list.filter((o) => o.status === "완료").length;
 
   return (
-    <main style={{ minHeight: "100vh", background: "linear-gradient(180deg,#f6f4ff 0%,#faf9f6 340px)", padding: "0 0 80px", color: "#1a1a1a" }}>
+    <main style={{ minHeight: "100vh", background: "linear-gradient(180deg,#eef0f7 0%,#f7f8fb 360px)", padding: "0 0 80px", color: "#1a1a1a" }}>
       <header style={{ display: "flex", alignItems: "center", gap: 12, padding: "16px 24px", background: "rgba(255,255,255,.8)", backdropFilter: "blur(12px)", position: "sticky", top: 0, zIndex: 10, borderBottom: "1px solid rgba(0,0,0,.05)" }}>
         <Link href={`/${slug}`} style={{ fontSize: 14, color: "#555", textDecoration: "none", fontWeight: 600 }}>← {store.name}</Link>
         <b style={{ position: "absolute", left: "50%", transform: "translateX(-50%)", fontSize: 16, color: "#1a1a1a" }}>마이페이지</b>
@@ -45,7 +45,7 @@ export default async function MyPage({ params }: { params: Promise<{ slug: strin
 
       <div style={{ maxWidth: 960, margin: "0 auto", padding: "32px 24px" }}>
         {/* 히어로 프로필 카드 (그라데이션, 꽉찬 느낌) */}
-        <div style={{ position: "relative", overflow: "hidden", borderRadius: 26, padding: "34px 32px", color: "#fff", background: "linear-gradient(135deg,#8b5cf6 0%,#ec4899 100%)", boxShadow: "0 24px 60px -28px rgba(139,92,246,.7)" }}>
+        <div style={{ position: "relative", overflow: "hidden", borderRadius: 26, padding: "34px 32px", color: "#fff", background: "linear-gradient(135deg,#312e81 0%,#4f46e5 55%,#6d28d9 100%)", boxShadow: "0 24px 60px -30px rgba(49,46,129,.6)" }}>
           <div style={{ position: "absolute", right: -40, top: -40, width: 200, height: 200, borderRadius: "50%", background: "rgba(255,255,255,.12)" }} />
           <div style={{ position: "absolute", right: 70, bottom: -60, width: 150, height: 150, borderRadius: "50%", background: "rgba(255,255,255,.08)" }} />
           <div style={{ position: "relative", display: "flex", alignItems: "center", gap: 18 }}>
@@ -61,10 +61,10 @@ export default async function MyPage({ params }: { params: Promise<{ slug: strin
         {/* 통계 4칸 */}
         <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit,minmax(140px,1fr))", gap: 14, marginTop: 18 }}>
           {[
-            { l: "적립금", v: won(cust.points), c: "#8b5cf6", ico: "💰" },
-            { l: "전체 주문", v: `${list.length}건`, c: "#2563eb", ico: "🧾" },
-            { l: "완료", v: `${done}건`, c: "#16a34a", ico: "✅" },
-            { l: "누적 구매액", v: won(totalSpent), c: "#ea580c", ico: "🛍" },
+            { l: "적립금", v: won(cust.points), c: "#4f46e5", ico: "💰" },
+            { l: "전체 주문", v: `${list.length}건`, c: "#1e293b", ico: "🧾" },
+            { l: "완료", v: `${done}건`, c: "#1e293b", ico: "✅" },
+            { l: "누적 구매액", v: won(totalSpent), c: "#1e293b", ico: "🛍" },
           ].map((s) => (
             <div key={s.l} style={{ background: "#fff", borderRadius: 18, padding: "20px 18px", boxShadow: "0 8px 24px -18px rgba(0,0,0,.3)" }}>
               <div style={{ fontSize: 22 }}>{s.ico}</div>
@@ -91,7 +91,7 @@ export default async function MyPage({ params }: { params: Promise<{ slug: strin
 
         {/* 찜한 상품 */}
         <h2 style={{ fontSize: 16, fontWeight: 800, margin: "34px 4px 14px" }}>
-          🩷 찜한 상품{wish.length > 0 && <span style={{ color: "#ec4899", marginLeft: 6 }}>{wish.length}</span>}
+          🩷 찜한 상품{wish.length > 0 && <span style={{ color: "#6d28d9", marginLeft: 6 }}>{wish.length}</span>}
         </h2>
         {wish.length === 0 ? (
           <div style={{ background: "#fff", borderRadius: 20, padding: "44px 20px", textAlign: "center", boxShadow: "0 8px 24px -18px rgba(0,0,0,.3)" }}>
@@ -115,7 +115,7 @@ export default async function MyPage({ params }: { params: Promise<{ slug: strin
                 </div>
                 <div style={{ padding: "12px 14px" }}>
                   <div style={{ fontSize: 13.5, fontWeight: 700, lineHeight: 1.3, overflow: "hidden", display: "-webkit-box", WebkitLineClamp: 2, WebkitBoxOrient: "vertical" }}>{p.name}</div>
-                  <div style={{ fontSize: 14, fontWeight: 800, color: "#8b5cf6", marginTop: 6 }}>{won(p.price)}</div>
+                  <div style={{ fontSize: 14, fontWeight: 800, color: "#4f46e5", marginTop: 6 }}>{won(p.price)}</div>
                 </div>
               </Link>
             ))}
@@ -129,7 +129,7 @@ export default async function MyPage({ params }: { params: Promise<{ slug: strin
             <div style={{ fontSize: 44 }}>🛍</div>
             <div style={{ fontWeight: 800, fontSize: 16, marginTop: 12 }}>아직 주문 내역이 없어요</div>
             <div style={{ fontSize: 13, color: "#8b8f98", marginTop: 5 }}>마음에 드는 상품을 담아보세요!</div>
-            <Link href={`/${slug}`} style={{ display: "inline-block", marginTop: 18, padding: "12px 26px", borderRadius: 999, background: "linear-gradient(135deg,#8b5cf6,#ec4899)", color: "#fff", fontWeight: 800, fontSize: 14, textDecoration: "none" }}>쇼핑하러 가기 →</Link>
+            <Link href={`/${slug}`} style={{ display: "inline-block", marginTop: 18, padding: "12px 26px", borderRadius: 999, background: "linear-gradient(135deg,#4f46e5,#6d28d9)", color: "#fff", fontWeight: 800, fontSize: 14, textDecoration: "none" }}>쇼핑하러 가기 →</Link>
           </div>
         ) : (
           <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
