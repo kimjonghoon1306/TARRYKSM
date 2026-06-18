@@ -41,3 +41,13 @@ export async function adminDeleteStore(storeId: string) {
   await supabase.from("stores").delete().eq("id", storeId);
   revalidatePath("/dashboard/platform");
 }
+
+// 회원 삭제 — 그 회원의 쇼핑몰·프로필·계정을 모두 제거 (RPC, 자기 자신 불가)
+export async function adminDeleteUser(userId: string): Promise<{ ok: boolean; error?: string }> {
+  if (!(await assertAdmin())) return { ok: false, error: "권한이 없습니다" };
+  const supabase = await createClient();
+  const { error } = await supabase.rpc("admin_delete_user", { p_user: userId });
+  if (error) return { ok: false, error: error.message };
+  revalidatePath("/dashboard/platform");
+  return { ok: true };
+}

@@ -3,7 +3,7 @@ import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { getMe } from "@/lib/role";
 import { PRIMARY_DOMAIN } from "@/lib/domains";
-import { RoleToggle, PlanToggle, StoreAdminControls } from "@/components/PlatformControls";
+import { RoleToggle, PlanToggle, StoreAdminControls, DeleteUserButton } from "@/components/PlatformControls";
 
 type Store = {
   id: string;
@@ -130,6 +130,7 @@ export default async function PlatformPage() {
                 <th className="px-4 py-3 text-right font-semibold">쇼핑몰</th>
                 <th className="px-4 py-3 text-right font-semibold">요금제</th>
                 <th className="px-4 py-3 text-right font-semibold">역할</th>
+                <th className="px-4 py-3 text-right font-semibold">관리</th>
               </tr>
             </thead>
             <tbody>
@@ -152,6 +153,9 @@ export default async function PlatformPage() {
                         role={p.role === "admin" ? "admin" : "founder"}
                         isSelf={p.id === me.userId}
                       />
+                    </td>
+                    <td className="px-4 py-3 text-right">
+                      <DeleteUserButton userId={p.id} email={p.email || ""} isSelf={p.id === me.userId} />
                     </td>
                   </tr>
                 ))}

@@ -1,27 +1,81 @@
 "use client";
 
 import { useState, useTransition } from "react";
-import { setUserRole, setUserPlan, adminSetPublished, adminDeleteStore } from "@/app/dashboard/platform/actions";
+import { setUserRole, setUserPlan, adminSetPublished, adminDeleteStore, adminDeleteUser } from "@/app/dashboard/platform/actions";
 
-// 회원 요금제 변경
-export function PlanToggle({ userId, plan }: { userId: string; plan: string }) {
-  const [cur, setCur] = useState(plan === "basic" || plan === "pro" ? plan : "free");
+// 회원 삭제 (관리자) — 쇼핑몰·프로필·계정 모두 제거. 자기 자신은 불가.
+export function DeleteUserButton({ userId, email, isSelf }: { userId: string; email: string; isSelf: boolean }) {
   const [pending, start] = useTransition();
+  const [deleted, setDeleted] = useState(false);
+  const [err, setErr] = useState("");
+  if (isSelf) return <span className="text-xs text-neutral-300 dark:text-neutral-600">—</span>;
+  if (deleted) return <span className="text-xs text-rose-500">삭제됨</span>;
   return (
-    <select
-      value={cur}
-      disabled={pending}
-      onChange={(e) => {
-        const next = e.target.value as "free" | "basic" | "pro";
-        setCur(next);
-        start(() => setUserPlan(userId, next).then(() => {}));
-      }}
-      className="rounded-lg border-0 bg-black/5 px-2.5 py-1 text-xs font-bold text-neutral-600 outline-none ring-1 ring-black/5 dark:bg-white/10 dark:text-neutral-300 dark:ring-white/10"
-    >
-      <option value="free">무료</option>
-      <option value="basic">베이직</option>
-      <option value="pro">프로</option>
-    </select>
+    <span className="inline-flex items-center gap-1.5">
+      <button
+        disabled={pending}
+        onClick={() => {
+          if (!confirm(`'${email}' 회원을 삭제할까요?\n이 회원의 쇼핑몰·상품·주문 데이터가 모두 삭제되며 되돌릴 수 없어요.`)) return;
+          setErr("");
+          start(() =>
+            adminDeleteUser(userId).then((r) => {
+              if (r.ok) setDeleted(true);
+              else setErr(r.error || "삭제 실패");
+            })
+          );
+        }}
+        className="rounded-lg px-2 py-1 text-xs text-neutral-400 transition hover:bg-rose-500/10 hover:text-rose-500 disabled:opacity-50"
+        title="회원 삭제"
+      >
+        {pending ? "삭제 중…" : "🗑"}
+      </button>
+      {err && <span className="text-xs text-rose-500" title={err}>실패</span>}
+    </span>
+  );
+}
+
+// 회원 요금제 변경 — 드롭다운으로 고르고 저장 버튼으로 확정 (저장 피드백 표시)
+export function PlanToggle({ userId, plan }: { userId: string; plan: string }) {
+  const init = plan === "basic" || plan === "pro" ? plan : "free";
+  const [cur, setCur] = useState(init);
+  const [saved, setSaved] = useState(init); // 마지막으로 저장된 값
+  const [pending, start] = useTransition();
+  const [done, setDone] = useState(false);
+  const dirty = cur !== saved;
+  return (
+    <div className="flex items-center gap-1.5">
+      <select
+        value={cur}
+        disabled={pending}
+        onChange={(e) => {
+          setCur(e.target.value);
+          setDone(false);
+        }}
+        className="rounded-lg border-0 bg-black/5 px-2.5 py-1 text-xs font-bold text-neutral-600 outline-none ring-1 ring-black/5 dark:bg-white/10 dark:text-neutral-300 dark:ring-white/10"
+      >
+        <option value="free">무료</option>
+        <option value="basic">베이직</option>
+        <option value="pro">프로</option>
+      </select>
+      {dirty ? (
+        <button
+          disabled={pending}
+          onClick={() =>
+            start(() =>
+              setUserPlan(userId, cur as "free" | "basic" | "pro").then(() => {
+                setSaved(cur);
+                setDone(true);
+              })
+            )
+          }
+          className="rounded-lg bg-violet-600 px-2.5 py-1 text-xs font-bold text-white transition hover:brightness-110 disabled:opacity-50"
+        >
+          {pending ? "저장 중…" : "저장"}
+        </button>
+      ) : done ? (
+        <span className="text-xs font-bold text-emerald-600 dark:text-emerald-400">✓ 저장됨</span>
+      ) : null}
+    </div>
   );
 }
 
