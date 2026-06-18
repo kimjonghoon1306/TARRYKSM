@@ -113,9 +113,15 @@
 .cine-mall{aspect-ratio:4/5;border-radius:12px;overflow:hidden;background:var(--surf);border:1px solid var(--line-2);box-shadow:var(--shadow);opacity:0;transform:scale(.3) translateY(60px);filter:hue-rotate(var(--h,0deg))}
 /* 등장(transform)과 둥둥 떠다님(translate)은 서로 다른 속성이라 충돌 없이 합성됨 → 더 역동적 */
 .sc-multiply.on .cine-mall{animation:mallIn .65s var(--ease) var(--d,0s) forwards,mallFloat var(--fdur,4s) ease-in-out var(--fd,1.4s) infinite}
-.cm-bar{height:22%;background:var(--brand);opacity:.9}
+.cm-bar{height:22%;background:var(--brand);opacity:.95;display:flex;align-items:center;justify-content:space-between;padding:0 8px}
+.cm-blogo{width:16px;height:16px;border-radius:5px;background:rgba(255,255,255,.92);box-shadow:0 1px 3px rgba(0,0,0,.18)}
+.cm-bcart{width:11px;height:11px;border-radius:3px;border:2px solid rgba(255,255,255,.85)}
+.cm-bar-sm .cm-blogo{width:12px;height:12px;border-radius:4px}
+.cm-bar-sm .cm-bcart{width:9px;height:9px}
 .cm-body{padding:9px;display:flex;flex-direction:column;gap:6px}
-.cm-hero{height:26px;border-radius:6px;background:rgba(109,94,252,.18)}
+.cm-hero{height:30px;border-radius:6px;background:linear-gradient(120deg,rgba(109,94,252,.26),rgba(109,94,252,.1));display:flex;flex-direction:column;justify-content:center;gap:4px;padding:0 9px}
+.cm-hbadge{width:34%;height:5px;border-radius:3px;background:var(--brand);opacity:.85}
+.cm-hline{width:60%;height:4px;border-radius:3px;background:rgba(109,94,252,.3)}
 .cm-tiles{display:grid;grid-template-columns:1fr 1fr;gap:6px}
 .cm-tiles i{aspect-ratio:1;border-radius:6px;background:rgba(109,94,252,.14);display:grid;place-items:center;font-size:13px;font-style:normal}
 

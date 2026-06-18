@@ -21,21 +21,30 @@ function buildCineProgress(){
   el.innerHTML = CINE.map((_,i)=>`<div class="seg" onclick="cineGo(${i})"><span class="seg-fill"></span></div>`).join('');
 }
 
-/* 무한분양 씬 — 더 많은 매장이 색·레이아웃·이미지를 달리하며 쏟아져 둥둥 떠다님 */
+/* 무한분양 씬 — 업종별로 통일된 미니 "쇼핑몰"이 대량 증식해 둥둥 떠다님
+   (핵심: 한 카드 = 한 업종 상품 + 매장 헤더바 → 사진 모음이 아니라 진짜 쇼핑몰처럼) */
 function buildCineMalls(){
   const el = document.getElementById('cineMalls');
   if(!el) return;
   const P = (n)=> `/landing/img/products/${n}.webp`;
   const F = (n)=> `/landing/img/food/${n}.webp`;
-  const IMG = [
-    P('candle'),P('sneaker'),P('serum'),P('tote'),P('watch'),P('earbuds'),P('sunglasses'),P('mug'),
-    P('cap'),P('plant'),P('perfume'),P('lipstick'),P('backpack'),P('vase'),P('rug'),P('keyboard'),
-    P('camera'),P('dress'),P('necklace'),P('diffuser'),P('coffeebean'),P('tumbler'),P('moodlamp'),P('knit'),
-    F('fruit_strawberry'),F('bakery_croissant'),F('meat_beef'),F('produce_broccoli'),F('dairy_milk'),F('gourmet_wine'),
-    F('traditional_kimchi'),F('seafood_prawn'),F('fruit_grape'),F('bakery_bread'),F('dairy_cheese'),F('produce_carrot')
+  // 업종(테마)별 상품 묶음 — 한 매장은 한 테마 안에서만 상품을 보여줌
+  const THEMES = [
+    [P('sneaker'),P('tote'),P('cap'),P('dress'),P('knit'),P('coat'),P('scarf'),P('backpack')],        // 패션
+    [P('serum'),P('perfume'),P('lipstick'),P('cushion'),P('mascara'),P('sunscreen'),P('cleanser'),P('handcream')], // 뷰티
+    [P('candle'),P('mug'),P('vase'),P('rug'),P('plant'),P('diffuser'),P('moodlamp'),P('pillow')],      // 리빙
+    [P('earbuds'),P('keyboard'),P('camera'),P('speaker'),P('smartwatch'),P('mouse'),P('charger')],     // 테크
+    [P('watch'),P('sunglasses'),P('necklace'),P('wallet'),P('earring'),P('ring'),P('bracelet'),P('belt')], // 액세서리
+    [F('produce_broccoli'),F('produce_carrot'),F('produce_spinach'),F('produce_mushroom'),F('produce_garlic')], // 농산물
+    [F('fruit_strawberry'),F('fruit_apple'),F('fruit_grape'),F('fruit_peach'),F('fruit_mango'),F('fruit_tangerine')], // 과일
+    [F('bakery_croissant'),F('bakery_bread'),F('bakery_baguette'),F('bakery_cookie'),F('bakery_cupcake')], // 베이커리
+    [F('meat_beef'),F('meat_porkbelly'),F('meat_chicken'),F('meat_sausage'),F('meat_striploin')],     // 정육
+    [F('gourmet_wine'),F('gourmet_chocolate'),F('gourmet_cheeseplatter'),F('gourmet_oliveoil'),F('gourmet_teaset')], // 고메
+    [F('dairy_milk'),F('dairy_cheese'),F('dairy_yogurt'),F('dairy_butter'),F('dairy_icecream')],      // 유제품
+    [F('seafood_prawn'),F('seafood_oyster'),F('seafood_squid'),F('seafood_hairtail'),F('seafood_myeongnan')] // 수산
   ];
   const N = 30;                                        // 처음 14개 → 30개로 대폭 증식
-  const NV = 8;                                        // 8가지 레이아웃 변형(스킨 다양화 반영)
+  const NV = 6;                                        // 매장 레이아웃 6변형 (전부 헤더바 있는 쇼핑몰 형태)
   let html = '';
   for(let i=0;i<N;i++){
     const hue = Math.round((360/N)*i);
@@ -43,24 +52,25 @@ function buildCineMalls(){
     const fd = (1.2 + (i%7)*0.18).toFixed(2);          // 등장 후 제각각 떠다니기 시작
     const fdur = (3.6 + (i%5)*0.5).toFixed(2);
     const v = i % NV;
-    const e = (k)=> `<img class="cm-img" src="${IMG[(i*3+k) % IMG.length]}" alt="" loading="lazy">`;
+    const theme = THEMES[i % THEMES.length];           // 이 매장의 업종
+    const e = (k)=> `<img class="cm-img" src="${theme[(i + k) % theme.length]}" alt="" loading="lazy">`;
+    // 매장 상단바(로고+장바구니) — 모든 카드가 진짜 쇼핑몰 헤더처럼 보이도록
+    const BAR   = `<div class="cm-bar"><span class="cm-blogo"></span><span class="cm-bcart"></span></div>`;
+    const BARSM = `<div class="cm-bar cm-bar-sm"><span class="cm-blogo"></span><span class="cm-bcart"></span></div>`;
+    const HERO  = `<div class="cm-hero"><span class="cm-hbadge"></span><span class="cm-hline"></span></div>`;
     let inner;
-    if(v===0){            // 클래식: 바 + 히어로 + 타일2
-      inner = `<div class="cm-bar"></div><div class="cm-body"><div class="cm-hero"></div><div class="cm-tiles"><i>${e(0)}</i><i>${e(1)}</i></div></div>`;
+    if(v===0){            // 클래식: 바 + 배너 + 타일2
+      inner = `${BAR}<div class="cm-body">${HERO}<div class="cm-tiles"><i>${e(0)}</i><i>${e(1)}</i></div></div>`;
     } else if(v===1){     // 카탈로그: 바 + 타일4(2×2)
-      inner = `<div class="cm-bar"></div><div class="cm-body"><div class="cm-tiles cm-4"><i>${e(0)}</i><i>${e(1)}</i><i>${e(2)}</i><i>${e(3)}</i></div></div>`;
-    } else if(v===2){     // 배너형: 큰 히어로 + 와이드 타일
-      inner = `<div class="cm-body cm-banner"><div class="cm-hero cm-hero-lg"><b>${e(0)}</b></div><div class="cm-tiles cm-wide"><i>${e(1)}</i></div></div>`;
-    } else if(v===3){     // 브랜드형: 둥근 로고 + 라인 + 타일2
-      inner = `<div class="cm-body"><div class="cm-brand"><span class="cm-dot"></span><span class="cm-lines"><i></i><i></i></span></div><div class="cm-tiles"><i>${e(0)}</i><i>${e(1)}</i></div></div>`;
-    } else if(v===4){     // 리스트형: 얇은 바 + 가로 행 3
-      inner = `<div class="cm-bar cm-bar-sm"></div><div class="cm-body"><div class="cm-rows"><span>${e(0)}</span><span>${e(1)}</span><span>${e(2)}</span></div></div>`;
-    } else if(v===5){     // 풀블리드: 큰 단일 상품 + 하단 캡션바
-      inner = `<div class="cm-body cm-solo"><div class="cm-big">${e(0)}</div><div class="cm-cap"></div></div>`;
-    } else if(v===6){     // 매거진형: 세로 큰 이미지 + 얇은 캡션 (신규 레이아웃)
-      inner = `<div class="cm-body cm-mag"><div class="cm-mag-img">${e(0)}</div><div class="cm-cap cm-cap-sm"></div></div>`;
-    } else {              // 갤러리형: 바 + 타일3 가로 (신규 레이아웃)
-      inner = `<div class="cm-bar cm-bar-sm"></div><div class="cm-body"><div class="cm-tiles cm-3"><i>${e(0)}</i><i>${e(1)}</i><i>${e(2)}</i></div></div>`;
+      inner = `${BAR}<div class="cm-body"><div class="cm-tiles cm-4"><i>${e(0)}</i><i>${e(1)}</i><i>${e(2)}</i><i>${e(3)}</i></div></div>`;
+    } else if(v===2){     // 배너형: 바 + 큰 히어로(상품) + 와이드 타일
+      inner = `${BAR}<div class="cm-body cm-banner"><div class="cm-hero cm-hero-lg"><b>${e(0)}</b></div><div class="cm-tiles cm-wide"><i>${e(1)}</i></div></div>`;
+    } else if(v===3){     // 브랜드형: 바 + 로고/라인 + 타일2
+      inner = `${BARSM}<div class="cm-body"><div class="cm-brand"><span class="cm-dot"></span><span class="cm-lines"><i></i><i></i></span></div><div class="cm-tiles"><i>${e(0)}</i><i>${e(1)}</i></div></div>`;
+    } else if(v===4){     // 리스트형: 바 + 가로 행 3 (검색바 느낌)
+      inner = `${BARSM}<div class="cm-body"><div class="cm-rows"><span>${e(0)}</span><span>${e(1)}</span><span>${e(2)}</span></div></div>`;
+    } else {              // 갤러리형: 바 + 배너 + 타일3
+      inner = `${BAR}<div class="cm-body">${HERO}<div class="cm-tiles cm-3"><i>${e(0)}</i><i>${e(1)}</i><i>${e(2)}</i></div></div>`;
     }
     html += `<div class="cine-mall cm-v${v}" style="--h:${hue}deg;--d:${d}s;--fd:${fd}s;--fdur:${fdur}s">${inner}</div>`;
   }
