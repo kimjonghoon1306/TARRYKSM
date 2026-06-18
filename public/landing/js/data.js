@@ -271,7 +271,18 @@ const SKIN_THEME = {
 const LIFESTYLE = { cats: CATS, items: PRODUCTS };
 function themeFor(skinId){ return THEMES[SKIN_THEME[skinId]] || LIFESTYLE; }
 // 스킨 대표 썸네일 — 그 스킨 업태에 맞는 상품 사진 (스킨마다 다르게)
+// 범용 스킨 대표 사진 — 스킨 무드에 맞춰 전부 다른 사진 (식품 스킨은 테마 상품으로 자동)
+const SKIN_PREVIEW = {
+  mono:'/landing/img/products/notebook.webp', noir:'/landing/img/products/perfume.webp',
+  bloom:'/landing/img/products/bouquet.webp', citrus:'/landing/img/products/sneaker.webp',
+  azure:'/landing/img/products/tumbler.webp', mocha:'/landing/img/products/coffeebean.webp',
+  grape:'/landing/img/products/earbuds.webp', pine:'/landing/img/products/plant.webp',
+  midnight:'/landing/img/products/watch.webp', coral:'/landing/img/products/candle.webp',
+  lavender:'/landing/img/products/diffuser.webp', slate:'/landing/img/products/wallet.webp',
+  berry:'/landing/img/products/lipstick.webp', crimson:'/landing/img/products/backpack.webp',
+};
 function skinThumb(skinId){
+  if(SKIN_PREVIEW[skinId]) return SKIN_PREVIEW[skinId];
   const items = themeFor(skinId).items;
   const idx = SKINS.findIndex(s => s.id === skinId);
   return ((items[(idx < 0 ? 0 : idx) % items.length]) || {}).img || '';

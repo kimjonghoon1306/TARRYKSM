@@ -30,12 +30,21 @@ const SKIN_THUMB: Record<string, string> = {
   orchard: `${FOOD}/fruit_apple.webp`, hanok: `${FOOD}/traditional_doenjang.webp`,
   market: `${FOOD}/banchan_anchovy.webp`, sprout: `${FOOD}/produce_ssam.webp`,
   dairy: `${FOOD}/dairy_milk.webp`, gourmet: `${FOOD}/gourmet_giftset.webp`,
-  // 범용
-  mono: `${PROD}/candle.webp`, noir: `${PROD}/watch.webp`, bloom: `${PROD}/serum.webp`,
-  citrus: `${PROD}/sneaker.webp`, azure: `${PROD}/earbuds.webp`, mocha: `${PROD}/mug.webp`,
-  grape: `${PROD}/sunglasses.webp`, pine: `${PROD}/plant.webp`, midnight: `${PROD}/earbuds.webp`,
-  coral: `${PROD}/cap.webp`, lavender: `${PROD}/serum.webp`, slate: `${PROD}/tote.webp`,
-  berry: `${PROD}/sunglasses.webp`, crimson: `${PROD}/sneaker.webp`,
+  // 범용 — 스킨 무드에 맞춰 전부 다른 대표 사진
+  mono: `${PROD}/notebook.webp`,   // 흑백 미니멀 → 노트
+  noir: `${PROD}/perfume.webp`,    // 골드 럭셔리 → 향수
+  bloom: `${PROD}/bouquet.webp`,   // 파스텔 큐트 → 꽃다발
+  citrus: `${PROD}/sneaker.webp`,  // Z세대 팝 → 스니커즈
+  azure: `${PROD}/tumbler.webp`,   // 청량 블루 → 텀블러
+  mocha: `${PROD}/coffeebean.webp`,// 뉴트럴 우드 → 원두
+  grape: `${PROD}/earbuds.webp`,   // 사이버 퍼플 → 이어폰
+  pine: `${PROD}/plant.webp`,      // 내추럴 그린 → 식물
+  midnight: `${PROD}/watch.webp`,  // 테크 다크 → 시계
+  coral: `${PROD}/candle.webp`,    // 코랄 웜 → 캔들
+  lavender: `${PROD}/diffuser.webp`,// 드리미 소프트 → 디퓨저
+  slate: `${PROD}/wallet.webp`,    // 쿨 그레이 프리미엄 → 지갑
+  berry: `${PROD}/lipstick.webp`,  // 베리 볼드 → 립스틱
+  crimson: `${PROD}/backpack.webp`,// 스포티 액티브 → 백팩
 };
 
 // hex 색에 투명도 적용 (#rrggbb + alpha → rgba)
