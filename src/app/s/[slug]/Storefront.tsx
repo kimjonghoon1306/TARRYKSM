@@ -44,6 +44,29 @@ type CartLine = {
 
 const BEST_RE = /best|베스트|인기|추천|hot|스테디/i;
 
+// 전체 상품 그리드 — 상품이 많으면 페이지 번호로 나눠서 보여줌
+function PagedGrid({ items, render, perPage = 12 }: { items: Product[]; render: (p: Product) => React.ReactNode; perPage?: number }) {
+  const [page, setPage] = useState(1);
+  const pages = Math.ceil(items.length / perPage);
+  useEffect(() => { setPage(1); }, [items.length]);
+  const p = Math.min(page, Math.max(pages, 1));
+  const view = items.slice((p - 1) * perPage, (p - 1) * perPage + perPage);
+  return (
+    <>
+      <div className="sf-grid">{view.map(render)}</div>
+      {pages > 1 && (
+        <div className="sf-pager">
+          <button type="button" className="sf-page-arrow" disabled={p === 1} onClick={() => setPage(p - 1)} aria-label="이전 페이지">‹</button>
+          {Array.from({ length: pages }, (_, i) => i + 1).map((n) => (
+            <button type="button" key={n} className={"sf-page-num" + (n === p ? " on" : "")} onClick={() => setPage(n)}>{n}</button>
+          ))}
+          <button type="button" className="sf-page-arrow" disabled={p === pages} onClick={() => setPage(p + 1)} aria-label="다음 페이지">›</button>
+        </div>
+      )}
+    </>
+  );
+}
+
 // 선반 가로 스크롤 래퍼 — 데스크탑에서 좌우 화살표로 넘기고, 모바일은 터치 스크롤.
 function ShelfRail({ children }: { children: React.ReactNode }) {
   const ref = useRef<HTMLDivElement>(null);
@@ -503,7 +526,7 @@ export default function Storefront({
             <h2>{c.title || "전체 상품"}</h2>
             <span className="sf-count">{items.length}개</span>
           </div>
-          <div className="sf-grid">{items.map(renderCard)}</div>
+          <PagedGrid items={items} render={renderCard} />
         </section>
       );
     }
@@ -595,7 +618,7 @@ export default function Storefront({
                       <h2>전체 상품</h2>
                       <span className="sf-count">{products.length}개</span>
                     </div>
-                    <div className="sf-grid">{products.map(renderCard)}</div>
+                    <PagedGrid items={products} render={renderCard} />
                   </section>
                 )}
               </>
@@ -611,7 +634,7 @@ export default function Storefront({
                   <h2>{activeCat === "전체" ? "검색 결과" : activeCat}</h2>
                   <span className="sf-count">{shown.length}개</span>
                 </div>
-                <div className="sf-grid">{shown.map(renderCard)}</div>
+                <PagedGrid items={shown} render={renderCard} />
               </>
             )}
           </>
@@ -695,7 +718,7 @@ export default function Storefront({
                 <h2>전체 상품</h2>
                 <span className="sf-count">{products.length}개</span>
               </div>
-              <div className="sf-grid">{products.map(renderCard)}</div>
+              <PagedGrid items={products} render={renderCard} />
             </section>
           </>
         ) : shown.length === 0 ? (
@@ -711,7 +734,7 @@ export default function Storefront({
               <h2>{activeCat === "전체" ? "전체 상품" : activeCat}</h2>
               <span className="sf-count">{shown.length}개</span>
             </div>
-            <div className="sf-grid">{shown.map(renderCard)}</div>
+            <PagedGrid items={shown} render={renderCard} />
           </>
         )}
         </>

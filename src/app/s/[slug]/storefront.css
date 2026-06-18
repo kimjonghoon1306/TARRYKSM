@@ -291,6 +291,17 @@
 /* 카드는 항상 또렷하게 표시 (등장 fade 애니메이션 제거 — 오른쪽 카드가 흐릿하게 남던 문제) */
 .sf-card { opacity: 1; }
 
+/* 전체 상품 페이지 번호 */
+.sf-pager { display: flex; flex-wrap: wrap; align-items: center; justify-content: center; gap: 6px; margin-top: 26px; }
+.sf-page-num, .sf-page-arrow {
+  min-width: 38px; height: 38px; padding: 0 10px; border-radius: 10px;
+  border: 1px solid var(--s-line); background: var(--s-surf, #fff); color: var(--s-ink);
+  font-size: 14px; font-weight: 700; cursor: pointer; transition: .15s;
+}
+.sf-page-num:hover, .sf-page-arrow:not(:disabled):hover { border-color: var(--s-brand); }
+.sf-page-num.on { background: var(--s-brand); color: var(--s-brand-ink); border-color: var(--s-brand); }
+.sf-page-arrow:disabled { opacity: .4; cursor: default; }
+
 /* 카드 썸네일 hover 줌 */
 .sf-thumb { overflow: hidden; }
 .sf-thumb-img { transition: transform .5s var(--ease); }
