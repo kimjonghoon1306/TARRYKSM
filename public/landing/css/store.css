@@ -39,9 +39,17 @@
 .sth-art{position:absolute;right:-10px;bottom:-20px;font-size:170px;line-height:1;opacity:var(--s-art-op,.16);pointer-events:none;transform:rotate(-8deg)}
 
 /* 카테고리 레일 */
-/* 실제 쇼핑몰(React .sf-cats)과 동일하게 줄바꿈으로 카테고리 전부 표시 (마우스 미리보기서도 안 잘림) */
-.st-rail{display:flex;flex-wrap:wrap;gap:9px;padding:18px 22px 4px}
+/* 카테고리: 한 줄 가로스크롤(옆으로 넘김) — 마우스용 좌우 화살표 제공 */
+.st-rail-wrap{position:relative}
+.st-rail{display:flex;flex-wrap:nowrap;gap:9px;padding:18px 22px 4px;overflow-x:auto;scrollbar-width:none;-webkit-overflow-scrolling:touch;scroll-behavior:smooth}
 .st-rail::-webkit-scrollbar{height:0}
+.st-rail-arrow{position:absolute;top:calc(50% + 5px);transform:translateY(-50%);z-index:5;width:32px;height:32px;border-radius:50%;border:1px solid var(--s-line);background:var(--s-surf,#fff);color:var(--s-ink);font-size:19px;line-height:1;cursor:pointer;display:flex;align-items:center;justify-content:center;box-shadow:0 5px 14px rgba(0,0,0,.16);opacity:0;transition:opacity .18s,transform .15s}
+.st-rail-arrow.prev{left:8px}
+.st-rail-arrow.next{right:8px}
+.st-rail-wrap:hover .st-rail-arrow{opacity:1}
+.st-rail-arrow:hover{transform:translateY(-50%) scale(1.1)}
+.st-rail-arrow:active{transform:translateY(-50%) scale(.9)}
+@media(max-width:640px){.st-rail-arrow{display:none}}
 .rail-chip{flex-shrink:0;font-size:12px;font-weight:600;padding:8px 16px;border-radius:99px;border:1px solid var(--s-line);color:var(--s-sub);white-space:nowrap;cursor:pointer;transition:transform .16s var(--ease),color .16s,border-color .16s,background .16s,box-shadow .16s}
 .rail-chip:hover{color:var(--s-ink);border-color:var(--s-brand);transform:translateY(-2px);box-shadow:0 6px 14px -8px var(--s-brand)}
 .rail-chip:active{transform:translateY(0) scale(.96)}

@@ -164,8 +164,18 @@
 .sf-hero.has-img p { opacity: .9; }
 
 .sf-wrap { max-width: 1080px; margin: 0 auto; padding: 8px 18px 80px; }
-.sf-cats { display: flex; flex-wrap: wrap; gap: 8px; padding: 14px 0 20px; }
-.sf-chip { padding: 8px 15px; border: 1px solid var(--s-line); border-radius: var(--s-rpill); background: var(--s-surf); color: var(--s-sub); font-size: 13px; font-weight: 600; cursor: pointer; transition: transform .16s var(--ease), color .16s, border-color .16s, background .16s, box-shadow .16s; }
+/* 카테고리: 한 줄 가로스크롤(옆으로 넘김) + 마우스용 좌우 화살표 */
+.sf-catrail-wrap { position: relative; flex: 1; min-width: 0; }
+.sf-cats { display: flex; flex-wrap: nowrap; gap: 8px; padding: 14px 0 20px; overflow-x: auto; scrollbar-width: none; -webkit-overflow-scrolling: touch; scroll-behavior: smooth; }
+.sf-cats::-webkit-scrollbar { height: 0; }
+.sf-cat-arrow { position: absolute; top: calc(50% - 3px); transform: translateY(-50%); z-index: 5; width: 34px; height: 34px; border-radius: 50%; border: 1px solid var(--s-line); background: var(--s-surf, #fff); color: var(--s-ink); font-size: 20px; line-height: 1; cursor: pointer; display: flex; align-items: center; justify-content: center; box-shadow: 0 5px 14px rgba(0, 0, 0, .16); opacity: 0; transition: opacity .18s, transform .15s; }
+.sf-cat-arrow.prev { left: -6px; }
+.sf-cat-arrow.next { right: -6px; }
+.sf-catrail-wrap:hover .sf-cat-arrow { opacity: 1; }
+.sf-cat-arrow:hover { transform: translateY(-50%) scale(1.1); }
+.sf-cat-arrow:active { transform: translateY(-50%) scale(.9); }
+@media (max-width: 640px) { .sf-cat-arrow { display: none; } }
+.sf-chip { flex-shrink: 0; padding: 8px 15px; border: 1px solid var(--s-line); border-radius: var(--s-rpill); background: var(--s-surf); color: var(--s-sub); font-size: 13px; font-weight: 600; cursor: pointer; transition: transform .16s var(--ease), color .16s, border-color .16s, background .16s, box-shadow .16s; }
 .sf-chip:hover { color: var(--s-ink); border-color: var(--s-brand); transform: translateY(-2px); box-shadow: 0 6px 14px -8px var(--s-brand); }
 .sf-chip:active { transform: translateY(0) scale(.96); }
 .sf-chip.on { background: var(--s-brand); color: var(--s-brand-ink); border-color: var(--s-brand); }

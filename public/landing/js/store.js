@@ -222,7 +222,11 @@ function buildStore(st){
       <button class="ssb-x" data-act="toggle-search">✕</button>
     </div>
 
-    <div class="st-rail">${railHTML(st)}</div>
+    <div class="st-rail-wrap">
+      <button class="st-rail-arrow prev" data-act="railScroll" data-dir="-1" aria-label="이전 카테고리">‹</button>
+      <div class="st-rail">${railHTML(st)}</div>
+      <button class="st-rail-arrow next" data-act="railScroll" data-dir="1" aria-label="다음 카테고리">›</button>
+    </div>
 
     <div class="st-shelf">
       <div class="sh-head"><h3 class="sh-title">이번 주 셀렉션</h3><a data-act="reset">전체보기 →</a></div>
@@ -295,6 +299,7 @@ function onStoreClick(e){
     case 'coupon-clear': st.coupon=null; st.couponMsg=''; st.couponErr=false; refreshCart(st); break;
     case 'checkout':   checkout(st); break;
     case 'scroll-shelf': st.root.querySelector('.st-shelf')?.scrollIntoView({behavior:'smooth',block:'start'}); break;
+    case 'railScroll': { const r=st.root.querySelector('.st-rail'); if(r) r.scrollBy({left:(+a.dataset.dir||0)*220,behavior:'smooth'}); break; }
     case 'close':      closeOverlay(st); break;
   }
 }

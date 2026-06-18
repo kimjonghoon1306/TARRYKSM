@@ -80,6 +80,19 @@ function ShelfRail({ children }: { children: React.ReactNode }) {
   );
 }
 
+// 카테고리 칩 — 한 줄 가로스크롤(옆으로 넘김) + 마우스용 좌우 화살표
+function CatRail({ children }: { children: React.ReactNode }) {
+  const ref = useRef<HTMLDivElement>(null);
+  const by = (dir: number) => ref.current?.scrollBy({ left: dir * 220, behavior: "smooth" });
+  return (
+    <div className="sf-catrail-wrap">
+      <button type="button" className="sf-cat-arrow prev" onClick={() => by(-1)} aria-label="이전 카테고리">‹</button>
+      <div className="sf-cats" ref={ref}>{children}</div>
+      <button type="button" className="sf-cat-arrow next" onClick={() => by(1)} aria-label="다음 카테고리">›</button>
+    </div>
+  );
+}
+
 type Store = {
   id: string;
   name: string;
@@ -616,7 +629,7 @@ export default function Storefront({
             {/* 카테고리 칩 — 손님이 눌러 카테고리별로 둘러보기 */}
             {products.length > 0 && cats.length > 1 && (
               <div className="sf-toolbar">
-                <div className="sf-cats">
+                <CatRail>
                   {cats.map((c) => (
                     <button
                       key={c}
@@ -626,7 +639,7 @@ export default function Storefront({
                       {c}
                     </button>
                   ))}
-                </div>
+                </CatRail>
               </div>
             )}
 
