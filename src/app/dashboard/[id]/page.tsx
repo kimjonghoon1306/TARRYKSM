@@ -86,6 +86,15 @@ export default async function StoreAdmin({
   }[];
 
   const storeCats = await listStoreCategories(id);
+  // 기존 상품들이 이미 쓰는 카테고리 (관리 목록 자동 채우기용)
+  const { data: catRows } = await supabase.from("products").select("category").eq("store_id", id);
+  const productCats = [
+    ...new Set(
+      ((catRows as { category: string | null }[] | null) ?? [])
+        .map((r) => (r.category || "").trim())
+        .filter((c) => c && c !== "전체" && c !== "ALL")
+    ),
+  ];
 
   const card =
     "rounded-2xl border border-black/5 bg-white p-5 shadow-sm dark:border-white/10 dark:bg-white/[0.03]";
@@ -301,7 +310,7 @@ export default async function StoreAdmin({
         <p className="mb-4 text-xs text-neutral-500">
           쇼핑몰 카테고리를 직접 만들고 순서·이름을 바꾸세요. 상품 등록 시 여기서 고른 카테고리로 분류됩니다.
         </p>
-        <CategoryManager storeId={s.id} initial={storeCats} />
+        <CategoryManager storeId={s.id} initial={storeCats} productCats={productCats} />
       </section>
 
       {/* 결제 설정 */}

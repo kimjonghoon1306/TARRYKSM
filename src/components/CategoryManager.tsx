@@ -6,24 +6,36 @@ import {
   renameStoreCategory,
   deleteStoreCategory,
   moveStoreCategory,
-  seedCategoriesFromProducts,
+  seedStoreCategories,
   type StoreCat,
 } from "@/app/dashboard/[id]/categories/actions";
 
-export default function CategoryManager({ storeId, initial }: { storeId: string; initial: StoreCat[] }) {
-  const [cats, setCats] = useState<StoreCat[]>(initial);
+export default function CategoryManager({
+  storeId,
+  initial,
+  productCats = [],
+}: {
+  storeId: string;
+  initial: StoreCat[];
+  productCats?: string[];
+}) {
+  // 관리 목록이 비어있고 기존 상품 카테고리가 있으면 즉시 그걸 보여주고(낙관적) 백그라운드로 시딩
+  const needSeed = initial.length === 0 && productCats.length > 0;
+  const [cats, setCats] = useState<StoreCat[]>(
+    initial.length ? initial : productCats.map((n, i) => ({ id: "tmp-" + i, name: n, position: i }))
+  );
   const [name, setName] = useState("");
   const [editing, setEditing] = useState<string | null>(null);
   const [editVal, setEditVal] = useState("");
   const [err, setErr] = useState("");
-  const [seeding, setSeeding] = useState(initial.length === 0);
+  const [seeding, setSeeding] = useState(needSeed);
   const [pending, start] = useTransition();
 
-  // 관리 목록이 비어있으면 기존 상품들이 쓰던 카테고리를 자동으로 불러와 채움
+  // 비어있으면 기존 상품 카테고리를 관리 목록(실제 id 부여)으로 등록
   useEffect(() => {
-    if (initial.length === 0) {
-      seedCategoriesFromProducts(storeId).then((list) => {
-        setCats(list);
+    if (needSeed) {
+      seedStoreCategories(storeId, productCats).then((list) => {
+        if (list.length) setCats(list);
         setSeeding(false);
       });
     }
@@ -84,16 +96,16 @@ export default function CategoryManager({ storeId, initial }: { storeId: string;
           placeholder="새 카테고리 (예: 신상, 베스트, 패션)"
           className="min-w-[180px] flex-1 rounded-xl border border-black/10 bg-white px-4 py-2.5 text-sm outline-none focus:border-violet-500 focus:ring-2 focus:ring-violet-500/25 dark:border-white/10 dark:bg-white/[0.04]"
         />
-        <button onClick={add} disabled={pending} className="press-glow rounded-xl bg-gradient-to-r from-violet-500 to-pink-500 px-4 py-2.5 text-sm font-semibold text-white shadow-lg shadow-violet-500/25 transition hover:brightness-105 disabled:opacity-50">＋ 추가</button>
+        <button onClick={add} disabled={seeding || pending} className="press-glow rounded-xl bg-gradient-to-r from-violet-500 to-pink-500 px-4 py-2.5 text-sm font-semibold text-white shadow-lg shadow-violet-500/25 transition hover:brightness-105 disabled:opacity-50">＋ 추가</button>
       </div>
       {err && <p className="mt-2 text-xs font-semibold text-rose-500">{err}</p>}
 
+      {seeding && (
+        <p className="mt-3 text-xs font-semibold text-violet-500">기존 상품 카테고리를 불러오는 중…</p>
+      )}
+
       {/* 목록 */}
-      {seeding ? (
-        <div className="mt-4 rounded-xl border border-dashed border-black/10 py-8 text-center text-sm text-neutral-400 dark:border-white/10">
-          기존 상품 카테고리를 불러오는 중…
-        </div>
-      ) : cats.length === 0 ? (
+      {cats.length === 0 ? (
         <div className="mt-4 rounded-xl border border-dashed border-black/10 py-8 text-center text-sm text-neutral-400 dark:border-white/10">
           아직 카테고리가 없어요. 위에서 추가하면 상품 등록 시 선택할 수 있어요.
         </div>
@@ -114,10 +126,10 @@ export default function CategoryManager({ storeId, initial }: { storeId: string;
               ) : (
                 <span className="flex-1 text-sm font-semibold">{c.name}</span>
               )}
-              <button onClick={() => move(c.id, -1)} disabled={pending || i === 0} className={pill} aria-label="위로">↑</button>
-              <button onClick={() => move(c.id, 1)} disabled={pending || i === cats.length - 1} className={pill} aria-label="아래로">↓</button>
-              <button onClick={() => { setEditing(c.id); setEditVal(c.name); }} disabled={pending} className={pill}>이름</button>
-              <button onClick={() => del(c.id)} disabled={pending} className={pill + " hover:border-rose-400 hover:text-rose-500"}>삭제</button>
+              <button onClick={() => move(c.id, -1)} disabled={seeding || pending || i === 0} className={pill} aria-label="위로">↑</button>
+              <button onClick={() => move(c.id, 1)} disabled={seeding || pending || i === cats.length - 1} className={pill} aria-label="아래로">↓</button>
+              <button onClick={() => { setEditing(c.id); setEditVal(c.name); }} disabled={seeding || pending} className={pill}>이름</button>
+              <button onClick={() => del(c.id)} disabled={seeding || pending} className={pill + " hover:border-rose-400 hover:text-rose-500"}>삭제</button>
             </li>
           ))}
         </ul>
