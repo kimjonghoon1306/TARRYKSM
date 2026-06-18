@@ -468,11 +468,12 @@ export default function Storefront({
     const c = s.config || {};
     if (s.type === "banner") {
       const link = c.link_product_id ? products.find((p) => p.id === c.link_product_id) : null;
+      const hasLink = !!(link || c.link_url);
       return (
         <button
           key={s.id}
           className={"sf-promo sf-promo--" + (c.height || "md") + (c.image_url ? " has-img" : "")}
-          style={c.image_url ? { backgroundImage: `url(${c.image_url})` } : undefined}
+          style={{ ...(c.image_url ? { backgroundImage: `url(${c.image_url})` } : {}), cursor: hasLink ? "pointer" : "default" }}
           onClick={() => {
             if (link) openDetail(link);
             else if (c.link_url) window.open(c.link_url, "_blank");
@@ -482,7 +483,8 @@ export default function Storefront({
             {c.eyebrow && <span className="sf-promo-eyebrow">{c.eyebrow}</span>}
             {c.title && <h3>{c.title}</h3>}
             {c.subtitle && <p>{c.subtitle}</p>}
-            {c.cta_label && <span className="sf-promo-cta">{c.cta_label} →</span>}
+            {/* 링크(상품·URL)가 설정된 경우에만 버튼 표시 — 헛클릭 방지 */}
+            {hasLink && c.cta_label && <span className="sf-promo-cta">{c.cta_label} →</span>}
           </div>
         </button>
       );

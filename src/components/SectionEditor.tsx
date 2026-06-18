@@ -347,9 +347,11 @@ export default function SectionEditor({
                   </button>
                 </span>
                 <span className="text-lg">{m.icon}</span>
-                <button onClick={() => setOpen(isOpen ? null : s.id)} className="flex-1 text-left">
+                <button onClick={() => setOpen(isOpen ? null : s.id)} className="flex flex-1 items-center gap-1.5 text-left">
+                  <span style={{ fontSize: 11, color: "#8b5cf6", transition: "transform .15s", display: "inline-block", transform: isOpen ? "rotate(90deg)" : "none" }}>▶</span>
                   <span className="text-sm font-semibold">{m.label}</span>
-                  <span className="ml-2 text-xs text-neutral-400">{summary(s)}</span>
+                  <span className="ml-1 text-xs text-neutral-400">{summary(s)}</span>
+                  {!isOpen && <span style={{ marginLeft: "auto", fontSize: 11, fontWeight: 700, color: "#8b5cf6", whiteSpace: "nowrap" }}>✏️ 탭하여 수정</span>}
                 </button>
                 <button
                   onClick={() => toggle(s.id)}
