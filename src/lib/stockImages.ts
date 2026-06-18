@@ -70,6 +70,22 @@ export const STOCK_IMAGES: StockImage[] = [
   { src: "/landing/img/products/sneaker.webp", cat: "스니커즈", group: "라이프스타일" },
   { src: "/landing/img/products/sunglasses.webp", cat: "선글라스", group: "라이프스타일" },
   { src: "/landing/img/products/tote.webp", cat: "토트백", group: "라이프스타일" },
-  { src: "/landing/img/products/watch.webp", cat: "손목시계", group: "라이프스타일" },];
+  { src: "/landing/img/products/watch.webp", cat: "손목시계", group: "라이프스타일" },
+  { src: "/landing/img/products/knit.webp", cat: "니트", group: "라이프스타일" },
+  { src: "/landing/img/products/coat.webp", cat: "코트", group: "라이프스타일" },
+  { src: "/landing/img/products/perfume.webp", cat: "향수", group: "라이프스타일" },
+  { src: "/landing/img/products/lipstick.webp", cat: "립스틱", group: "라이프스타일" },
+  { src: "/landing/img/products/shoulderbag.webp", cat: "숄더백", group: "라이프스타일" },
+  { src: "/landing/img/products/handcream.webp", cat: "핸드크림", group: "라이프스타일" },
+  { src: "/landing/img/products/diffuser.webp", cat: "디퓨저", group: "라이프스타일" },
+  { src: "/landing/img/products/coffeebean.webp", cat: "원두커피", group: "라이프스타일" },
+  { src: "/landing/img/products/necklace.webp", cat: "목걸이", group: "라이프스타일" },
+  { src: "/landing/img/products/tumbler.webp", cat: "텀블러", group: "라이프스타일" },
+  { src: "/landing/img/products/moodlamp.webp", cat: "무드등", group: "라이프스타일" },
+  { src: "/landing/img/products/backpack.webp", cat: "백팩", group: "라이프스타일" },
+  { src: "/landing/img/products/bouquet.webp", cat: "꽃다발", group: "라이프스타일" },
+  { src: "/landing/img/products/wallet.webp", cat: "지갑", group: "라이프스타일" },
+  { src: "/landing/img/products/earring.webp", cat: "귀걸이", group: "라이프스타일" },
+  { src: "/landing/img/products/notebook.webp", cat: "노트", group: "라이프스타일" },];
 
 export const STOCK_GROUPS = ["전체", "식품", "라이프스타일"] as const;

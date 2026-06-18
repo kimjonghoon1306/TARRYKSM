@@ -157,6 +157,22 @@ const PRODUCTS = [
     d:'부드러운 워싱 코튼에 조절 가능한 스트랩. 어떤 룩에도 얹기 좋은 데일리 캡.' },
   { e:'🌿', img:'/landing/img/products/plant.webp', n:'미니 식물 · 율마',      b:'GREEN', p:19000,  tag:'NEW',  cat:'리빙', r:4.9, rc:87,
     d:'레몬향이 은은한 율마. 햇빛 좋아하는 초보자용 반려식물, 화분 포함.' },
+  { e:'🧶', img:'/landing/img/products/knit.webp', n:'케이블 니트 스웨터', b:'KNIT', p:59000, tag:'NEW', cat:'패션', r:4.7, rc:96, d:'도톰한 케이블 짜임의 데일리 니트.' },
+  { e:'🧥', img:'/landing/img/products/coat.webp', n:'클래식 트렌치코트', b:'ATELIER', p:189000, tag:'BEST', cat:'패션', r:4.8, rc:74, d:'사계절 입기 좋은 베이지 트렌치코트.' },
+  { e:'💎', img:'/landing/img/products/perfume.webp', n:'오 드 퍼퓸 50ml', b:'SCENT', p:78000, cat:'뷰티', r:4.7, rc:120, d:'은은하게 머무는 머스크 향수.' },
+  { e:'💄', img:'/landing/img/products/lipstick.webp', n:'벨벳 매트 립스틱', b:'BLUSH', p:26000, tag:'HOT', cat:'뷰티', r:4.6, rc:210, d:'부드럽게 발리는 매트 립스틱.' },
+  { e:'👜', img:'/landing/img/products/shoulderbag.webp', n:'미니 숄더백', b:'BAG', p:98000, cat:'패션', r:4.7, rc:64, d:'데일리로 메기 좋은 가죽 숄더백.' },
+  { e:'🧴', img:'/landing/img/products/handcream.webp', n:'시어버터 핸드크림', b:'CARE', p:14000, cat:'뷰티', r:4.8, rc:160, d:'촉촉하게 스며드는 핸드크림.' },
+  { e:'🪔', img:'/landing/img/products/diffuser.webp', n:'리드 디퓨저 200ml', b:'AROMA', p:32000, tag:'NEW', cat:'리빙', r:4.9, rc:88, d:'공간을 채우는 우디 디퓨저.' },
+  { e:'☕', img:'/landing/img/products/coffeebean.webp', n:'스페셜티 원두 200g', b:'ROAST', p:18000, tag:'BEST', cat:'리빙', r:4.8, rc:142, d:'갓 볶은 싱글 오리진 원두.' },
+  { e:'📿', img:'/landing/img/products/necklace.webp', n:'골드 펜던트 목걸이', b:'LUXE', p:62000, cat:'액세서리', r:4.7, rc:58, d:'데일리로 좋은 골드 펜던트 목걸이.' },
+  { e:'🥤', img:'/landing/img/products/tumbler.webp', n:'보온 텀블러 500ml', b:'KEEP', p:29000, cat:'리빙', r:4.6, rc:96, d:'온도를 오래 유지하는 텀블러.' },
+  { e:'💡', img:'/landing/img/products/moodlamp.webp', n:'무드 조명 램프', b:'GLOW', p:39000, tag:'HOT', cat:'리빙', r:4.8, rc:110, d:'따뜻한 빛의 세라믹 무드등.' },
+  { e:'🎒', img:'/landing/img/products/backpack.webp', n:'캔버스 백팩', b:'PACK', p:69000, cat:'패션', r:4.5, rc:72, d:'노트북도 들어가는 데일리 백팩.' },
+  { e:'💐', img:'/landing/img/products/bouquet.webp', n:'시즌 꽃다발', b:'BLOOM', p:42000, tag:'NEW', cat:'리빙', r:4.9, rc:64, d:'크라프트로 포장한 제철 꽃다발.' },
+  { e:'👛', img:'/landing/img/products/wallet.webp', n:'가죽 반지갑', b:'LEATHER', p:48000, cat:'액세서리', r:4.7, rc:80, d:'슬림한 천연가죽 반지갑.' },
+  { e:'✨', img:'/landing/img/products/earring.webp', n:'골드 후프 귀걸이', b:'LUXE', p:34000, cat:'액세서리', r:4.6, rc:90, d:'얼굴이 화사해지는 골드 후프 귀걸이.' },
+  { e:'📓', img:'/landing/img/products/notebook.webp', n:'하드커버 노트', b:'PAPER', p:12000, cat:'리빙', r:4.7, rc:130, d:'매끄러운 필기감의 양장 노트.' },
 ];
 
 /* 데모 리뷰 풀 — 상세에서 상품별로 deterministic하게 2개씩 노출 */
