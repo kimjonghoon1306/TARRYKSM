@@ -1,12 +1,11 @@
 import { createClient } from "@/lib/supabase/server";
 import { fetchNotifications } from "@/lib/notifications";
 import NotificationList from "@/components/NotificationList";
+import { currentUser } from "@/lib/auth";
 
 export default async function NotificationsPage() {
   const supabase = await createClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
+  const user = await currentUser();
 
   const card =
     "rounded-2xl border border-black/5 bg-white p-5 shadow-sm dark:border-white/10 dark:bg-white/[0.03]";

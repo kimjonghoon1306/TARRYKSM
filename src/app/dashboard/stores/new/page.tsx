@@ -3,7 +3,7 @@ import { redirect } from "next/navigation";
 import { createStoreOpen } from "../../actions";
 import { SKIN_BY_ID, SKIN_IDS } from "@/lib/skins";
 import { PRIMARY_DOMAIN } from "@/lib/domains";
-import { createClient } from "@/lib/supabase/server";
+import { currentUser } from "@/lib/auth";
 
 export default async function NewStorePage({
   searchParams,
@@ -15,8 +15,7 @@ export default async function NewStorePage({
   const meta = SKIN_BY_ID[skin];
 
   // 안전망: 비로그인 사용자가 만들기 화면에 닿으면 로그인으로 (생성은 로그인 필수)
-  const supabase = await createClient();
-  const { data: { user } } = await supabase.auth.getUser();
+  const user = await currentUser();
   if (!user) redirect(`/login?next=${encodeURIComponent(`/dashboard/stores/new?skin=${skin}`)}`);
 
   const card =

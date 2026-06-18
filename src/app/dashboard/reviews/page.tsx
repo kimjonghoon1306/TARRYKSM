@@ -1,11 +1,10 @@
 import { createClient } from "@/lib/supabase/server";
 import ReviewItem, { type DashReview } from "@/components/ReviewItem";
+import { currentUser } from "@/lib/auth";
 
 export default async function ReviewsPage() {
   const supabase = await createClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
+  const user = await currentUser();
 
   let reviews: DashReview[] = [];
   let tableMissing = false;

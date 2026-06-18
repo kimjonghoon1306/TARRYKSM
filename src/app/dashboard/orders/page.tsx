@@ -1,4 +1,5 @@
 import { createClient } from "@/lib/supabase/server";
+import { currentUser } from "@/lib/auth";
 import OrderStatusSelect from "@/components/OrderStatusSelect";
 import ShippingForm from "@/components/ShippingForm";
 
@@ -28,9 +29,7 @@ function fmt(d: string) {
 
 export default async function OrdersPage() {
   const supabase = await createClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
+  const user = await currentUser();
 
   let orders: Order[] = [];
   let tableMissing = false;

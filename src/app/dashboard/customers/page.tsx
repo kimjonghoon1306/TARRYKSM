@@ -1,4 +1,5 @@
 import { createClient } from "@/lib/supabase/server";
+import { currentUser } from "@/lib/auth";
 
 type Row = {
   buyer_name: string;
@@ -25,9 +26,7 @@ function fmt(d: string) {
 
 export default async function CustomersPage() {
   const supabase = await createClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
+  const user = await currentUser();
 
   let customers: Customer[] = [];
   let tableMissing = false;

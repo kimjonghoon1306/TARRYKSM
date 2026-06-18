@@ -1,4 +1,5 @@
 import { createClient } from "@/lib/supabase/server";
+import { currentUser } from "@/lib/auth";
 
 export type Role = "admin" | "founder";
 
@@ -11,12 +12,10 @@ export type Me = {
 
 // 현재 로그인 사용자의 역할·플랜을 profiles에서 조회. 비로그인/미생성 시 founder/free 기본.
 export async function getMe(): Promise<Me> {
-  const supabase = await createClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
+  const user = await currentUser();
   if (!user) return { userId: null, email: null, role: "founder", plan: "free" };
 
+  const supabase = await createClient();
   const { data } = await supabase
     .from("profiles")
     .select("role,plan")

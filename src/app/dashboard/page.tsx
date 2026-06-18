@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { createClient } from "@/lib/supabase/server";
+import { currentUser } from "@/lib/auth";
 import { SKINS } from "@/lib/skins";
 import { PRIMARY_DOMAIN } from "@/lib/domains";
 import { fetchActiveAnnouncements } from "@/lib/announcements";
@@ -15,11 +16,10 @@ export default async function Overview({
   const { smsg, serr } = await searchParams;
   const supabase = await createClient();
   // 인증 확인과 목록 조회를 병렬로 (전환 속도 개선)
-  const [{ data: userData }, { data: stores }] = await Promise.all([
-    supabase.auth.getUser(),
+  const [user, { data: stores }] = await Promise.all([
+    currentUser(),
     supabase.from("stores").select("id,name,skin,slug").order("created_at", { ascending: false }),
   ]);
-  const user = userData.user;
   const list = (stores ?? []) as Store[];
 
   const storeIds = list.map((s) => s.id);

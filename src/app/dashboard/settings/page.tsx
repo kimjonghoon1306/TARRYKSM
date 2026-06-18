@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { createClient } from "@/lib/supabase/server";
 import { changePassword } from "./actions";
+import { currentUser } from "@/lib/auth";
 
 export default async function SettingsPage({
   searchParams,
@@ -9,9 +10,7 @@ export default async function SettingsPage({
 }) {
   const sp = await searchParams;
   const supabase = await createClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
+  const user = await currentUser();
 
   const card =
     "rounded-2xl border border-black/5 bg-white p-6 shadow-sm dark:border-white/10 dark:bg-white/[0.03]";
