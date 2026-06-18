@@ -134,6 +134,39 @@
 }
 [data-skin="crimson"] .sth-title,[data-skin="crimson"] .stb-logo{text-transform:uppercase}
 
+/* ════════ 신규 무드 4종 (2026-06-18) ════════ */
+/* LUXE — 모노크롬 럭셔리 (다크·세리프) */
+[data-skin="luxe"]{
+  --s-bg:#0c0c0d;--s-surf:#161617;--s-ink:#f4f1ea;--s-sub:#9a958c;--s-line:rgba(255,255,255,.08);
+  --s-brand:#e8e2d4;--s-brand-ink:#15130f;--s-brand-soft:rgba(232,226,212,.12);
+  --s-hero:linear-gradient(165deg,#1c1c1e,#0c0c0d);--s-r:2px;--s-radd:2px;--s-rpill:2px;--s-fw:500;--s-ls:.05em;--s-hls:.02em;
+  --s-shadow:0 22px 44px -18px rgba(0,0,0,.8);
+  --s-fd:'Fraunces',serif;--s-fb:'Inter',sans-serif;
+}
+[data-skin="luxe"] .sth-title,[data-skin="luxe"] .stb-logo,[data-skin="luxe"] .sh-head h3{letter-spacing:.06em}
+/* RETRO — 따뜻한 뉴트로 (머스타드·브라운) */
+[data-skin="retro"]{
+  --s-bg:#f7ecd8;--s-surf:#fff8ec;--s-ink:#4a3417;--s-sub:#9c815a;--s-line:#e6d4b3;
+  --s-brand:#d98a2b;--s-brand-ink:#fff8ec;--s-brand-soft:#f3dcb4;
+  --s-hero:linear-gradient(120deg,#f0d49a,#f7e7c6);--s-r:18px;--s-radd:14px;--s-rpill:99px;--s-fw:700;--s-ls:0;
+  --s-fd:'Archivo',sans-serif;--s-fb:'Plus Jakarta Sans',sans-serif;
+}
+/* SAND — 어스 뉴트럴 (테라코타·샌드) */
+[data-skin="sand"]{
+  --s-bg:#f3e9df;--s-surf:#fbf5ee;--s-ink:#473428;--s-sub:#9a8472;--s-line:#e6d6c6;
+  --s-brand:#bc6c44;--s-brand-ink:#fbf5ee;--s-brand-soft:#ecd8c6;
+  --s-hero:linear-gradient(135deg,#e4cdb6,#f1e3d4);--s-r:14px;--s-radd:12px;--s-fw:600;
+  --s-fd:'Fraunces',serif;--s-fb:'Inter',sans-serif;
+}
+/* FOREST — 딥 그린 보태니컬 */
+[data-skin="forest"]{
+  --s-bg:#0f1a13;--s-surf:#16241b;--s-ink:#eaf2e8;--s-sub:#8fa893;--s-line:rgba(255,255,255,.08);
+  --s-brand:#7bb661;--s-brand-ink:#0f1a13;--s-brand-soft:rgba(123,182,97,.16);
+  --s-hero:linear-gradient(160deg,#1d3025,#0f1a13);--s-r:16px;--s-radd:12px;--s-fw:600;
+  --s-shadow:0 22px 44px -18px rgba(0,0,0,.6);
+  --s-fd:'Fraunces',serif;--s-fb:'Plus Jakarta Sans',sans-serif;
+}
+
 /* ════════ 식품·농축수산물·업태 특화 스킨 10종 ════════ */
 /* 15 · HARVEST — 유기농 내추럴 그린 */
 [data-skin="harvest"]{

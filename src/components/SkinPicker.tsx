@@ -46,6 +46,10 @@ const SKIN_THUMB: Record<string, string> = {
   slate: `${PROD}/wallet.webp`,    // 쿨 그레이 프리미엄 → 지갑
   berry: `${PROD}/lipstick.webp`,  // 베리 볼드 → 립스틱
   crimson: `${PROD}/backpack.webp`,// 스포티 액티브 → 백팩
+  luxe: `${PROD}/watch.webp`,      // 모노크롬 럭셔리 → 시계
+  retro: `${PROD}/coat.webp`,      // 뉴트로 → 코트
+  sand: `${PROD}/vase.webp`,       // 어스 뉴트럴 → 화병
+  forest: `${PROD}/plant.webp`,    // 보태니컬 → 식물
 };
 
 // 스킨 컨셉 → 어울리는 상품 카테고리 (미리보기에 관련 상품만 노출)

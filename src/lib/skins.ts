@@ -107,6 +107,18 @@ export const SKINS: Skin[] = [
   { id: "crimson", name: "Crimson", vibe: "스포티 크림슨 액티브", color: "#e23b2e", bg: "#fdf1f0", group: "general",
     desc: "역동적인 크림슨 레드. 빠르고 힘찬 인상이라 스포츠·액티브 브랜드에 활기를 줍니다.",
     recommend: "스포츠·피트니스, 액티브웨어, 자동차·용품, 에너지" },
+  { id: "luxe", name: "Luxe", vibe: "모노크롬 럭셔리 (다크·세리프)", color: "#e8e2d4", bg: "#0c0c0d", group: "general",
+    desc: "검정 위에 얹은 절제된 세리프. 고급스럽고 시크한 무드로 하이엔드 브랜드의 격을 살립니다.",
+    recommend: "주얼리·시계, 명품·편집숍, 향수·뷰티, 프리미엄 기프트" },
+  { id: "retro", name: "Retro", vibe: "따뜻한 뉴트로 (머스타드·브라운)", color: "#d98a2b", bg: "#f7ecd8", group: "general",
+    desc: "머스타드빛과 둥근 모서리의 70년대 감성. 정겹고 따뜻해 빈티지·감성 브랜드에 어울립니다.",
+    recommend: "빈티지·라이프스타일, 음반·서점, 카페·디저트, 감성 소품" },
+  { id: "sand", name: "Sand", vibe: "어스 뉴트럴 (테라코타·샌드)", color: "#bc6c44", bg: "#f3e9df", group: "general",
+    desc: "흙과 모래를 닮은 따뜻한 뉴트럴 톤. 편안하고 자연스러워 홈데코·오브제와 잘 맞습니다.",
+    recommend: "홈데코·인테리어, 도자·오브제, 패브릭, 천연·핸드메이드" },
+  { id: "forest", name: "Forest", vibe: "딥 그린 보태니컬", color: "#7bb661", bg: "#0f1a13", group: "general",
+    desc: "깊은 초록의 보태니컬 무드. 차분하고 자연 친화적이라 식물·웰니스 브랜드에 안성맞춤입니다.",
+    recommend: "식물·가드닝, 향·아로마, 웰니스·요가, 친환경·비건" },
 ];
 
 export const SKIN_IDS = SKINS.map((s) => s.id);
@@ -118,9 +130,9 @@ export const SKIN_BY_ID: Record<string, Skin> = Object.fromEntries(
 // 스킨 갤러리 — 느낌(무드)별 카테고리 (스튜디오 data.js SKIN_GROUPS와 동일하게 유지)
 export const SKIN_GROUPS: { label: string; ids: string[] }[] = [
   { label: "⬛ 미니멀·모던", ids: ["mono", "slate", "azure"] },
-  { label: "🌑 다크·시크", ids: ["noir", "midnight", "grape"] },
+  { label: "🌑 다크·시크", ids: ["noir", "luxe", "midnight", "grape"] },
   { label: "💗 러블리·소프트", ids: ["bloom", "coral", "lavender"] },
-  { label: "⚡ 비비드·팝", ids: ["citrus", "berry", "crimson"] },
-  { label: "🌿 내추럴·우드", ids: ["pine", "mocha"] },
+  { label: "⚡ 비비드·팝", ids: ["citrus", "berry", "crimson", "retro"] },
+  { label: "🌿 내추럴·우드", ids: ["pine", "mocha", "sand", "forest"] },
   { label: "🥬 식품·신선", ids: ["harvest", "ocean", "butcher", "bakery", "orchard", "hanok", "market", "sprout", "dairy", "gourmet"] },
 ];

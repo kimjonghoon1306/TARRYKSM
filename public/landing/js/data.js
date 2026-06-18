@@ -76,6 +76,27 @@ const SKINS = [
     heroTitle:'Move faster', heroSub:'강렬한 레드로 밀어붙이는 액티브 셀렉션. 멈추지 않는 하루.',
     cta:'GEAR UP', chips:['ALL','스포츠','액티브','슈즈','기어'] },
 
+  // ── 신규 무드 4종 (2026-06-18) ──
+  { id:'luxe', name:'Luxe', emoji:'🖤', vibe:'모노크롬 럭셔리 (다크·세리프)',
+    brand:'NOIR ATELIER', badge:'THE COLLECTION',
+    heroTitle:'Timeless in black', heroSub:'군더더기를 걷어낸 검정의 미학. 시간이 지나도 변치 않는 가치.',
+    cta:'컬렉션 입장', chips:['ALL','시그니처','한정','액세서리','기프트'] },
+
+  { id:'retro', name:'Retro', emoji:'🟠', vibe:'따뜻한 뉴트로 (머스타드·브라운)',
+    brand:'GOLDEN DAYS', badge:'SINCE THE 70s',
+    heroTitle:'그 시절, 좋은 물건', heroSub:'머스타드빛 감성과 둥근 모서리. 오래 봐도 질리지 않는 레트로 무드.',
+    cta:'빈티지 둘러보기', chips:['전체','패션','리빙','소품','음반'] },
+
+  { id:'sand', name:'Sand', emoji:'🏜️', vibe:'어스 뉴트럴 (테라코타·샌드)',
+    brand:'TERRA', badge:'EARTHY & WARM',
+    heroTitle:'흙과 햇살의 색', heroSub:'테라코타와 모래빛이 주는 편안함. 자연을 닮은 따뜻한 톤의 물건들.',
+    cta:'컬렉션 보기', chips:['전체','홈데코','오브제','패브릭','식물'] },
+
+  { id:'forest', name:'Forest', emoji:'🌲', vibe:'딥 그린 보태니컬',
+    brand:'EVERGREEN', badge:'INTO THE GREEN',
+    heroTitle:'숲을 들이다', heroSub:'깊은 초록과 보태니컬 무드. 공간에 자연의 차분함을 더하는 셀렉션.',
+    cta:'그린 셀렉션', chips:['전체','식물','홈','향','가드닝'] },
+
   // ── 식품·농축수산물·업태 특화 10종 ──
   { id:'harvest', name:'Harvest', emoji:'🌾', vibe:'유기농 내추럴 그린',
     brand:'들녘', badge:'정직하게 기른',
@@ -133,10 +154,10 @@ const SKIN_BY_ID = Object.fromEntries(SKINS.map(s => [s.id, s]));
 /* 스킨 갤러리 — 느낌(무드)별 카테고리로 분리 */
 const SKIN_GROUPS = [
   { label:'⬛ 미니멀·모던',  ids:['mono','slate','azure'] },
-  { label:'🌑 다크·시크',    ids:['noir','midnight','grape'] },
+  { label:'🌑 다크·시크',    ids:['noir','luxe','midnight','grape'] },
   { label:'💗 러블리·소프트', ids:['bloom','coral','lavender'] },
-  { label:'⚡ 비비드·팝',     ids:['citrus','berry','crimson'] },
-  { label:'🌿 내추럴·우드',   ids:['pine','mocha'] },
+  { label:'⚡ 비비드·팝',     ids:['citrus','berry','crimson','retro'] },
+  { label:'🌿 내추럴·우드',   ids:['pine','mocha','sand','forest'] },
   { label:'🥬 식품·신선',     ids:['harvest','ocean','butcher','bakery','orchard','hanok','market','sprout','dairy','gourmet'] },
 ];
 
@@ -301,7 +322,22 @@ const SKIN_THEME = {
   dairy:'dairy', gourmet:'gourmet',
 };
 const LIFESTYLE = { cats: CATS, items: PRODUCTS };
-function themeFor(skinId){ return THEMES[SKIN_THEME[skinId]] || LIFESTYLE; }
+// 신규 무드 스킨 — 컨셉에 맞는 상품만(서로 중복 최소). 파일명으로 PRODUCTS에서 추출.
+const LIFE_PICK = {
+  luxe:   ['watch','necklace','ring','bracelet','earring','perfume','wallet','sunglasses'], // 럭셔리 액세서리
+  retro:  ['coat','knit','cap','scarf','denim','shirt','dress','sneaker'],                  // 빈티지 패션
+  sand:   ['vase','rug','pillow','frame','mug','candle','plant','candleholder'],            // 어스 홈데코
+  forest: ['bouquet','moodlamp','diffuser','serum','cleanser','coffeebean','notebook','tumbler'], // 그린·웰니스
+};
+function lifePickTheme(ids){
+  const items = ids.map(n => PRODUCTS.find(p => p.img && p.img.endsWith('/'+n+'.webp'))).filter(Boolean);
+  return { cats: ['전체', ...new Set(items.map(p => p.cat))], items };
+}
+function themeFor(skinId){
+  if(THEMES[SKIN_THEME[skinId]]) return THEMES[SKIN_THEME[skinId]];
+  if(LIFE_PICK[skinId]) return lifePickTheme(LIFE_PICK[skinId]);
+  return LIFESTYLE;
+}
 // 스킨 대표 썸네일 — 그 스킨 업태에 맞는 상품 사진 (스킨마다 다르게)
 // 범용 스킨 대표 사진 — 스킨 무드에 맞춰 전부 다른 사진 (식품 스킨은 테마 상품으로 자동)
 const SKIN_PREVIEW = {
@@ -312,6 +348,8 @@ const SKIN_PREVIEW = {
   midnight:'/landing/img/products/watch.webp', coral:'/landing/img/products/candle.webp',
   lavender:'/landing/img/products/diffuser.webp', slate:'/landing/img/products/wallet.webp',
   berry:'/landing/img/products/lipstick.webp', crimson:'/landing/img/products/backpack.webp',
+  luxe:'/landing/img/products/watch.webp', retro:'/landing/img/products/coat.webp',
+  sand:'/landing/img/products/vase.webp', forest:'/landing/img/products/plant.webp',
 };
 function skinThumb(skinId){
   if(SKIN_PREVIEW[skinId]) return SKIN_PREVIEW[skinId];

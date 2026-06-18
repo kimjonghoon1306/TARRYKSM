@@ -27,8 +27,21 @@ export function heroForStore(skin: string) {
   };
 }
 
-// 스킨 → 샘플 상품 세트 (식품 스킨은 해당 업태 테마, 그 외는 라이프스타일)
+// 신규 무드 스킨 — 컨셉 맞는 상품만(중복 최소). data.js LIFE_PICK과 동일 유지.
+const LIFE_PICK: Record<string, string[]> = {
+  luxe: ["watch", "necklace", "ring", "bracelet", "earring", "perfume", "wallet", "sunglasses"],
+  retro: ["coat", "knit", "cap", "scarf", "denim", "shirt", "dress", "sneaker"],
+  sand: ["vase", "rug", "pillow", "frame", "mug", "candle", "plant", "candleholder"],
+  forest: ["bouquet", "moodlamp", "diffuser", "serum", "cleanser", "coffeebean", "notebook", "tumbler"],
+};
+
+// 스킨 → 샘플 상품 세트 (식품 스킨=업태 테마, 신규무드=컨셉 픽, 그 외=라이프스타일)
 export function sampleProductsForSkin(skin: string): SampleItem[] {
+  if (LIFE_PICK[skin]) {
+    return LIFE_PICK[skin]
+      .map((n) => data.lifestyle.items.find((p) => p.img?.endsWith("/" + n + ".webp")))
+      .filter((p): p is SampleItem => !!p);
+  }
   const themeKey = data.skinTheme[skin];
   const theme = (themeKey && data.themes[themeKey]) || data.lifestyle;
   return theme.items;
