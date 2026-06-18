@@ -94,10 +94,30 @@ function cartHTML(st){
   return head + `<div class="cp-body">${rows}</div>` + foot;
 }
 
+/* 카테고리 기반 기본 옵션 — 데모용(실제 쇼핑몰의 '옵션 선택' UX를 미리보기에서 연상시키기 위함) */
+function optionsFor(p){
+  if(p.opt) return p.opt;
+  const c = p.cat || '';
+  if(/패션|스트릿|웨어|의류|HYPE|굿즈/.test(c)) return [{name:'사이즈',choices:[{label:'S'},{label:'M'},{label:'L'},{label:'XL'}]},{name:'색상',choices:[{label:'블랙'},{label:'아이보리'}]}];
+  if(/뷰티|스킨/.test(c)) return [{name:'용량',choices:[{label:'30ml'},{label:'50ml',add:9000}]}];
+  if(/채소|수산|축산|정육|과일|농산|베이커리|반찬|가공|식품|건강|곡물|유제품|해산|청과/.test(c)) return [{name:'중량',choices:[{label:'500g'},{label:'1kg',add:8000},{label:'2kg',add:19000}]},{name:'포장',choices:[{label:'일반'},{label:'선물포장',add:3000}]}];
+  if(/리빙|오브젝트|스테이/.test(c)) return [{name:'색상',choices:[{label:'화이트'},{label:'그레이'},{label:'세이지'}]}];
+  if(/테크|액세서리|시그니처|한정|기프트/.test(c)) return [{name:'색상',choices:[{label:'블랙'},{label:'실버'}]}];
+  return [{name:'구성',choices:[{label:'기본'},{label:'프리미엄',add:12000}]}];
+}
+
 function detailHTML(i,st){
   const p = st.products[i];
   const fav = st.favs.has(i);
   const qty = st.dqty;
+  const dopts = st.dopts || {};
+  const opts = optionsFor(p);
+  const addSum = opts.reduce((s,g)=>{const ch=g.choices.find(x=>x.label===dopts[g.name]);return s+(ch&&ch.add?ch.add:0)},0);
+  const unit = p.p + addSum;
+  const optHTML = opts.map(g=>`<div class="dp-opt">
+      <div class="dp-opt-name">${g.name}</div>
+      <div class="dp-opt-chips">${g.choices.map(c=>`<button class="dp-opt-chip ${dopts[g.name]===c.label?'on':''}" data-act="opt" data-g="${g.name}" data-label="${c.label}">${c.label}${c.add?` <i>+${won(c.add)}</i>`:''}</button>`).join('')}</div>
+    </div>`).join('');
   const revs = [REVIEWS[i % REVIEWS.length], REVIEWS[(i+3) % REVIEWS.length]];
   const reviewHTML = revs.map(rv=>`<div class="dp-rev">
       <div class="dp-rev-top"><b>${rv.n}</b><span class="pc-stars">${stars(rv.s)}</span></div>
@@ -116,8 +136,9 @@ function detailHTML(i,st){
         <div class="pc-brand">${p.b} · ${p.cat}</div>
         <h3 class="dp-name">${p.n}</h3>
         <div class="dp-rating"><span class="pc-stars">${stars(p.r)}</span><b>${p.r}</b><span>리뷰 ${p.rc}개</span></div>
-        <div class="dp-price">${won(p.p)}</div>
+        <div class="dp-price">${won(unit)}${addSum?` <small>(옵션 +${won(addSum)})</small>`:''}</div>
         <p class="dp-desc">${p.d || ''}</p>
+        ${optHTML?`<div class="dp-opts">${optHTML}</div>`:''}
         <ul class="dp-meta">
           <li><span>배송</span><b>5만원 이상 무료배송</b></li>
           <li><span>혜택</span><b>첫 구매 5% 적립</b></li>
@@ -135,7 +156,7 @@ function detailHTML(i,st){
       <div class="dp-qty">
         <button data-act="dq-dec">−</button><em>${qty}</em><button data-act="dq-inc">＋</button>
       </div>
-      <button class="dp-add" data-act="add-close" data-i="${i}">담기 · ${won(p.p*qty)}</button>
+      <button class="dp-add" data-act="add-close" data-i="${i}">담기 · ${won(unit*qty)}</button>
     </div>`;
 }
 
@@ -203,7 +224,7 @@ function buildStore(st){
 function mountStore(box, skinId, brandOverride){
   const s = SKIN_BY_ID[skinId] || SKINS[0];
   const theme = themeFor(s.id);
-  const st = { box, skin:s.id, brand:brandOverride||s.brand, products:theme.items, cats:theme.cats, cart:[], cat:theme.cats[0], sort:'reco', q:'', search:false, favs:new Set(), detailIdx:-1, dqty:1 };
+  const st = { box, skin:s.id, brand:brandOverride||s.brand, products:theme.items, cats:theme.cats, cart:[], cat:theme.cats[0], sort:'reco', q:'', search:false, favs:new Set(), detailIdx:-1, dqty:1, dopts:{} };
   box._ss = st;
   box.style.overflow = '';        // 이전 오버레이 lock 잔존 방지
   box.innerHTML = buildStore(st);
@@ -235,6 +256,7 @@ function onStoreClick(e){
     case 'remove':     removeItem(st,i); break;
     case 'dq-inc':     st.dqty++; refreshDetailQty(st); break;
     case 'dq-dec':     st.dqty = Math.max(1, st.dqty-1); refreshDetailQty(st); break;
+    case 'opt':        st.dopts[a.dataset.g] = (st.dopts[a.dataset.g]===a.dataset.label ? undefined : a.dataset.label); refreshDetailQty(st); break;
     case 'checkout':   checkout(st); break;
     case 'scroll-shelf': st.root.querySelector('.st-shelf')?.scrollIntoView({behavior:'smooth',block:'start'}); break;
     case 'close':      closeOverlay(st); break;
@@ -328,7 +350,7 @@ function openCart(st){
   st.root.classList.add('cart-on');
 }
 function openDetail(st,i){
-  st.detailIdx = i; st.dqty = 1;
+  st.detailIdx = i; st.dqty = 1; st.dopts = {};
   const d = st.root.querySelector('.st-detail-panel'); if(d){ d.innerHTML = detailHTML(i,st); d.scrollTop = 0; }
   st.root.querySelector('.dp-scroll')?.scrollTo(0,0);
   lockFrame(st);
