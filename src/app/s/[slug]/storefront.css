@@ -288,16 +288,8 @@
 @keyframes sf-float { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-8px); } }
 @keyframes sf-hero-pan { from { background-position: 50% 48%; } to { background-position: 50% 52%; } }
 
-/* 카드 순차 등장 (opacity만 → hover transform과 충돌 X) */
-.sf-card { animation: sf-fade .5s var(--ease) both; }
-.sf-grid .sf-card:nth-child(1) { animation-delay: .03s; }
-.sf-grid .sf-card:nth-child(2) { animation-delay: .07s; }
-.sf-grid .sf-card:nth-child(3) { animation-delay: .11s; }
-.sf-grid .sf-card:nth-child(4) { animation-delay: .15s; }
-.sf-grid .sf-card:nth-child(5) { animation-delay: .19s; }
-.sf-grid .sf-card:nth-child(6) { animation-delay: .23s; }
-.sf-grid .sf-card:nth-child(7) { animation-delay: .27s; }
-.sf-grid .sf-card:nth-child(n+8) { animation-delay: .3s; }
+/* 카드는 항상 또렷하게 표시 (등장 fade 애니메이션 제거 — 오른쪽 카드가 흐릿하게 남던 문제) */
+.sf-card { opacity: 1; }
 
 /* 카드 썸네일 hover 줌 */
 .sf-thumb { overflow: hidden; }
@@ -373,6 +365,23 @@
 /* 추천 선반 — 가로 스크롤, 이미지+이름만 (담기·가격 없음) */
 .sf-shelf-rail { display: flex; gap: 14px; overflow-x: auto; scroll-snap-type: x mandatory; padding: 4px 24px 10px 2px; margin: 0 -2px; scrollbar-width: none; -webkit-overflow-scrolling: touch; }
 .sf-shelf-rail::-webkit-scrollbar { height: 0; }
+
+/* 선반 좌우 화살표 — 데스크탑에서 클릭으로 스크롤(마우스로 가로 스크롤 어려운 문제 해결) */
+.sf-rail-wrap { position: relative; }
+.sf-rail-arrow {
+  position: absolute; top: 84px; transform: translateY(-50%); z-index: 5;
+  width: 40px; height: 40px; border-radius: 50%; border: 1px solid var(--s-line);
+  background: var(--s-surf, #fff); color: var(--s-ink); font-size: 22px; line-height: 1; cursor: pointer;
+  display: flex; align-items: center; justify-content: center;
+  box-shadow: 0 6px 18px rgba(0, 0, 0, .16); opacity: 0; transition: opacity .18s, transform .15s;
+}
+.sf-rail-prev { left: -8px; }
+.sf-rail-next { right: -8px; }
+.sf-rail-wrap:hover .sf-rail-arrow { opacity: 1; }
+.sf-rail-arrow:hover { transform: translateY(-50%) scale(1.1); }
+.sf-rail-arrow:active { transform: translateY(-50%) scale(.9); }
+/* 모바일은 손가락 터치 스크롤이 자연스러워 화살표 숨김 */
+@media (max-width: 640px) { .sf-rail-arrow { display: none; } }
 .sf-rail-card { flex: 0 0 auto; width: 168px; scroll-snap-align: start; border: 0; background: none; padding: 0; cursor: pointer; text-align: left; }
 .sf-rail-thumb { position: relative; width: 168px; height: 168px; border-radius: calc(var(--s-r) + 4px); overflow: hidden; background: var(--s-brand-soft); display: grid; place-items: center; }
 .sf-rail-thumb .sf-thumb-img { width: 100%; height: 100%; object-fit: cover; transition: transform .5s var(--ease); }

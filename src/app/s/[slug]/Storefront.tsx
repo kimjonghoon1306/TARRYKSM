@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import type { Section } from "@/lib/sections";
 import { placeOrder, submitReview, checkCoupon } from "./actions";
 import { toggleWishlist } from "@/app/[slug]/customer-actions";
@@ -43,6 +43,20 @@ type CartLine = {
 };
 
 const BEST_RE = /best|베스트|인기|추천|hot|스테디/i;
+
+// 선반 가로 스크롤 래퍼 — 데스크탑에서 좌우 화살표로 넘기고, 모바일은 터치 스크롤.
+function ShelfRail({ children }: { children: React.ReactNode }) {
+  const ref = useRef<HTMLDivElement>(null);
+  const by = (dir: number) => ref.current?.scrollBy({ left: dir * 360, behavior: "smooth" });
+  return (
+    <div className="sf-rail-wrap">
+      <button type="button" className="sf-rail-arrow sf-rail-prev" onClick={() => by(-1)} aria-label="이전 상품">‹</button>
+      <div className="sf-shelf-rail" ref={ref}>{children}</div>
+      <button type="button" className="sf-rail-arrow sf-rail-next" onClick={() => by(1)} aria-label="다음 상품">›</button>
+    </div>
+  );
+}
+
 type Store = {
   id: string;
   name: string;
@@ -476,7 +490,7 @@ export default function Storefront({
             <h2>{c.title || "상품"}</h2>
             {c.subtitle && <span className="sf-shelf-sub">{c.subtitle}</span>}
           </div>
-          <div className="sf-shelf-rail">{items.map(renderShelfCard)}</div>
+          <ShelfRail>{items.map(renderShelfCard)}</ShelfRail>
         </section>
       );
     }
@@ -647,7 +661,7 @@ export default function Storefront({
                   <h2>🆕 신상품</h2>
                   <span className="sf-shelf-sub">방금 들어온 따끈한 신상</span>
                 </div>
-                <div className="sf-shelf-rail">{newItems.map(renderShelfCard)}</div>
+                <ShelfRail>{newItems.map(renderShelfCard)}</ShelfRail>
               </section>
             )}
 
@@ -672,7 +686,7 @@ export default function Storefront({
                   <h2>🔥 베스트</h2>
                   <span className="sf-shelf-sub">가장 사랑받는 상품</span>
                 </div>
-                <div className="sf-shelf-rail">{bestItems.map(renderShelfCard)}</div>
+                <ShelfRail>{bestItems.map(renderShelfCard)}</ShelfRail>
               </section>
             )}
 
