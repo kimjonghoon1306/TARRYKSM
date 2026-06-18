@@ -18,7 +18,9 @@ export async function ensureDefaultSections(storeId: string): Promise<Section[]>
   if (!ok) return [];
   const existing = await fetchSections(supabase, storeId, false);
   if (existing.length) return existing;
-  await supabase.from("store_sections").insert(sampleSectionsForStore(storeId));
+  // RLS 우회 함수로 채움(직접 insert는 권한 평가에서 막힘). 없으면 직접 insert 폴백.
+  const { error } = await supabase.rpc("seed_default_sections", { p_store: storeId });
+  if (error) await supabase.from("store_sections").insert(sampleSectionsForStore(storeId));
   return await fetchSections(supabase, storeId, false);
 }
 
