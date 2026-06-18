@@ -57,24 +57,27 @@ export function PlanToggle({ userId, plan }: { userId: string; plan: string }) {
         <option value="basic">베이직</option>
         <option value="pro">프로</option>
       </select>
-      {dirty ? (
-        <button
-          disabled={pending}
-          onClick={() =>
-            start(() =>
-              setUserPlan(userId, cur as "free" | "basic" | "pro").then(() => {
-                setSaved(cur);
-                setDone(true);
-              })
-            )
-          }
-          className="rounded-lg bg-violet-600 px-2.5 py-1 text-xs font-bold text-white transition hover:brightness-110 disabled:opacity-50"
-        >
-          {pending ? "저장 중…" : "저장"}
-        </button>
-      ) : done ? (
-        <span className="text-xs font-bold text-emerald-600 dark:text-emerald-400">✓ 저장됨</span>
-      ) : null}
+      <button
+        disabled={!dirty || pending}
+        onClick={() =>
+          start(() =>
+            setUserPlan(userId, cur as "free" | "basic" | "pro").then(() => {
+              setSaved(cur);
+              setDone(true);
+            })
+          )
+        }
+        className={
+          "rounded-lg px-2.5 py-1 text-xs font-bold transition " +
+          (dirty
+            ? "bg-violet-600 text-white hover:brightness-110"
+            : done
+              ? "bg-emerald-500/15 text-emerald-600 dark:text-emerald-400"
+              : "cursor-default bg-black/5 text-neutral-400 dark:bg-white/10 dark:text-neutral-500")
+        }
+      >
+        {pending ? "저장 중…" : !dirty && done ? "✓ 저장됨" : "저장"}
+      </button>
     </div>
   );
 }
