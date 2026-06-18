@@ -87,3 +87,31 @@
 [data-skin="orchard"] .sh-head,[data-skin="market"] .sh-head{
   border-bottom:3px solid var(--s-brand);padding-bottom:12px;align-items:center;
 }
+
+/* ════════ 신규 무드 4종 레이아웃 (2026-06-18) ════════ */
+/* MAGAZINE(세로 긴 컷·여유 그리드·가운데 큰 타이포): luxe·forest */
+[data-skin="luxe"] .sh-grid,[data-skin="forest"] .sh-grid{
+  grid-template-columns:repeat(auto-fill,minmax(210px,1fr));gap:26px;
+}
+[data-skin="luxe"] .pc-media,[data-skin="forest"] .pc-media{aspect-ratio:3/4}
+[data-skin="luxe"] .st-hero,[data-skin="forest"] .st-hero{
+  display:flex;flex-direction:column;align-items:center;text-align:center;padding:62px 36px;
+}
+[data-skin="luxe"] .sth-sub,[data-skin="forest"] .sth-sub{margin-left:auto;margin-right:auto;max-width:30em}
+[data-skin="luxe"] .sth-title,[data-skin="forest"] .sth-title{font-size:2.3em;line-height:1.1}
+[data-skin="luxe"] .sh-head,[data-skin="forest"] .sh-head{justify-content:center;text-align:center}
+[data-skin="luxe"] .sh-head a,[data-skin="forest"] .sh-head a{display:none}
+[data-skin="luxe"] .pcard,[data-skin="forest"] .pcard{border:none;background:transparent}
+
+/* EARTHY SOFT(가운데 정렬·부드러운 큰 카드): sand·retro */
+[data-skin="sand"] .sh-grid,[data-skin="retro"] .sh-grid{
+  grid-template-columns:repeat(auto-fill,minmax(195px,1fr));gap:20px;
+}
+[data-skin="sand"] .st-hero,[data-skin="retro"] .st-hero{
+  display:flex;flex-direction:column;align-items:center;text-align:center;
+}
+[data-skin="sand"] .sth-sub,[data-skin="retro"] .sth-sub{margin-left:auto;margin-right:auto}
+[data-skin="sand"] .sh-head,[data-skin="retro"] .sh-head{justify-content:center;text-align:center}
+[data-skin="sand"] .pcard,[data-skin="retro"] .pcard{text-align:center}
+[data-skin="sand"] .pc-bottom,[data-skin="retro"] .pc-bottom{justify-content:center;gap:10px}
+[data-skin="sand"] .pc-add,[data-skin="retro"] .pc-add{margin-left:0}

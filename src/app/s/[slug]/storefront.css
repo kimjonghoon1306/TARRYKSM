@@ -554,3 +554,19 @@ textarea.sf-co-input { resize: vertical; min-height: 56px; }
 .sf-related-head { font-size: 14px; font-weight: 700; margin-bottom: 12px; }
 .sf-related-rail { display: flex; gap: 12px; overflow-x: auto; padding-bottom: 8px; scroll-snap-type: x mandatory; -webkit-overflow-scrolling: touch; }
 .sf-related-rail > * { scroll-snap-align: start; flex: 0 0 auto; width: 124px; }
+
+/* ── 신규 무드 4종 레이아웃 ── */
+/* MAGAZINE (luxe·forest): 세로 긴 컷 + 여유 그리드 + 가운데 히어로 + 미니멀 카드 */
+.sf[data-skin="luxe"] .sf-thumb, .sf[data-skin="forest"] .sf-thumb { aspect-ratio: 3 / 4; }
+.sf[data-skin="luxe"] .sf-card, .sf[data-skin="forest"] .sf-card { border: none; background: transparent; }
+.sf[data-skin="luxe"] .sf-hero, .sf[data-skin="forest"] .sf-hero { text-align: center; }
+.sf[data-skin="luxe"] .sf-hero-inner, .sf[data-skin="forest"] .sf-hero-inner { display: flex; flex-direction: column; align-items: center; }
+.sf[data-skin="luxe"] .sf-grid, .sf[data-skin="forest"] .sf-grid { gap: 22px; }
+@media (min-width: 920px) {
+  .sf[data-skin="luxe"] .sf-grid, .sf[data-skin="forest"] .sf-grid { grid-template-columns: repeat(3, 1fr); }
+}
+/* EARTHY SOFT (sand·retro): 가운데 정렬 + 부드러운 카드 */
+.sf[data-skin="sand"] .sf-hero, .sf[data-skin="retro"] .sf-hero { text-align: center; }
+.sf[data-skin="sand"] .sf-hero-inner, .sf[data-skin="retro"] .sf-hero-inner { display: flex; flex-direction: column; align-items: center; }
+.sf[data-skin="sand"] .sf-meta, .sf[data-skin="retro"] .sf-meta { text-align: center; }
+.sf[data-skin="sand"] .sf-bottom, .sf[data-skin="retro"] .sf-bottom { justify-content: center; }
