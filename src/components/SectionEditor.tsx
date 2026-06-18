@@ -502,27 +502,42 @@ function Fields({
             <input className={input} value={c.subtitle || ""} onChange={(e) => onPatch({ subtitle: e.target.value })} placeholder="(선택)" />
           </div>
         </div>
-        <div className="grid gap-4 sm:grid-cols-2">
-          <div>
-            <label className={label}>어떤 상품을 보여줄까요?</label>
-            <select className={input} value={src} onChange={(e) => onPatch({ source: e.target.value as SectionConfig["source"] })}>
-              <option value="new">🆕 신상품 — 최근 올린 상품 자동</option>
-              <option value="best">🔥 베스트 — 인기 상품 자동</option>
-              <option value="category">📁 특정 카테고리 상품</option>
-              <option value="manual">✋ 내가 직접 고르기</option>
-            </select>
+        <div>
+          <label className={label}>어떤 상품을 보여줄까요?</label>
+          <div style={{ display: "flex", flexWrap: "wrap", gap: 6, marginTop: 4 }}>
+            {([
+              ["new", "🆕 신상품", "최근 올린 상품 자동"],
+              ["best", "🔥 베스트", "인기 상품 자동"],
+              ["category", "📁 특정 카테고리", "고른 분류 상품"],
+              ["manual", "✋ 내가 직접 고르기", "상품을 직접 선택"],
+            ] as const).map(([v, t, d]) => (
+              <button
+                key={v}
+                type="button"
+                onClick={() => onPatch({ source: v })}
+                style={{
+                  flex: "1 1 calc(50% - 3px)", minWidth: 130, textAlign: "left",
+                  padding: "9px 12px", borderRadius: 10, cursor: "pointer",
+                  border: src === v ? "2px solid #8b5cf6" : "1px solid rgba(0,0,0,0.12)",
+                  background: src === v ? "rgba(139,92,246,0.08)" : "transparent",
+                }}
+              >
+                <div style={{ fontWeight: 700, fontSize: 13 }}>{t}</div>
+                <div style={{ fontSize: 11, color: "#8b8f98", marginTop: 1 }}>{d}</div>
+              </button>
+            ))}
           </div>
-          <div>
-            <label className={label}>최대 상품 수</label>
-            <input
-              type="number"
-              min={1}
-              max={20}
-              className={input}
-              value={c.limit ?? 8}
-              onChange={(e) => onPatch({ limit: parseInt(e.target.value, 10) || 8 })}
-            />
-          </div>
+        </div>
+        <div style={{ maxWidth: 200 }}>
+          <label className={label}>최대 상품 수</label>
+          <input
+            type="number"
+            min={1}
+            max={20}
+            className={input}
+            value={c.limit ?? 8}
+            onChange={(e) => onPatch({ limit: parseInt(e.target.value, 10) || 8 })}
+          />
         </div>
         {/* 진열 기준 안내 — 처음 보는 사람도 이해하게 */}
         <div style={{ fontSize: 12.5, lineHeight: 1.65, color: "#6b7280", background: "rgba(139,92,246,0.07)", borderRadius: 10, padding: "11px 13px" }}>
