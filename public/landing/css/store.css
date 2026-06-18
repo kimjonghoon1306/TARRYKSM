@@ -232,3 +232,17 @@
   -webkit-mask-image:linear-gradient(to right,transparent,#000 40%);mask-image:linear-gradient(to right,transparent,#000 40%)}
 .st-hero .sth-badge,.st-hero .sth-title,.st-hero .sth-sub,.st-hero .sth-cta{position:relative;z-index:1}
 .device.mobile .sth-photo{width:42%}
+
+/* 장바구니 쿠폰(데모) */
+.cp-coupon{display:flex;gap:8px;margin-bottom:12px}
+.cp-coupon input{flex:1;min-width:0;border:1px solid var(--s-line);border-radius:10px;padding:10px 12px;font-size:12.5px;background:var(--s-bg);color:var(--s-ink)}
+.cp-coupon input:disabled{opacity:.55}
+.cp-coupon-btn{flex-shrink:0;border:none;border-radius:10px;padding:0 16px;font-size:12.5px;font-weight:700;cursor:pointer;background:var(--s-brand);color:var(--s-brand-ink)}
+.cp-coupon-msg{font-size:11.5px;margin:-4px 0 12px}
+.cp-coupon-msg.ok{color:#16a34a}
+.cp-coupon-msg.err{color:#e0245e}
+.cp-foot .cp-sum{margin-bottom:9px}
+.cp-foot .cp-sum b{font-size:14px}
+.cp-disc b{color:#e0245e}
+.cp-foot .cp-sum.cp-total{margin-top:11px;padding-top:12px;border-top:1px solid var(--s-line)}
+.cp-foot .cp-sum.cp-total b{font-size:20px;color:var(--s-brand)}

@@ -8,6 +8,25 @@
 /* ── 상태 헬퍼 ── */
 function cartCount(st){ return st.cart.reduce((n,c)=>n+c.qty,0); }
 function cartTotal(st){ return st.cart.reduce((s,c)=>s+st.products[c.i].p*c.qty,0); }
+
+/* 데모 쿠폰 — 미리보기에서 쿠폰 적용 UX를 연상시키기 위함(실제 쇼핑몰은 창업자가 직접 발급) */
+const DEMO_COUPONS = {
+  WELCOME:   { kind:'percent', value:10,   label:'첫 구매 10% 할인' },
+  ONJONGIL:  { kind:'percent', value:15,   label:'온종일 15% 할인' },
+  FRESH5000: { kind:'amount',  value:5000, label:'5,000원 할인' },
+};
+function applyCoupon(st){
+  const inp = st.root.querySelector('[data-act="coupon-input"]');
+  const code = (inp ? inp.value : '').trim().toUpperCase();
+  if(!code){ st.coupon=null; st.couponMsg='쿠폰 코드를 입력해 주세요'; st.couponErr=true; refreshCart(st); return; }
+  const c = DEMO_COUPONS[code];
+  if(!c){ st.coupon=null; st.couponMsg='없는 쿠폰 코드예요'; st.couponErr=true; refreshCart(st); return; }
+  const sub = cartTotal(st);
+  const disc = c.kind==='percent' ? Math.round(sub*c.value/100) : c.value;
+  st.coupon = { code, discount:Math.min(disc, sub) };
+  st.couponMsg = c.label + ' 적용됐어요'; st.couponErr=false;
+  refreshCart(st);
+}
 function visibleProducts(st){
   const q = st.q.trim().toLowerCase();
   const list = st.products.map((p,i)=>({p,i}))
@@ -87,8 +106,18 @@ function cartHTML(st){
       <button class="cp-del" data-act="remove" data-i="${c.i}" aria-label="삭제">✕</button>
     </div>`;
   }).join('');
+  const sub = cartTotal(st);
+  const disc = st.coupon ? Math.min(st.coupon.discount, sub) : 0;
+  const pay = Math.max(0, sub - disc);
   const foot = `<div class="cp-foot">
-    <div class="cp-sum"><span>합계</span><b>${won(cartTotal(st))}</b></div>
+    <div class="cp-coupon">
+      <input type="text" data-act="coupon-input" placeholder="쿠폰 코드 (예: WELCOME)" value="${st.coupon ? st.coupon.code : ''}" ${st.coupon ? 'disabled' : ''}>
+      <button class="cp-coupon-btn" data-act="${st.coupon ? 'coupon-clear' : 'coupon-apply'}">${st.coupon ? '해제' : '적용'}</button>
+    </div>
+    ${st.couponMsg ? `<div class="cp-coupon-msg ${st.couponErr ? 'err' : 'ok'}">${st.couponMsg}</div>` : ''}
+    <div class="cp-sum"><span>상품합계</span><b>${won(sub)}</b></div>
+    ${disc ? `<div class="cp-sum cp-disc"><span>쿠폰할인</span><b>-${won(disc)}</b></div>` : ''}
+    <div class="cp-sum cp-total"><span>결제예정</span><b>${won(pay)}</b></div>
     <button class="cp-checkout" data-act="checkout">결제하기 →</button>
   </div>`;
   return head + `<div class="cp-body">${rows}</div>` + foot;
@@ -224,7 +253,7 @@ function buildStore(st){
 function mountStore(box, skinId, brandOverride){
   const s = SKIN_BY_ID[skinId] || SKINS[0];
   const theme = themeFor(s.id);
-  const st = { box, skin:s.id, brand:brandOverride||s.brand, products:theme.items, cats:theme.cats, cart:[], cat:theme.cats[0], sort:'reco', q:'', search:false, favs:new Set(), detailIdx:-1, dqty:1, dopts:{} };
+  const st = { box, skin:s.id, brand:brandOverride||s.brand, products:theme.items, cats:theme.cats, cart:[], cat:theme.cats[0], sort:'reco', q:'', search:false, favs:new Set(), detailIdx:-1, dqty:1, dopts:{}, coupon:null, couponMsg:'', couponErr:false };
   box._ss = st;
   box.style.overflow = '';        // 이전 오버레이 lock 잔존 방지
   box.innerHTML = buildStore(st);
@@ -257,6 +286,8 @@ function onStoreClick(e){
     case 'dq-inc':     st.dqty++; refreshDetailQty(st); break;
     case 'dq-dec':     st.dqty = Math.max(1, st.dqty-1); refreshDetailQty(st); break;
     case 'opt':        st.dopts[a.dataset.g] = (st.dopts[a.dataset.g]===a.dataset.label ? undefined : a.dataset.label); refreshDetailQty(st); break;
+    case 'coupon-apply': applyCoupon(st); break;
+    case 'coupon-clear': st.coupon=null; st.couponMsg=''; st.couponErr=false; refreshCart(st); break;
     case 'checkout':   checkout(st); break;
     case 'scroll-shelf': st.root.querySelector('.st-shelf')?.scrollIntoView({behavior:'smooth',block:'start'}); break;
     case 'close':      closeOverlay(st); break;
@@ -319,16 +350,20 @@ function bumpCart(st){
   c.classList.remove('bump'); void c.offsetWidth; c.classList.add('bump');
 }
 function checkout(st){
-  const n = cartCount(st), total = won(cartTotal(st));
+  const n = cartCount(st);
   if(!n) return;
+  const sub = cartTotal(st);
+  const disc = st.coupon ? Math.min(st.coupon.discount, sub) : 0;
+  const total = won(Math.max(0, sub - disc));
   st.cart = [];
+  st.coupon = null; st.couponMsg = ''; st.couponErr = false;
   const c = st.root.querySelector('.stb-cnt'); if(c) c.textContent = 0;
   const p = st.root.querySelector('.st-cart-panel');
   p.innerHTML = `<div class="cp-head"><b>주문 완료</b><button class="cp-x" data-act="close">✕</button></div>
     <div class="cp-done">
       <span>✅</span>
       <b>주문이 접수됐어요!</b>
-      <i>${n}개 · ${total}</i>
+      <i>${n}개 · ${total}${disc ? ` <small>(쿠폰 -${won(disc)})</small>` : ''}</i>
       <p>데모 결제입니다. 실제 결제·주문은 백엔드(창업자별 PG) 연동 후 동작해요.</p>
       <button class="cp-shop" data-act="close">계속 쇼핑하기</button>
     </div>`;
