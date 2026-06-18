@@ -1,11 +1,12 @@
 "use client";
 
-import { useState, useTransition } from "react";
+import { useState, useEffect, useTransition } from "react";
 import {
   addStoreCategory,
   renameStoreCategory,
   deleteStoreCategory,
   moveStoreCategory,
+  seedCategoriesFromProducts,
   type StoreCat,
 } from "@/app/dashboard/[id]/categories/actions";
 
@@ -15,7 +16,19 @@ export default function CategoryManager({ storeId, initial }: { storeId: string;
   const [editing, setEditing] = useState<string | null>(null);
   const [editVal, setEditVal] = useState("");
   const [err, setErr] = useState("");
+  const [seeding, setSeeding] = useState(initial.length === 0);
   const [pending, start] = useTransition();
+
+  // 관리 목록이 비어있으면 기존 상품들이 쓰던 카테고리를 자동으로 불러와 채움
+  useEffect(() => {
+    if (initial.length === 0) {
+      seedCategoriesFromProducts(storeId).then((list) => {
+        setCats(list);
+        setSeeding(false);
+      });
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   // 서버액션 후 목록을 새로 받아오기 위해 페이지가 revalidate되지만,
   // 즉시 반영 위해 낙관적으로 로컬도 갱신한다.
@@ -76,7 +89,11 @@ export default function CategoryManager({ storeId, initial }: { storeId: string;
       {err && <p className="mt-2 text-xs font-semibold text-rose-500">{err}</p>}
 
       {/* 목록 */}
-      {cats.length === 0 ? (
+      {seeding ? (
+        <div className="mt-4 rounded-xl border border-dashed border-black/10 py-8 text-center text-sm text-neutral-400 dark:border-white/10">
+          기존 상품 카테고리를 불러오는 중…
+        </div>
+      ) : cats.length === 0 ? (
         <div className="mt-4 rounded-xl border border-dashed border-black/10 py-8 text-center text-sm text-neutral-400 dark:border-white/10">
           아직 카테고리가 없어요. 위에서 추가하면 상품 등록 시 선택할 수 있어요.
         </div>
