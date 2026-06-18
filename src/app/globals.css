@@ -65,8 +65,14 @@ body {
   [role="button"]:active {
     transform: scale(0.95);
   }
+  /* 링크에 마우스 올리면 살짝 흐려져 '누를 수 있음'을 표시 */
+  a:hover {
+    opacity: 0.68;
+  }
+  /* 누르는 순간 또렷하게 반응 */
   a:active {
-    transform: scale(0.985);
+    transform: scale(0.94);
+    opacity: 0.55;
   }
 
   /* 키보드 포커스 링 (접근성) */
