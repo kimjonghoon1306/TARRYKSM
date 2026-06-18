@@ -203,6 +203,7 @@ function buildStore(st){
       <nav class="stb-nav"><a data-act="scroll-shelf">신상</a><a data-act="scroll-shelf">베스트</a><a data-act="scroll-shelf">카테고리</a><a data-act="scroll-shelf">이벤트</a></nav>
       <div class="stb-actions">
         <button class="stb-ico" data-act="toggle-search">🔍</button>
+        <button class="stb-login" data-act="demo-auth">로그인</button>
         <button class="stb-cart" data-act="open-cart">🛒 <b class="stb-cnt">${cartCount(st)}</b></button>
       </div>
     </div>
@@ -244,6 +245,7 @@ function buildStore(st){
     <div class="st-overlay" data-act="close"></div>
     <aside class="st-cart-panel"></aside>
     <section class="st-detail-panel"></section>
+    <aside class="st-auth-panel"></aside>
   </div>`;
 }
 
@@ -280,6 +282,9 @@ function onStoreClick(e){
     case 'reset':      st.cat='전체'; st.sort='reco'; st.q=''; setSearch(st,false); refreshGrid(st); refreshSearchInput(st); break;
     case 'toggle-search': setSearch(st, !st.search); break;
     case 'open-cart':  openCart(st); break;
+    case 'demo-auth':  openAuth(st); break;
+    case 'auth-tab':   st.authTab = a.dataset.tab; refreshAuth(st); break;
+    case 'auth-go':    closeOverlay(st); storeToast(st, '미리보기 데모예요 — 실제 쇼핑몰에선 로그인이 동작해요'); break;
     case 'inc':        changeQty(st,i,1); break;
     case 'dec':        changeQty(st,i,-1); break;
     case 'remove':     removeItem(st,i); break;
@@ -374,7 +379,7 @@ function lockFrame(st){
   st.box.scrollTop = 0;
   st.box.style.overflow = 'hidden';
   const h = st.box.clientHeight + 'px';
-  st.root.querySelectorAll('.st-overlay,.st-cart-panel,.st-detail-panel').forEach(el=>{
+  st.root.querySelectorAll('.st-overlay,.st-cart-panel,.st-detail-panel,.st-auth-panel').forEach(el=>{
     el.style.top = '0'; el.style.height = h;
   });
 }
@@ -383,6 +388,35 @@ function openCart(st){
   refreshCart(st);
   lockFrame(st);
   st.root.classList.add('cart-on');
+}
+
+/* ── 손님 로그인/회원가입 시트 (데모 — 실제 쇼핑몰의 손님 인증 UX를 미리보기에서 연상) ── */
+function authHTML(st){
+  const isS = (st.authTab || 'login') === 'signup';
+  return `<button class="cp-x" data-act="close">✕</button>
+    <div class="au-sheet">
+      <div class="au-brand">${st.brand}</div>
+      <div class="au-sub">${isS ? '회원가입하고 더 편하게 쇼핑하세요' : '다시 오셨네요, 반가워요'}</div>
+      <div class="au-tabs">
+        <button class="au-tab ${isS ? '' : 'on'}" data-act="auth-tab" data-tab="login">로그인</button>
+        <button class="au-tab ${isS ? 'on' : ''}" data-act="auth-tab" data-tab="signup">회원가입</button>
+      </div>
+      ${isS ? `<input class="au-input" placeholder="이름">` : ''}
+      <input class="au-input" placeholder="이메일">
+      <input class="au-input" type="password" placeholder="비밀번호">
+      ${isS ? `<input class="au-input" placeholder="휴대폰 번호">` : ''}
+      <button class="au-go" data-act="auth-go">${isS ? '회원가입' : '로그인'}</button>
+      <p class="au-demo">미리보기 데모예요. 실제 쇼핑몰에선 손님이 회원가입·로그인하고 마이페이지(주문내역·찜·적립금)를 이용할 수 있어요.</p>
+    </div>`;
+}
+function openAuth(st){
+  st.authTab = 'login';
+  const p = st.root.querySelector('.st-auth-panel'); if(p) p.innerHTML = authHTML(st);
+  lockFrame(st);
+  st.root.classList.add('auth-on');
+}
+function refreshAuth(st){
+  const p = st.root.querySelector('.st-auth-panel'); if(p) p.innerHTML = authHTML(st);
 }
 function openDetail(st,i){
   st.detailIdx = i; st.dqty = 1; st.dopts = {};
@@ -401,7 +435,7 @@ function storeToast(st, html){
   st._toastTimer = setTimeout(()=> t.remove(), 1900);
 }
 function closeOverlay(st){
-  st.root.classList.remove('cart-on','detail-on');
+  st.root.classList.remove('cart-on','detail-on','auth-on');
   unlockFrame(st);
 }
 
