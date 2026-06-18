@@ -120,6 +120,7 @@ export default function Storefront({
   customer,
   slug,
   wishlistIds,
+  openAuth,
 }: {
   store: Store;
   products: Product[];
@@ -128,9 +129,11 @@ export default function Storefront({
   customer?: CustomerInfo;
   slug?: string;
   wishlistIds?: string[];
+  openAuth?: "login" | "signup";
 }) {
   const [cart, setCart] = useState<Record<string, CartLine>>({});
-  const [authOpen, setAuthOpen] = useState(false); // 로그인/회원가입 시트
+  // 비로그인 손님이 마이페이지 등에서 넘어오면 로그인/회원가입 시트를 자동으로 연다
+  const [authOpen, setAuthOpen] = useState(!!openAuth && !customer);
   const [detail, setDetail] = useState<Product | null>(null);
   const [promo, setPromo] = useState<{ title: string; items: Product[] } | null>(null); // 기획전 모음 시트
   const [detailQty, setDetailQty] = useState(1);
@@ -1175,7 +1178,7 @@ export default function Storefront({
       )}
 
       {authOpen && slug && (
-        <CustomerAuthSheet storeId={store.id} storeName={store.name} slug={slug} onClose={() => setAuthOpen(false)} />
+        <CustomerAuthSheet storeId={store.id} storeName={store.name} slug={slug} initialTab={openAuth === "signup" ? "signup" : "login"} onClose={() => setAuthOpen(false)} />
       )}
 
       <div className={"sf-toast" + (toast ? " on" : "")}>{toast}</div>

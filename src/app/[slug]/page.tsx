@@ -60,10 +60,14 @@ type Store = {
 // (예약 정적 경로 dashboard·login·s 등이 우선하므로 충돌 없음)
 export default async function PrettyStorefront({
   params,
+  searchParams,
 }: {
   params: Promise<{ slug: string }>;
+  searchParams?: Promise<{ auth?: string }>;
 }) {
   const { slug } = await params;
+  const sp = searchParams ? await searchParams : {};
+  const openAuth = sp.auth === "signup" ? "signup" : sp.auth === "login" ? "login" : undefined;
   const supabase = await createClient();
 
   const { data: store } = await supabase
@@ -100,6 +104,7 @@ export default async function PrettyStorefront({
         slug={slug}
         customer={customer}
         wishlistIds={wishlistIds}
+        openAuth={openAuth}
         store={{
           id: s.id,
           name: s.name,

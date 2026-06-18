@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { redirect, notFound } from "next/navigation";
+import { notFound } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { getCustomer, getWishlistProducts } from "../customer-actions";
 import CustomerLogoutButton from "@/components/CustomerLogoutButton";
@@ -21,7 +21,25 @@ export default async function MyPage({ params }: { params: Promise<{ slug: strin
   if (!store) notFound();
 
   const cust = await getCustomer();
-  if (!cust || cust.store_id !== store.id) redirect(`/${slug}`); // 비로그인은 쇼핑몰로
+  // 비로그인 손님 → 그냥 튕기지 말고 로그인/회원가입 안내
+  if (!cust || cust.store_id !== store.id) {
+    return (
+      <main style={{ minHeight: "100vh", background: "linear-gradient(180deg,#eef0f7 0%,#f7f8fb 360px)", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", padding: 24, color: "#1a1a1a" }}>
+        <div style={{ width: "100%", maxWidth: 420, background: "#fff", borderRadius: 24, padding: "40px 28px", textAlign: "center", boxShadow: "0 20px 50px -28px rgba(0,0,0,.3)" }}>
+          <div style={{ fontSize: 46 }}>🔒</div>
+          <h1 style={{ fontSize: 21, fontWeight: 900, marginTop: 14 }}>로그인이 필요해요</h1>
+          <p style={{ fontSize: 14, color: "#6b7280", marginTop: 8, lineHeight: 1.6 }}>
+            로그인하면 <b>주문 내역 · 찜한 상품 · 적립금</b>을<br />한곳에서 확인할 수 있어요.
+          </p>
+          <div style={{ display: "flex", flexDirection: "column", gap: 10, marginTop: 24 }}>
+            <Link href={`/${slug}?auth=login`} style={{ padding: "14px", borderRadius: 14, background: "linear-gradient(135deg,#4f46e5,#6d28d9)", color: "#fff", fontWeight: 800, fontSize: 15, textDecoration: "none" }}>로그인하기</Link>
+            <Link href={`/${slug}?auth=signup`} style={{ padding: "14px", borderRadius: 14, background: "#f3f4f6", color: "#374151", fontWeight: 800, fontSize: 15, textDecoration: "none" }}>회원가입하기</Link>
+          </div>
+          <Link href={`/${slug}`} style={{ display: "inline-block", marginTop: 18, fontSize: 13, color: "#9ca3af", fontWeight: 600, textDecoration: "none" }}>← {store.name} 쇼핑 계속하기</Link>
+        </div>
+      </main>
+    );
+  }
 
   // 내 주문 내역 (customer_id 연결분)
   const { data: orders } = await supabase

@@ -9,13 +9,15 @@ export default function CustomerAuthSheet({
   storeName,
   slug,
   onClose,
+  initialTab = "login",
 }: {
   storeId: string;
   storeName?: string;
   slug: string;
   onClose: () => void;
+  initialTab?: "login" | "signup";
 }) {
-  const [tab, setTab] = useState<"login" | "signup">("login");
+  const [tab, setTab] = useState<"login" | "signup">(initialTab);
   const [email, setEmail] = useState("");
   const [pw, setPw] = useState("");
   const [showPw, setShowPw] = useState(false);
