@@ -15,7 +15,9 @@ import {
   ensureDefaultSections,
 } from "@/app/dashboard/[id]/sections/actions";
 
-type Prod = { id: string; name: string; emoji: string | null; image_url: string | null; category: string | null; tag?: string | null; created_at?: string | null };
+type Prod = { id: string; name: string; emoji: string | null; image_url: string | null; category: string | null; price?: number | null; tag?: string | null; created_at?: string | null };
+
+const won = (n: number) => "₩" + (n || 0).toLocaleString("ko-KR");
 
 const BEST_RE = /best|베스트|인기|추천|hot|스테디/i;
 
@@ -53,13 +55,18 @@ function BlockPreview({
       pool = [...products].sort((a, b) => (b.created_at || "").localeCompare(a.created_at || ""));
     }
   }
-  const imgs = pool.filter((p) => p.image_url).slice(0, 4);
-  const thumb = (i: number): React.CSSProperties => ({
-    aspectRatio: "1 / 1", borderRadius: 8, overflow: "hidden", background: hexA(sk.color, 0.1),
-    backgroundImage: imgs[i]?.image_url ? `url(${imgs[i].image_url})` : undefined,
-    backgroundSize: "cover", backgroundPosition: "center",
-    display: "grid", placeItems: "center", fontSize: 22,
-  });
+  // 진열 기준에 맞는 상품을 limit 개수만큼 (선반은 가로 스크롤로 4개 넘어도 다 보임)
+  const limit = section.type === "grid" ? Math.max(pool.length, 1) : (c.limit ?? 8);
+  const list = pool.slice(0, limit);
+  const card = (p: Prod, key: number, w?: number) => (
+    <div key={key} style={{ flex: w ? `0 0 ${w}px` : undefined }}>
+      <div style={{ aspectRatio: "1 / 1", borderRadius: 8, overflow: "hidden", background: hexA(sk.color, 0.1), backgroundImage: p.image_url ? `url(${p.image_url})` : undefined, backgroundSize: "cover", backgroundPosition: "center", display: "grid", placeItems: "center", fontSize: 22 }}>
+        {p.image_url ? "" : p.emoji || "🛍"}
+      </div>
+      <div style={{ fontSize: 10, fontWeight: 700, color: sk.color, marginTop: 4, opacity: 0.85, overflow: "hidden", whiteSpace: "nowrap", textOverflow: "ellipsis" }}>{p.name}</div>
+      <div style={{ fontSize: 11, fontWeight: 800, color: sk.color }}>{won(p.price || 0)}</div>
+    </div>
+  );
 
   if (section.type === "banner") {
     return (
@@ -86,24 +93,27 @@ function BlockPreview({
       </div>
     );
   }
-  // shelf / grid — 상품 진열
-  const cols = section.type === "grid" ? 4 : 4;
+  // shelf / grid — 상품 진열 (선반=가로 스크롤로 전부, 그리드=여러 줄)
   return (
     <div style={wrap}>
       <div style={{ padding: 14 }}>
         <div style={{ display: "flex", alignItems: "baseline", justifyContent: "space-between", marginBottom: 10, color: sk.color }}>
           <b style={{ fontSize: 14, fontWeight: 800 }}>{c.title || (section.type === "grid" ? "전체 상품" : "상품 선반")}</b>
-          {section.type === "shelf" && <span style={{ fontSize: 11, opacity: 0.6 }}>더보기 →</span>}
+          <span style={{ fontSize: 11, opacity: 0.6 }}>{list.length}개</span>
         </div>
-        <div style={{ display: "grid", gridTemplateColumns: `repeat(${cols}, 1fr)`, gap: 8 }}>
-          {Array.from({ length: cols }).map((_, i) => (
-            <div key={i}>
-              <div style={thumb(i)}>{imgs[i]?.image_url ? "" : "🛍"}</div>
-              <div style={{ fontSize: 10, fontWeight: 700, color: sk.color, marginTop: 4, opacity: 0.85 }}>{imgs[i]?.name || "상품"}</div>
-              <div style={{ fontSize: 11, fontWeight: 800, color: sk.color }}>₩12,000</div>
-            </div>
-          ))}
-        </div>
+        {list.length === 0 ? (
+          <div style={{ padding: "18px 0", textAlign: "center", fontSize: 12, color: hexA(sk.color, 0.55) }}>
+            {c.source === "manual" ? "아래에서 상품을 직접 골라주세요." : "표시할 상품이 없어요."}
+          </div>
+        ) : section.type === "shelf" ? (
+          <div style={{ display: "flex", gap: 8, overflowX: "auto", paddingBottom: 6 }}>
+            {list.map((p, i) => card(p, i, 86))}
+          </div>
+        ) : (
+          <div style={{ display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: 8 }}>
+            {list.map((p, i) => card(p, i))}
+          </div>
+        )}
       </div>
     </div>
   );

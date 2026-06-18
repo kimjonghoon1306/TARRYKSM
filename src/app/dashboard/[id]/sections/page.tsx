@@ -19,7 +19,7 @@ export default async function SectionsPage({ params }: { params: Promise<{ id: s
 
   const { data: prods } = await supabase
     .from("products")
-    .select("id,name,emoji,image_url,category,tag,created_at")
+    .select("id,name,emoji,image_url,category,price,tag,created_at")
     .eq("store_id", id)
     .order("created_at", { ascending: false });
   const products = (prods ?? []) as {
@@ -28,6 +28,7 @@ export default async function SectionsPage({ params }: { params: Promise<{ id: s
     emoji: string | null;
     image_url: string | null;
     category: string | null;
+    price: number | null;
     tag: string | null;
     created_at: string | null;
   }[];
