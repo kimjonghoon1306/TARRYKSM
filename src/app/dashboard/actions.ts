@@ -217,6 +217,29 @@ export async function setStorePayment(formData: FormData) {
   redirect(`/dashboard/${id}?pmsg=` + encodeURIComponent("결제 설정을 저장했어요"));
 }
 
+// 적립금 설정 — 사용 여부 + 적립률(%). 주문 '완료' 시 손님에게 total*rate% 자동 적립.
+export async function setStorePoints(formData: FormData) {
+  const supabase = await createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+  if (!user) redirect("/login");
+  const id = String(formData.get("id") || "");
+  if (!id) return;
+
+  const pointsOn = String(formData.get("points_on") || "") === "1";
+  let rate = parseInt(String(formData.get("points_rate") || "0"), 10);
+  if (!Number.isFinite(rate)) rate = 0;
+  rate = Math.max(0, Math.min(50, rate)); // 0~50% 안전범위
+
+  await supabase
+    .from("stores")
+    .update({ points_on: pointsOn, points_rate: rate })
+    .eq("id", id);
+  revalidatePath(`/dashboard/${id}`);
+  redirect(`/dashboard/${id}?ptmsg=` + encodeURIComponent("적립금 설정을 저장했어요"));
+}
+
 // 사업자 정보 — 쇼핑몰 하단에 표시되는 법적 의무 표시 항목
 export async function setStoreBusiness(formData: FormData) {
   const supabase = await createClient();

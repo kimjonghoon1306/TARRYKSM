@@ -10,6 +10,8 @@ export async function updateOrderStatus(orderId: string, status: string) {
   if (!STATUSES.includes(status)) return;
   const supabase = await createClient();
   await supabase.from("orders").update({ status }).eq("id", orderId);
+  // 적립금 동기화: '완료'면 적립, 완료에서 벗어나면 회수 (멱등, points.sql 미실행 환경이면 무시)
+  await supabase.rpc("sync_order_points", { p_order: orderId });
   revalidatePath("/dashboard/orders");
   revalidatePath("/dashboard");
 }

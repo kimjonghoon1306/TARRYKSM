@@ -2,13 +2,14 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { domainToUnicode } from "node:url";
 import { createClient } from "@/lib/supabase/server";
-import { setStoreDomain, togglePublish, setStoreSlug, setStorePayment, setStoreBusiness } from "../actions";
+import { setStoreDomain, togglePublish, setStoreSlug, setStorePayment, setStorePoints, setStoreBusiness } from "../actions";
 import { PRIMARY_DOMAIN } from "@/lib/domains";
 import DomainHelp from "@/components/DomainHelp";
 import BrandingForm from "@/components/BrandingForm";
 import StorePreviewButton from "@/components/StorePreviewButton";
 import { SaveButton, SavedToast } from "@/components/SaveBar";
 import PaymentMethods from "@/components/PaymentMethods";
+import PointsSettings from "@/components/PointsSettings";
 import BrandingTutorial from "@/components/BrandingTutorial";
 
 type Store = {
@@ -27,6 +28,8 @@ type Store = {
   pay_bank_on: boolean | null;
   pay_card_on: boolean | null;
   pay_vbank_on: boolean | null;
+  points_on: boolean | null;
+  points_rate: number | null;
   footer_text: string | null;
   biz_company: string | null;
   biz_owner: string | null;
@@ -42,14 +45,14 @@ export default async function StoreAdmin({
   searchParams,
 }: {
   params: Promise<{ id: string }>;
-  searchParams: Promise<{ dmsg?: string; derr?: string; smsg?: string; serr?: string; brmsg?: string; pmsg?: string }>;
+  searchParams: Promise<{ dmsg?: string; derr?: string; smsg?: string; serr?: string; brmsg?: string; pmsg?: string; ptmsg?: string }>;
 }) {
   const { id } = await params;
-  const { dmsg, derr, smsg, serr, brmsg, pmsg } = await searchParams;
+  const { dmsg, derr, smsg, serr, brmsg, pmsg, ptmsg } = await searchParams;
   const supabase = await createClient();
   const { data: store } = await supabase
     .from("stores")
-    .select("id,name,skin,slug,published,custom_domain,logo_url,hero_image_url,hero_title,hero_subtitle,pay_bank,pay_note,pay_bank_on,pay_card_on,pay_vbank_on,footer_text,biz_company,biz_owner,biz_number,biz_mailorder,biz_address,biz_phone,biz_email")
+    .select("id,name,skin,slug,published,custom_domain,logo_url,hero_image_url,hero_title,hero_subtitle,pay_bank,pay_note,pay_bank_on,pay_card_on,pay_vbank_on,points_on,points_rate,footer_text,biz_company,biz_owner,biz_number,biz_mailorder,biz_address,biz_phone,biz_email")
     .eq("id", id)
     .maybeSingle();
   if (!store) notFound();
@@ -85,7 +88,7 @@ export default async function StoreAdmin({
 
   return (
     <div className="mx-auto max-w-4xl">
-      <SavedToast message={brmsg || pmsg || dmsg || smsg} />
+      <SavedToast message={brmsg || pmsg || ptmsg || dmsg || smsg} />
       <Link href="/dashboard/stores" className="text-sm text-neutral-500 hover:text-violet-500">
         ← 쇼핑몰
       </Link>
@@ -335,6 +338,22 @@ export default async function StoreAdmin({
             (아임웹·식스샵과 동일한 방식) 지금은 무통장입금으로 주문을 받을 수 있어요.
           </p>
         </div>
+      </section>
+
+      {/* 적립금 설정 */}
+      <section className={card + " mt-4"}>
+        <h2 className="mb-1 font-semibold">💰 적립금</h2>
+        <p className="mb-4 text-xs text-neutral-500">
+          주문이 완료되면 손님에게 적립금을 자동으로 쌓아줄 수 있어요. 단골을 만드는 데 좋아요.
+        </p>
+        {ptmsg && (
+          <p className="mb-3 rounded-lg bg-emerald-500/10 px-3 py-2 text-sm text-emerald-600 dark:text-emerald-400">{ptmsg}</p>
+        )}
+        <form action={setStorePoints} className="space-y-3">
+          <input type="hidden" name="id" value={s.id} />
+          <PointsSettings on={s.points_on === true} rate={s.points_rate ?? 1} />
+          <SaveButton label="적립금 설정 저장" />
+        </form>
       </section>
 
       {/* 사업자 정보 (쇼핑몰 하단 표시) */}
