@@ -363,13 +363,15 @@
 /* ════════════════════════════════════════
    B · 상품 진열 고도화 (2026-06-15) — 신상/베스트 선반 + 기획전 배너
 ════════════════════════════════════════ */
-.sf-shelf { margin: 0 0 32px; }
+.sf-shelf { margin: 0 0 32px; position: relative; }
+/* 오른쪽 페이드 — 가로 스크롤로 상품이 더 있음을 자연스럽게 암시(잘린 느낌 제거) */
+.sf-shelf::after { content: ""; position: absolute; top: 42px; right: 0; bottom: 14px; width: 48px; background: linear-gradient(to right, transparent, var(--s-bg)); pointer-events: none; z-index: 1; }
 .sf-shelf-head { display: flex; align-items: baseline; justify-content: space-between; gap: 12px; margin: 6px 2px 14px; }
 .sf-shelf-head h2 { font-family: var(--s-fd); font-weight: var(--s-fw); font-size: 19px; letter-spacing: var(--s-hls); }
 .sf-shelf-sub { font-size: 12.5px; color: var(--s-sub); font-weight: 600; }
 
 /* 추천 선반 — 가로 스크롤, 이미지+이름만 (담기·가격 없음) */
-.sf-shelf-rail { display: flex; gap: 14px; overflow-x: auto; scroll-snap-type: x mandatory; padding: 4px 2px 10px; margin: 0 -2px; scrollbar-width: none; -webkit-overflow-scrolling: touch; }
+.sf-shelf-rail { display: flex; gap: 14px; overflow-x: auto; scroll-snap-type: x mandatory; padding: 4px 24px 10px 2px; margin: 0 -2px; scrollbar-width: none; -webkit-overflow-scrolling: touch; }
 .sf-shelf-rail::-webkit-scrollbar { height: 0; }
 .sf-rail-card { flex: 0 0 auto; width: 168px; scroll-snap-align: start; border: 0; background: none; padding: 0; cursor: pointer; text-align: left; }
 .sf-rail-thumb { position: relative; width: 168px; height: 168px; border-radius: calc(var(--s-r) + 4px); overflow: hidden; background: var(--s-brand-soft); display: grid; place-items: center; }
