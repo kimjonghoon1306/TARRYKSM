@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { useFormStatus } from "react-dom";
 import { createPortal } from "react-dom";
 import { SKINS, SKIN_BY_ID } from "@/lib/skins";
+import { sampleProductsForSkin } from "@/lib/sampleData";
 import { setStoreSkin } from "@/app/dashboard/actions";
 
 // 저장 버튼 — 누르는 즉시 "저장 중…" + 비활성. (useFormStatus는 form 자식에서만 동작)
@@ -245,18 +246,20 @@ export default function SkinPicker({
               </div>
             </div>
             <div style={{ display: "grid", gridTemplateColumns: `repeat(${DEVICE_COLS[device]}, 1fr)`, gap: 12, padding: 16 }}>
-              {Array.from({ length: DEVICE_COLS[device] * 2 }).map((_, i) => (
+              {sampleProductsForSkin(sel.id).slice(0, DEVICE_COLS[device] * 2).map((p, i) => (
                 <div key={i} style={{ borderRadius: 12, overflow: "hidden", border: `1px solid ${hexA(sel.color, 0.15)}` }}>
-                  <div style={{ aspectRatio: "1 / 1", overflow: "hidden", background: hexA(sel.color, 0.1) }}>
-                    {SKIN_THUMB[sel.id] && (
+                  <div style={{ aspectRatio: "1 / 1", overflow: "hidden", background: hexA(sel.color, 0.1), display: "grid", placeItems: "center", fontSize: 30 }}>
+                    {p.img ? (
                       // eslint-disable-next-line @next/next/no-img-element
-                      <img src={SKIN_THUMB[sel.id]} alt="" style={{ width: "100%", height: "100%", objectFit: "cover" }} />
+                      <img src={p.img} alt={p.n} style={{ width: "100%", height: "100%", objectFit: "cover" }} />
+                    ) : (
+                      p.e || "📦"
                     )}
                   </div>
                   <div style={{ padding: "9px 10px", color: sel.color }}>
-                    <div style={{ fontSize: 12, fontWeight: 700, opacity: 0.85 }}>상품 이름</div>
+                    <div style={{ fontSize: 12, fontWeight: 700, opacity: 0.85, overflow: "hidden", whiteSpace: "nowrap", textOverflow: "ellipsis" }}>{p.n}</div>
                     <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginTop: 5 }}>
-                      <b style={{ fontSize: 13 }}>₩12,000</b>
+                      <b style={{ fontSize: 13 }}>₩{(p.p || 0).toLocaleString()}</b>
                       <span style={{ fontSize: 11, fontWeight: 700, padding: "4px 10px", borderRadius: 7, background: sel.color, color: sel.bg }}>담기</span>
                     </div>
                   </div>
