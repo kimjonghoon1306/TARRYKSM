@@ -291,6 +291,14 @@
 /* 카드는 항상 또렷하게 표시 (등장 fade 애니메이션 제거 — 오른쪽 카드가 흐릿하게 남던 문제) */
 .sf-card { opacity: 1; }
 
+/* 기획전 모음 시트 — 배너에서 고른 상품들을 큰 모달로 */
+.sf-promo-sheet { position: fixed; z-index: 50; left: 50%; top: 50%; transform: translate(-50%, calc(-50% + 26px)) scale(.97); width: min(900px, 94vw); max-height: 88vh; display: flex; flex-direction: column; overflow: hidden; background: var(--s-surf); color: var(--s-ink); border: 1px solid var(--s-line); border-radius: calc(var(--s-r) + 12px); opacity: 0; pointer-events: none; transition: opacity .3s var(--ease), transform .38s var(--ease); box-shadow: 0 40px 90px -30px rgba(0,0,0,.55); }
+.sf-promo-sheet.on { opacity: 1; pointer-events: auto; transform: translate(-50%, -50%) scale(1); }
+.sf-promo-sheet-head { display: flex; align-items: flex-start; justify-content: space-between; gap: 12px; padding: 22px 24px 16px; border-bottom: 1px solid var(--s-line); }
+.sf-promo-sheet-head h2 { font-family: var(--s-fd); font-weight: var(--s-fw); font-size: 22px; margin: 2px 0; }
+.sf-promo-sheet-eyebrow { font-size: 11px; font-weight: 700; letter-spacing: .14em; text-transform: uppercase; color: var(--s-brand); }
+.sf-promo-sheet-body { overflow-y: auto; padding: 20px 24px 28px; }
+
 /* 전체 상품 페이지 번호 */
 .sf-pager { display: flex; flex-wrap: wrap; align-items: center; justify-content: center; gap: 6px; margin-top: 26px; }
 .sf-page-num, .sf-page-arrow {

@@ -132,6 +132,7 @@ export default function Storefront({
   const [cart, setCart] = useState<Record<string, CartLine>>({});
   const [authOpen, setAuthOpen] = useState(false); // 로그인/회원가입 시트
   const [detail, setDetail] = useState<Product | null>(null);
+  const [promo, setPromo] = useState<{ title: string; items: Product[] } | null>(null); // 기획전 모음 시트
   const [detailQty, setDetailQty] = useState(1);
   const [detailOpts, setDetailOpts] = useState<Record<string, string>>({});
   const [cartOpen, setCartOpen] = useState(false);
@@ -467,15 +468,18 @@ export default function Storefront({
   function renderSection(s: Section) {
     const c = s.config || {};
     if (s.type === "banner") {
+      // 기획전에 모은 상품들 (여러 개) — 우선순위: 모음 > 단일상품(하위호환) > 외부URL
+      const promoItems = (c.product_ids || []).map((id) => products.find((p) => p.id === id)).filter((p): p is Product => !!p);
       const link = c.link_product_id ? products.find((p) => p.id === c.link_product_id) : null;
-      const hasLink = !!(link || c.link_url);
+      const hasLink = promoItems.length > 0 || !!link || !!c.link_url;
       return (
         <button
           key={s.id}
           className={"sf-promo sf-promo--" + (c.height || "md") + (c.image_url ? " has-img" : "")}
           style={{ ...(c.image_url ? { backgroundImage: `url(${c.image_url})` } : {}), cursor: hasLink ? "pointer" : "default" }}
           onClick={() => {
-            if (link) openDetail(link);
+            if (promoItems.length) setPromo({ title: c.title || "기획전", items: promoItems });
+            else if (link) openDetail(link);
             else if (c.link_url) window.open(c.link_url, "_blank");
           }}
         >
@@ -768,6 +772,24 @@ export default function Storefront({
             : `© ${store.name} · 온종일로 만든 쇼핑몰`}
         </div>
       </div>
+
+      {/* 기획전 모음 시트 — 배너에서 고른 상품들을 한 번에 */}
+      <div className={"sf-scrim" + (promo ? " on" : "")} onClick={() => setPromo(null)} />
+      {promo && (
+        <div className="sf-promo-sheet on" role="dialog">
+          <div className="sf-promo-sheet-head">
+            <div>
+              <div className="sf-promo-sheet-eyebrow">기획전</div>
+              <h2>{promo.title}</h2>
+              <span className="sf-count">{promo.items.length}개 상품</span>
+            </div>
+            <button className="sf-x" style={{ position: "static" }} onClick={() => setPromo(null)}>✕</button>
+          </div>
+          <div className="sf-promo-sheet-body">
+            <div className="sf-grid">{promo.items.map(renderCard)}</div>
+          </div>
+        </div>
+      )}
 
       {/* 상세 시트 */}
       <div className={"sf-scrim" + (detail ? " on" : "")} onClick={() => setDetail(null)} />

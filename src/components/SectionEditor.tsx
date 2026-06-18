@@ -470,20 +470,16 @@ function Fields({
             </select>
           </div>
         </div>
-        <div className="grid gap-4 sm:grid-cols-2">
-          <div>
-            <label className={label}>클릭 시 이동할 상품</label>
-            <select className={input} value={c.link_product_id || ""} onChange={(e) => onPatch({ link_product_id: e.target.value || null })}>
-              <option value="">(없음)</option>
-              {products.map((p) => (
-                <option key={p.id} value={p.id}>{p.name}</option>
-              ))}
-            </select>
-          </div>
-          <div>
-            <label className={label}>또는 외부 링크 URL</label>
-            <input className={input} value={c.link_url || ""} onChange={(e) => onPatch({ link_url: e.target.value || null })} placeholder="https://..." />
-          </div>
+        <div>
+          <label className={label}>기획전에 모을 상품 (여러 개 선택)</label>
+          <ManualPicker products={products} selected={c.product_ids || []} onChange={(ids) => onPatch({ product_ids: ids })} />
+          <p style={{ fontSize: 12, color: "#6b7280", marginTop: 6 }}>
+            손님이 배너의 <b>“{c.cta_label || "지금 보기"}”</b>를 누르면 여기서 고른 상품을 한 번에 보여줘요.
+          </p>
+        </div>
+        <div>
+          <label className={label}>또는 외부 링크 URL (상품 대신)</label>
+          <input className={input} value={c.link_url || ""} onChange={(e) => onPatch({ link_url: e.target.value || null })} placeholder="https://..." />
         </div>
       </div>
     );
