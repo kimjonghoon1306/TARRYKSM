@@ -512,3 +512,9 @@ textarea.sf-co-input { resize: vertical; min-height: 56px; }
 .sf-fav.on { color: #e11d62; background: #fff0f5; }
 /* 상세 시트용 — 닫기(✕) 버튼과 안 겹치게 왼쪽으로 */
 .sf-fav-detail { top: 14px; right: 58px; width: 40px; height: 40px; font-size: 21px; }
+
+/* ── 연관상품(상세 시트 안) ── */
+.sf-related { margin-top: 26px; border-top: 1px solid var(--s-line); padding-top: 20px; }
+.sf-related-head { font-size: 14px; font-weight: 700; margin-bottom: 12px; }
+.sf-related-rail { display: flex; gap: 12px; overflow-x: auto; padding-bottom: 8px; scroll-snap-type: x mandatory; -webkit-overflow-scrolling: touch; }
+.sf-related-rail > * { scroll-snap-align: start; flex: 0 0 auto; width: 124px; }

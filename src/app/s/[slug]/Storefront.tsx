@@ -271,6 +271,15 @@ export default function Storefront({
     : 0;
   const stars = (n: number) => "★★★★★".slice(0, n) + "☆☆☆☆☆".slice(0, 5 - n);
 
+  // 연관상품 — 같은 카테고리 우선, 부족하면 다른 상품으로 채움 (자기 제외, 최대 6)
+  const related: Product[] = detail
+    ? (() => {
+        const same = products.filter((p) => p.id !== detail.id && p.category && p.category === detail.category);
+        const others = products.filter((p) => p.id !== detail.id && p.category !== detail.category);
+        return [...same, ...others].slice(0, 6);
+      })()
+    : [];
+
   async function postReview() {
     if (!detail) return;
     setRevErr("");
@@ -857,6 +866,13 @@ export default function Storefront({
                 </button>
               </div>
             </div>
+            {/* 연관상품 — 같은 카테고리 우선 */}
+            {related.length > 0 && (
+              <div className="sf-related">
+                <div className="sf-related-head">함께 보면 좋은 상품</div>
+                <div className="sf-related-rail">{related.map(renderShelfCard)}</div>
+              </div>
+            )}
           </div>
         </div>
       )}
