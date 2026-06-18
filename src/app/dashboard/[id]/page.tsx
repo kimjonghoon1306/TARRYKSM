@@ -10,6 +10,8 @@ import StorePreviewButton from "@/components/StorePreviewButton";
 import { SaveButton, SavedToast } from "@/components/SaveBar";
 import PaymentMethods from "@/components/PaymentMethods";
 import PointsSettings from "@/components/PointsSettings";
+import CategoryManager from "@/components/CategoryManager";
+import { listStoreCategories } from "./categories/actions";
 import BrandingTutorial from "@/components/BrandingTutorial";
 
 type Store = {
@@ -82,6 +84,8 @@ export default async function StoreAdmin({
     image_url: string | null;
     name: string;
   }[];
+
+  const storeCats = await listStoreCategories(id);
 
   const card =
     "rounded-2xl border border-black/5 bg-white p-5 shadow-sm dark:border-white/10 dark:bg-white/[0.03]";
@@ -289,6 +293,15 @@ export default async function StoreAdmin({
             ))}
           </div>
         )}
+      </section>
+
+      {/* 카테고리 관리 */}
+      <section className={card + " mt-4"}>
+        <h2 className="mb-1 font-semibold">🏷️ 카테고리</h2>
+        <p className="mb-4 text-xs text-neutral-500">
+          쇼핑몰 카테고리를 직접 만들고 순서·이름을 바꾸세요. 상품 등록 시 여기서 고른 카테고리로 분류됩니다.
+        </p>
+        <CategoryManager storeId={s.id} initial={storeCats} />
       </section>
 
       {/* 결제 설정 */}

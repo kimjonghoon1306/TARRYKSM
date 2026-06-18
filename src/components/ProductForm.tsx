@@ -8,12 +8,14 @@ import OptionsEditor from "@/components/OptionsEditor";
 import ProductImagePicker from "@/components/ProductImagePicker";
 import PriceInput from "@/components/PriceInput";
 
-const CATS = ["전체", "식품", "농산물", "수산물", "축산물", "베이커리", "가공·반찬", "패션", "리빙", "뷰티", "액세서리", "테크"];
+const DEFAULT_CATS = ["전체", "식품", "농산물", "수산물", "축산물", "베이커리", "가공·반찬", "패션", "리빙", "뷰티", "액세서리", "테크"];
 const INPUT =
   "w-full rounded-lg border border-black/10 bg-white px-3 py-2 text-sm outline-none focus:border-violet-500 focus:ring-2 focus:ring-violet-500/25 dark:border-white/10 dark:bg-white/[0.04]";
 const won = (n: number) => "₩" + (n || 0).toLocaleString("ko-KR");
 
-export default function ProductForm({ storeId, skin }: { storeId: string; skin: string }) {
+export default function ProductForm({ storeId, skin, cats }: { storeId: string; skin: string; cats?: string[] }) {
+  // 몰에서 직접 만든 카테고리가 있으면 그걸, 없으면 기본 목록
+  const CATS = cats && cats.length ? cats : DEFAULT_CATS;
   const sk = SKIN_BY_ID[skin] || SKIN_BY_ID["mono"];
   const [name, setName] = useState("");
   const [brand, setBrand] = useState("");
@@ -88,7 +90,7 @@ export default function ProductForm({ storeId, skin }: { storeId: string; skin: 
           <input name="brand" value={brand} onChange={(e) => setBrand(e.target.value)} placeholder="예: AROMA" className={INPUT} />
         </L>
         <L label="카테고리">
-          <select name="category" defaultValue="전체" className={INPUT}>
+          <select name="category" defaultValue={CATS[0]} className={INPUT}>
             {CATS.map((c) => <option key={c} value={c}>{c}</option>)}
           </select>
         </L>

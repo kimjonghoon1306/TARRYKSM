@@ -3,6 +3,7 @@ import { notFound } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { deleteProduct } from "./actions";
 import ProductForm from "@/components/ProductForm";
+import { listStoreCategories } from "../categories/actions";
 
 type Store = { id: string; name: string; slug: string; skin: string };
 type Product = {
@@ -43,6 +44,8 @@ export default async function ProductsAdmin({
     .order("created_at", { ascending: false });
   const items = (products ?? []) as Product[];
 
+  const storeCats = (await listStoreCategories(id)).map((c) => c.name);
+
   return (
     <div className="mx-auto max-w-5xl">
       <Link href={`/dashboard/${s.id}`} className="text-sm text-neutral-500 hover:text-violet-500">
@@ -62,7 +65,7 @@ export default async function ProductsAdmin({
       {/* 상품 추가 폼 + 소비자 미리보기 */}
       <section className={CARD + " mt-6"}>
         <h2 className="mb-4 font-semibold">＋ 상품 추가</h2>
-        <ProductForm storeId={s.id} skin={s.skin} />
+        <ProductForm storeId={s.id} skin={s.skin} cats={storeCats} />
       </section>
 
       {/* 상품 목록 */}

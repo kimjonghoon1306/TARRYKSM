@@ -2,6 +2,7 @@ import Link from "next/link";
 import { notFound, redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { updateProduct } from "../actions";
+import { listStoreCategories } from "../../categories/actions";
 import OptionsEditor from "@/components/OptionsEditor";
 import ProductImagePicker from "@/components/ProductImagePicker";
 import PriceInput from "@/components/PriceInput";
@@ -20,7 +21,7 @@ type Product = {
   options: { name: string; choices: { label: string; add: number }[] }[] | null;
 };
 
-const CATS = ["전체", "식품", "농산물", "수산물", "축산물", "베이커리", "가공·반찬", "패션", "리빙", "뷰티", "액세서리", "테크"];
+const DEFAULT_CATS = ["전체", "식품", "농산물", "수산물", "축산물", "베이커리", "가공·반찬", "패션", "리빙", "뷰티", "액세서리", "테크"];
 const INPUT =
   "w-full rounded-lg border border-black/10 bg-white px-3 py-2 text-sm outline-none focus:border-violet-500 focus:ring-2 focus:ring-violet-500/25 dark:border-white/10 dark:bg-white/[0.04]";
 
@@ -40,6 +41,11 @@ export default async function EditProduct({
     .maybeSingle();
   if (!data) notFound();
   const p = data as Product;
+
+  // 몰에서 만든 카테고리(있으면) + 현재 상품 카테고리 보존
+  const managed = (await listStoreCategories(id)).map((c) => c.name);
+  const base = managed.length ? managed : DEFAULT_CATS;
+  const CATS = p.category && !base.includes(p.category) ? [p.category, ...base] : base;
 
   async function save(formData: FormData) {
     "use server";
@@ -77,7 +83,7 @@ export default async function EditProduct({
           <input name="brand" defaultValue={p.brand || ""} className={INPUT} />
         </Field>
         <Field label="카테고리">
-          <select name="category" defaultValue={p.category || "전체"} className={INPUT}>
+          <select name="category" defaultValue={p.category || CATS[0]} className={INPUT}>
             {CATS.map((c) => <option key={c} value={c}>{c}</option>)}
           </select>
         </Field>
