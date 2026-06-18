@@ -48,6 +48,24 @@ const SKIN_THUMB: Record<string, string> = {
   crimson: `${PROD}/backpack.webp`,// 스포티 액티브 → 백팩
 };
 
+// 스킨 컨셉 → 어울리는 상품 카테고리 (미리보기에 관련 상품만 노출)
+const SKIN_CAT: Record<string, string> = {
+  midnight: "테크", grape: "테크",
+  noir: "액세서리", slate: "액세서리",
+  bloom: "뷰티", coral: "뷰티", lavender: "뷰티", berry: "뷰티",
+  citrus: "패션", crimson: "패션",
+  mono: "리빙", mocha: "리빙", pine: "리빙", azure: "리빙",
+};
+// 그 스킨 컨셉에 맞는 상품만 n개 (부족하면 중복으로 채움 — 무관한 상품 섞지 않음)
+function previewProducts(skin: string, n: number) {
+  const all = sampleProductsForSkin(skin);
+  const cat = SKIN_CAT[skin];
+  let pool = cat ? all.filter((p) => p.cat === cat) : all; // 식품 스킨은 이미 업태 상품
+  if (!pool.length) pool = all;
+  if (!pool.length) return [];
+  return Array.from({ length: n }, (_, i) => pool[i % pool.length]);
+}
+
 // hex 색에 투명도 적용 (#rrggbb + alpha → rgba)
 function hexA(hex: string, a: number) {
   const h = hex.replace("#", "");
@@ -246,7 +264,7 @@ export default function SkinPicker({
               </div>
             </div>
             <div style={{ display: "grid", gridTemplateColumns: `repeat(${DEVICE_COLS[device]}, 1fr)`, gap: 12, padding: 16 }}>
-              {sampleProductsForSkin(sel.id).slice(0, DEVICE_COLS[device] * 2).map((p, i) => (
+              {previewProducts(sel.id, DEVICE_COLS[device] * 2).map((p, i) => (
                 <div key={i} style={{ borderRadius: 12, overflow: "hidden", border: `1px solid ${hexA(sel.color, 0.15)}` }}>
                   <div style={{ aspectRatio: "1 / 1", overflow: "hidden", background: hexA(sel.color, 0.1), display: "grid", placeItems: "center", fontSize: 30 }}>
                     {p.img ? (
