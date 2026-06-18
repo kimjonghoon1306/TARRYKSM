@@ -17,11 +17,12 @@ export default async function SectionsPage({ params }: { params: Promise<{ id: s
 
   // 숨김 포함 전체 섹션(에디터용). 비어 있으면 기본 대문 틀(신상·배너·베스트·전체)을 바로 채워서 보여줌.
   let sections = await fetchSections(supabase, id, false);
+  let diag = "";
   if (sections.length === 0) {
-    // RLS 우회 함수로 채움(직접 insert는 권한 평가에서 막힘). 함수 없으면 직접 insert 폴백.
-    const { error } = await supabase.rpc("seed_default_sections", { p_store: id });
-    if (error) await supabase.from("store_sections").insert(sampleSectionsForStore(id));
+    const { data: rpcData, error: rpcErr } = await supabase.rpc("seed_default_sections", { p_store: id });
+    const ins = await supabase.from("store_sections").insert(sampleSectionsForStore(id));
     sections = await fetchSections(supabase, id, false);
+    diag = `[진단] rpc오류=${rpcErr ? rpcErr.message + " / " + (rpcErr.code || "") : "없음"} | rpc반환=${JSON.stringify(rpcData)} | insert오류=${ins.error ? ins.error.message + " / " + (ins.error.code || "") : "없음"} | 재조회=${sections.length}개`;
   }
 
   const { data: prods } = await supabase
@@ -46,13 +47,20 @@ export default async function SectionsPage({ params }: { params: Promise<{ id: s
   );
 
   return (
-    <SectionEditor
-      storeId={store.id as string}
-      slug={store.slug as string}
-      skin={store.skin as string}
-      initialSections={sections}
-      products={products}
-      categories={categories}
-    />
+    <>
+      {diag && (
+        <div style={{ margin: "0 0 14px", padding: "12px 14px", borderRadius: 10, background: "#fef2f2", border: "1px solid #fecaca", color: "#991b1b", fontSize: 12, lineHeight: 1.6, wordBreak: "break-all" }}>
+          {diag}
+        </div>
+      )}
+      <SectionEditor
+        storeId={store.id as string}
+        slug={store.slug as string}
+        skin={store.skin as string}
+        initialSections={sections}
+        products={products}
+        categories={categories}
+      />
+    </>
   );
 }
