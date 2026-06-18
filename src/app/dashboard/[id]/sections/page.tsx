@@ -18,7 +18,9 @@ export default async function SectionsPage({ params }: { params: Promise<{ id: s
   // 숨김 포함 전체 섹션(에디터용). 비어 있으면 기본 대문 틀(신상·배너·베스트·전체)을 바로 채워서 보여줌.
   let sections = await fetchSections(supabase, id, false);
   if (sections.length === 0) {
-    await supabase.from("store_sections").insert(sampleSectionsForStore(id));
+    // RLS 우회 함수로 채움(직접 insert는 권한 평가에서 막힘). 함수 없으면 직접 insert 폴백.
+    const { error } = await supabase.rpc("seed_default_sections", { p_store: id });
+    if (error) await supabase.from("store_sections").insert(sampleSectionsForStore(id));
     sections = await fetchSections(supabase, id, false);
   }
 
