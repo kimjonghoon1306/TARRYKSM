@@ -496,3 +496,19 @@ textarea.sf-co-input { resize: vertical; min-height: 56px; }
 .sf-coupon-msg { margin-top: 6px; font-size: 12px; }
 .sf-coupon-msg.ok { color: #16a34a; }
 .sf-coupon-msg.err { color: #e0245e; }
+
+/* ── 찜 ♥ 버튼 ── */
+.sf-fav {
+  position: absolute; top: 8px; right: 8px; z-index: 3;
+  width: 34px; height: 34px; border-radius: 50%; border: none;
+  background: rgba(255, 255, 255, .9); color: #d23369;
+  font-size: 18px; line-height: 1; cursor: pointer;
+  display: flex; align-items: center; justify-content: center;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, .14);
+  transition: transform .15s ease, background .15s ease, color .15s ease;
+}
+.sf-fav:hover { transform: scale(1.12); background: #fff; }
+.sf-fav:active { transform: scale(.88); }
+.sf-fav.on { color: #e11d62; background: #fff0f5; }
+/* 상세 시트용 — 닫기(✕) 버튼과 안 겹치게 왼쪽으로 */
+.sf-fav-detail { top: 14px; right: 58px; width: 40px; height: 40px; font-size: 21px; }

@@ -92,6 +92,37 @@ export async function getCustomer() {
   return data && data.length ? (data[0] as { id: string; store_id: string; email: string; name: string; phone: string | null; points: number }) : null;
 }
 
+// ── 찜(위시리스트) — cust_session 토큰으로 RPC 처리 ──
+
+// 찜 토글. 반환: { ok, faved } — 비로그인이면 ok:false
+export async function toggleWishlist(productId: string): Promise<{ ok: boolean; faved: boolean }> {
+  const t = (await cookies()).get(COOKIE)?.value;
+  if (!t) return { ok: false, faved: false };
+  const supabase = await createClient();
+  const { data, error } = await supabase.rpc("wishlist_toggle", { p_token: t, p_product: productId });
+  if (error) return { ok: false, faved: false };
+  return { ok: true, faved: !!data };
+}
+
+// 현재 손님이 찜한 product_id 집합 (스토어프런트 ♥ 표시용)
+export async function getWishlistIds(): Promise<string[]> {
+  const t = (await cookies()).get(COOKIE)?.value;
+  if (!t) return [];
+  const supabase = await createClient();
+  const { data } = await supabase.rpc("wishlist_ids", { p_token: t });
+  return (data as { product_id: string }[] | null)?.map((r) => r.product_id) ?? [];
+}
+
+// 찜한 상품 전체정보 (마이페이지)
+export type WishItem = { id: string; name: string; price: number; image_url: string | null; emoji: string | null; category: string | null };
+export async function getWishlistProducts(): Promise<WishItem[]> {
+  const t = (await cookies()).get(COOKIE)?.value;
+  if (!t) return [];
+  const supabase = await createClient();
+  const { data } = await supabase.rpc("wishlist_products", { p_token: t });
+  return (data as WishItem[] | null) ?? [];
+}
+
 // 아이디(이메일) 찾기
 export async function customerFindEmail(storeId: string, name: string, phone: string): Promise<{ ok: boolean; email?: string; error?: string }> {
   const supabase = await createClient();

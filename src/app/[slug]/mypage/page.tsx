@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { redirect, notFound } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
-import { getCustomer } from "../customer-actions";
+import { getCustomer, getWishlistProducts } from "../customer-actions";
 import CustomerLogoutButton from "@/components/CustomerLogoutButton";
 
 export const dynamic = "force-dynamic";
@@ -27,6 +27,9 @@ export default async function MyPage({ params }: { params: Promise<{ slug: strin
   const { data: orders } = await supabase
     .from("orders").select("id,total,status,created_at").eq("customer_id", cust.id).order("created_at", { ascending: false });
   const list = orders ?? [];
+
+  // 찜한 상품
+  const wish = await getWishlistProducts();
 
   const initial = (cust.name || "회").slice(0, 1);
   const totalSpent = list.filter((o) => o.status !== "취소").reduce((s, o) => s + (o.total || 0), 0);
@@ -85,6 +88,39 @@ export default async function MyPage({ params }: { params: Promise<{ slug: strin
             </Link>
           ))}
         </div>
+
+        {/* 찜한 상품 */}
+        <h2 style={{ fontSize: 16, fontWeight: 800, margin: "34px 4px 14px" }}>
+          🩷 찜한 상품{wish.length > 0 && <span style={{ color: "#ec4899", marginLeft: 6 }}>{wish.length}</span>}
+        </h2>
+        {wish.length === 0 ? (
+          <div style={{ background: "#fff", borderRadius: 20, padding: "44px 20px", textAlign: "center", boxShadow: "0 8px 24px -18px rgba(0,0,0,.3)" }}>
+            <div style={{ fontSize: 40 }}>🤍</div>
+            <div style={{ fontWeight: 800, fontSize: 15, marginTop: 10 }}>아직 찜한 상품이 없어요</div>
+            <div style={{ fontSize: 13, color: "#8b8f98", marginTop: 5 }}>상품의 ♡를 눌러 마음에 든 상품을 모아보세요!</div>
+          </div>
+        ) : (
+          <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill,minmax(150px,1fr))", gap: 14 }}>
+            {wish.map((p) => (
+              <Link key={p.id} href={`/${slug}`} style={{ textDecoration: "none", color: "inherit", background: "#fff", borderRadius: 16, overflow: "hidden", boxShadow: "0 8px 24px -20px rgba(0,0,0,.3)", display: "block" }}>
+                <div style={{ position: "relative", width: "100%", paddingBottom: "100%", background: "#f4f2fb", overflow: "hidden" }}>
+                  <div style={{ position: "absolute", inset: 0, display: "grid", placeItems: "center", fontSize: 40 }}>
+                    {p.image_url ? (
+                      // eslint-disable-next-line @next/next/no-img-element
+                      <img src={p.image_url} alt={p.name} style={{ width: "100%", height: "100%", objectFit: "cover" }} />
+                    ) : (
+                      p.emoji || "📦"
+                    )}
+                  </div>
+                </div>
+                <div style={{ padding: "12px 14px" }}>
+                  <div style={{ fontSize: 13.5, fontWeight: 700, lineHeight: 1.3, overflow: "hidden", display: "-webkit-box", WebkitLineClamp: 2, WebkitBoxOrient: "vertical" }}>{p.name}</div>
+                  <div style={{ fontSize: 14, fontWeight: 800, color: "#8b5cf6", marginTop: 6 }}>{won(p.price)}</div>
+                </div>
+              </Link>
+            ))}
+          </div>
+        )}
 
         {/* 주문 내역 */}
         <h2 style={{ fontSize: 16, fontWeight: 800, margin: "34px 4px 14px" }}>📦 주문 내역</h2>

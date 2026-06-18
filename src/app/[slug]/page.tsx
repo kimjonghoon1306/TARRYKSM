@@ -4,7 +4,7 @@ import { createClient } from "@/lib/supabase/server";
 import { fetchSections } from "@/lib/sections";
 import { fetchReviewsByProduct } from "@/lib/reviews";
 import Storefront, { type Product } from "../s/[slug]/Storefront";
-import { getCustomer } from "./customer-actions";
+import { getCustomer, getWishlistIds } from "./customer-actions";
 
 // 각 쇼핑몰 링크 공유 시: 가게 이름·로고(파비콘)·배너(미리보기 이미지)
 export async function generateMetadata({
@@ -88,6 +88,7 @@ export default async function PrettyStorefront({
   const items = (products ?? []) as Product[];
   const cust = await getCustomer();
   const customer = cust && cust.store_id === s.id ? { id: cust.id, name: cust.name, email: cust.email, points: cust.points } : null;
+  const wishlistIds = customer ? await getWishlistIds() : [];
 
   return (
     <>
@@ -98,6 +99,7 @@ export default async function PrettyStorefront({
       <Storefront
         slug={slug}
         customer={customer}
+        wishlistIds={wishlistIds}
         store={{
           id: s.id,
           name: s.name,

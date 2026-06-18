@@ -3,6 +3,7 @@
 import { useEffect, useMemo, useState } from "react";
 import type { Section } from "@/lib/sections";
 import { placeOrder, submitReview, checkCoupon } from "./actions";
+import { toggleWishlist } from "@/app/[slug]/customer-actions";
 import CustomerAuthSheet from "@/components/CustomerAuthSheet";
 import "./storefront.css";
 
@@ -81,6 +82,7 @@ export default function Storefront({
   reviewsByProduct,
   customer,
   slug,
+  wishlistIds,
 }: {
   store: Store;
   products: Product[];
@@ -88,6 +90,7 @@ export default function Storefront({
   reviewsByProduct?: Record<string, Review[]>;
   customer?: CustomerInfo;
   slug?: string;
+  wishlistIds?: string[];
 }) {
   const [cart, setCart] = useState<Record<string, CartLine>>({});
   const [authOpen, setAuthOpen] = useState(false); // 로그인/회원가입 시트
@@ -121,6 +124,8 @@ export default function Storefront({
   const [revComment, setRevComment] = useState("");
   const [revBusy, setRevBusy] = useState(false);
   const [revErr, setRevErr] = useState("");
+  // 찜(위시리스트) — 로그인 손님만. 서버에서 받은 찜 id로 초기화, 낙관적 토글.
+  const [favs, setFavs] = useState<Set<string>>(() => new Set(wishlistIds || []));
 
   const cats = useMemo(() => {
     const set = new Set<string>();
@@ -180,6 +185,33 @@ export default function Storefront({
   function flash(msg: string) {
     setToast(msg);
     setTimeout(() => setToast(""), 1800);
+  }
+  // 찜 토글 — 비로그인이면 로그인 시트 유도, 로그인이면 낙관적 토글 + 서버 저장(실패 시 롤백)
+  async function toggleFav(p: Product, e: React.MouseEvent) {
+    e.stopPropagation();
+    if (!customer) {
+      flash("로그인하면 찜할 수 있어요 ♥");
+      setAuthOpen(true);
+      return;
+    }
+    const willFav = !favs.has(p.id);
+    setFavs((prev) => {
+      const n = new Set(prev);
+      if (willFav) n.add(p.id);
+      else n.delete(p.id);
+      return n;
+    });
+    flash(willFav ? "찜했어요 ♥" : "찜을 해제했어요");
+    const r = await toggleWishlist(p.id);
+    if (!r.ok || r.faved !== willFav) {
+      // 실패하거나 서버 결과가 다르면 서버값으로 동기화
+      setFavs((prev) => {
+        const n = new Set(prev);
+        if (r.ok ? r.faved : !willFav) n.add(p.id);
+        else n.delete(p.id);
+        return n;
+      });
+    }
   }
   // 옵션 포함 담기. opts 없으면 기본.
   function add(
@@ -325,6 +357,13 @@ export default function Storefront({
         <div className="sf-thumb">
           {p.tag && !soldOut && <span className="sf-tag">{p.tag}</span>}
           {soldOut && <span className="sf-tag sf-tag-soldout">품절</span>}
+          <button
+            className={"sf-fav" + (favs.has(p.id) ? " on" : "")}
+            onClick={(e) => toggleFav(p, e)}
+            aria-label={favs.has(p.id) ? "찜 해제" : "찜하기"}
+          >
+            {favs.has(p.id) ? "♥" : "♡"}
+          </button>
           {p.image_url ? (
             // eslint-disable-next-line @next/next/no-img-element
             <img src={p.image_url} alt={p.name} className="sf-thumb-img" />
@@ -687,6 +726,13 @@ export default function Storefront({
       {detail && (
         <div className="sf-sheet on" role="dialog">
           <button className="sf-x" onClick={() => setDetail(null)}>✕</button>
+          <button
+            className={"sf-fav sf-fav-detail" + (favs.has(detail.id) ? " on" : "")}
+            onClick={(e) => toggleFav(detail, e)}
+            aria-label={favs.has(detail.id) ? "찜 해제" : "찜하기"}
+          >
+            {favs.has(detail.id) ? "♥" : "♡"}
+          </button>
           <div className="sf-sheet-img">
             {detail.image_url ? (
               // eslint-disable-next-line @next/next/no-img-element
