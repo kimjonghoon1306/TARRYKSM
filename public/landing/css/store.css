@@ -39,7 +39,8 @@
 .sth-art{position:absolute;right:-10px;bottom:-20px;font-size:170px;line-height:1;opacity:var(--s-art-op,.16);pointer-events:none;transform:rotate(-8deg)}
 
 /* 카테고리 레일 */
-.st-rail{display:flex;gap:9px;padding:18px 22px 4px;overflow-x:auto}
+/* 실제 쇼핑몰(React .sf-cats)과 동일하게 줄바꿈으로 카테고리 전부 표시 (마우스 미리보기서도 안 잘림) */
+.st-rail{display:flex;flex-wrap:wrap;gap:9px;padding:18px 22px 4px}
 .st-rail::-webkit-scrollbar{height:0}
 .rail-chip{flex-shrink:0;font-size:12px;font-weight:600;padding:8px 16px;border-radius:99px;border:1px solid var(--s-line);color:var(--s-sub);white-space:nowrap;cursor:pointer;transition:transform .16s var(--ease),color .16s,border-color .16s,background .16s,box-shadow .16s}
 .rail-chip:hover{color:var(--s-ink);border-color:var(--s-brand);transform:translateY(-2px);box-shadow:0 6px 14px -8px var(--s-brand)}
