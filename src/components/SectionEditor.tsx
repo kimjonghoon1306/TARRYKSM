@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useTransition } from "react";
+import { useState, useTransition, useEffect } from "react";
 import Link from "next/link";
 import { createClient } from "@/lib/supabase/client";
 import SectionsTutorial from "./SectionsTutorial";
@@ -12,6 +12,7 @@ import {
   toggleSection,
   deleteSection,
   reorderSections,
+  ensureDefaultSections,
 } from "@/app/dashboard/[id]/sections/actions";
 
 type Prod = { id: string; name: string; emoji: string | null; image_url: string | null; category: string | null };
@@ -118,6 +119,25 @@ export default function SectionEditor({
   const [drag, setDrag] = useState<string | null>(null);
   const [over, setOver] = useState<string | null>(null);
   const [pending, start] = useTransition();
+  const [seeding, setSeeding] = useState(initialSections.length === 0);
+
+  // 대문이 비어 있으면(기존 쇼핑몰 등) 기본 틀을 자동 생성해 완성본에서 수정하게
+  useEffect(() => {
+    if (initialSections.length !== 0) return;
+    let alive = true;
+    ensureDefaultSections(storeId).then((fresh) => {
+      if (!alive) return;
+      if (fresh.length) {
+        setSections(fresh);
+        setOpen(fresh[0].id);
+      }
+      setSeeding(false);
+    });
+    return () => {
+      alive = false;
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   function patchLocal(id: string, patch: Partial<SectionConfig>) {
     setSections((prev) =>
@@ -246,7 +266,11 @@ export default function SectionEditor({
       <div className="mt-5 space-y-3">
         {sections.length === 0 && (
           <div className={card + " border-dashed py-12 text-center text-sm text-neutral-400"}>
-            아직 블록이 없어요. <span className="font-semibold text-violet-500">＋ 블록 추가</span>로 시작하세요.
+            {seeding ? (
+              "🎨 기본 대문 구성을 불러오는 중…"
+            ) : (
+              <>아직 블록이 없어요. <span className="font-semibold text-violet-500">＋ 블록 추가</span>로 시작하세요.</>
+            )}
           </div>
         )}
         {sections.map((s, idx) => {

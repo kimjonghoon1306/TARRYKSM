@@ -2,13 +2,25 @@
 
 import { revalidatePath } from "next/cache";
 import { createClient } from "@/lib/supabase/server";
-import { SECTION_META, type Section, type SectionConfig, type SectionType } from "@/lib/sections";
+import { SECTION_META, fetchSections, type Section, type SectionConfig, type SectionType } from "@/lib/sections";
+import { sampleSectionsForStore } from "@/lib/sampleData";
 
 // 소유 확인 (RLS가 최종 방어, UX용 선검사)
 async function assertOwner(storeId: string) {
   const supabase = await createClient();
   const { data } = await supabase.from("stores").select("id").eq("id", storeId).maybeSingle();
   return { supabase, ok: !!data };
+}
+
+// 섹션이 비어 있으면 기본 대문 틀(신상·배너·베스트·전체)을 생성해 반환. 이미 있으면 그대로.
+export async function ensureDefaultSections(storeId: string): Promise<Section[]> {
+  const { supabase, ok } = await assertOwner(storeId);
+  if (!ok) return [];
+  const existing = await fetchSections(supabase, storeId, false);
+  if (existing.length) return existing;
+  await supabase.from("store_sections").insert(sampleSectionsForStore(storeId));
+  bump(storeId);
+  return await fetchSections(supabase, storeId, false);
 }
 
 // 변경 후 스토어프런트/에디터 갱신
