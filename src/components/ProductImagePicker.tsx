@@ -117,7 +117,7 @@ export default function ProductImagePicker({
                 className="text-neutral-500 hover:text-neutral-800 dark:hover:text-white"
                 style={{ marginLeft: "auto", fontSize: 24, lineHeight: 1, cursor: "pointer", padding: "2px 8px" }}>✕</button>
             </div>
-            <div style={{ display: "flex", gap: 8, padding: "12px 16px 0", flex: "0 0 auto" }}>
+            <div style={{ display: "flex", flexWrap: "wrap", gap: 8, padding: "12px 16px 0", flex: "0 0 auto" }}>
               {STOCK_GROUPS.map((g) => (
                 <button key={g} type="button" onClick={() => setGroup(g)}
                   className={group === g ? "text-white" : "text-neutral-500 hover:text-neutral-800 dark:text-neutral-300"}
