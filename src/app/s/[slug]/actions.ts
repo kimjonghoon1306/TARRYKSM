@@ -1,5 +1,6 @@
 "use server";
 
+import { cookies } from "next/headers";
 import { createClient } from "@/lib/supabase/server";
 
 export type CheckoutItem = { product_id: string; qty: number; opts?: Record<string, string> };
@@ -17,7 +18,8 @@ export async function placeOrder(
   storeId: string,
   buyer: CheckoutBuyer,
   items: CheckoutItem[],
-  couponCode?: string
+  couponCode?: string,
+  usePoints?: number
 ): Promise<{ ok: boolean; error?: string; orderId?: string }> {
   const name = (buyer.name || "").trim();
   const phone = (buyer.phone || "").trim();
@@ -95,9 +97,30 @@ export async function placeOrder(
       appliedCode = r.code || code;
     }
   }
-  const total = subtotal - discount;
+  const afterCoupon = subtotal - discount;
 
-  // 할인 적용 시에만 discount/coupon_code 컬럼 포함 (coupons.sql 미실행 환경 하위호환)
+  // 적립금 사용 — 로그인 손님 + 적립금 사용 켜진 몰에서만. 잔액·결제금액 한도로 클램프(서버 재검증).
+  let custId: string | null = null;
+  let pointsToUse = 0;
+  const token = (await cookies()).get("cust_session")?.value;
+  try {
+    const { getCustomer } = await import("@/app/[slug]/customer-actions");
+    const cust = await getCustomer();
+    if (cust && cust.store_id === storeId) {
+      custId = cust.id;
+      const want = Math.max(0, Math.trunc(Number(usePoints) || 0));
+      if (want > 0 && token) {
+        const { data: st } = await supabase.from("stores").select("points_on").eq("id", storeId).maybeSingle();
+        if (st && (st as { points_on?: boolean }).points_on) {
+          pointsToUse = Math.min(want, cust.points || 0, afterCoupon);
+        }
+      }
+    }
+  } catch { /* 비회원 주문은 그대로 */ }
+
+  const total = afterCoupon - pointsToUse;
+
+  // 할인/적립금 적용 시에만 해당 컬럼 포함 (관련 SQL 미실행 환경 하위호환)
   const orderRow: Record<string, unknown> = {
     store_id: storeId,
     buyer_name: name,
@@ -111,12 +134,8 @@ export async function placeOrder(
     orderRow.discount = discount;
     orderRow.coupon_code = appliedCode;
   }
-  // 로그인한 손님이면 주문에 연결 (마이페이지 주문내역에 표시)
-  try {
-    const { getCustomer } = await import("@/app/[slug]/customer-actions");
-    const cust = await getCustomer();
-    if (cust && cust.store_id === storeId) orderRow.customer_id = cust.id;
-  } catch { /* 비회원 주문은 그대로 */ }
+  if (custId) orderRow.customer_id = custId;
+  if (pointsToUse > 0) orderRow.points_used = pointsToUse;
 
   // id를 미리 생성해 insert (RLS상 anon은 insert 후 되읽기(select)가 막힐 수 있어 select 생략)
   const orderId = crypto.randomUUID();
@@ -148,6 +167,11 @@ export async function placeOrder(
   // 쿠폰 사용횟수 +1 (적용된 경우만, RPC 없으면 무시)
   if (appliedCode) {
     await supabase.rpc("redeem_coupon", { p_store_id: storeId, p_code: appliedCode });
+  }
+
+  // 적립금 차감 (주문 성공 후, 세션 토큰으로 서버 재검증·차감·내역기록. RPC 없으면 무시)
+  if (pointsToUse > 0 && token) {
+    await supabase.rpc("customer_use_points", { p_token: token, p_amount: pointsToUse, p_order: orderId });
   }
 
   return { ok: true, orderId };

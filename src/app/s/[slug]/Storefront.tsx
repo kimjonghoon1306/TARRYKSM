@@ -91,6 +91,7 @@ type Store = {
   pay_bank?: string | null;
   pay_note?: string | null;
   pay_bank_on?: boolean | null;
+  points_on?: boolean | null;
   footer_text?: string | null;
   biz_company?: string | null;
   biz_owner?: string | null;
@@ -158,6 +159,8 @@ export default function Storefront({
   const [couponMsg, setCouponMsg] = useState("");
   const [couponErr, setCouponErr] = useState(false);
   const [couponBusy, setCouponBusy] = useState(false);
+  // 적립금 사용
+  const [pointsInput, setPointsInput] = useState("");
   // 리뷰 (상세 시트). 서버에서 받은 것 + 이번 세션에 작성한 것(낙관적)
   const [addedReviews, setAddedReviews] = useState<Record<string, Review[]>>({});
   const [revName, setRevName] = useState("");
@@ -345,7 +348,13 @@ export default function Storefront({
 
   // 쿠폰 적용/해제. 표시 할인은 현재 장바구니 총액으로 클램프, 최종은 서버 재검증.
   const effectDiscount = Math.min(couponDiscount, total);
-  const payable = total - effectDiscount;
+  const afterCoupon = total - effectDiscount;
+  // 적립금 사용 — 로그인 손님 + 적립금 사용 켜진 몰에서만. 잔액·결제금액 한도로 클램프.
+  const pointsEnabled = !!customer && store.points_on === true && (customer.points ?? 0) > 0;
+  const pointsAvail = customer?.points ?? 0;
+  const pointsMax = Math.min(pointsAvail, afterCoupon);
+  const pointsUsed = pointsEnabled ? Math.max(0, Math.min(Math.trunc(Number(pointsInput) || 0), pointsMax)) : 0;
+  const payable = afterCoupon - pointsUsed;
 
   async function applyCoupon() {
     setCouponErr(false);
@@ -386,7 +395,7 @@ export default function Storefront({
     setPlacing(true);
     try {
       const items = cartLines.map((l) => ({ product_id: l.product.id, qty: l.qty, opts: l.opts }));
-      const res = await placeOrder(store.id, buyer, items, couponCode || undefined);
+      const res = await placeOrder(store.id, buyer, items, couponCode || undefined, pointsUsed);
       if (!res.ok) {
         setOrderErr(res.error || "주문에 실패했어요.");
         return;
@@ -394,6 +403,7 @@ export default function Storefront({
       setPaidTotal(payable);
       setCart({});
       clearCoupon();
+      setPointsInput("");
       setOrderDone(true);
     } finally {
       setPlacing(false);
@@ -1045,20 +1055,28 @@ export default function Storefront({
                       <b>{won(l.unit * l.qty)}</b>
                     </div>
                   ))}
-                  {effectDiscount > 0 && (
+                  {(effectDiscount > 0 || pointsUsed > 0) && (
                     <>
                       <div className="sf-co-line">
                         <span>상품 합계</span>
                         <b>{won(total)}</b>
                       </div>
-                      <div className="sf-co-line sf-co-discount">
-                        <span>쿠폰 할인{couponCode ? ` (${couponCode})` : ""}</span>
-                        <b>-{won(effectDiscount)}</b>
-                      </div>
+                      {effectDiscount > 0 && (
+                        <div className="sf-co-line sf-co-discount">
+                          <span>쿠폰 할인{couponCode ? ` (${couponCode})` : ""}</span>
+                          <b>-{won(effectDiscount)}</b>
+                        </div>
+                      )}
+                      {pointsUsed > 0 && (
+                        <div className="sf-co-line sf-co-discount">
+                          <span>적립금 사용</span>
+                          <b>-{won(pointsUsed)}</b>
+                        </div>
+                      )}
                     </>
                   )}
                   <div className="sf-co-total">
-                    <span>{effectDiscount > 0 ? "결제 예정" : "합계"}</span>
+                    <span>{effectDiscount > 0 || pointsUsed > 0 ? "결제 예정" : "합계"}</span>
                     <b>{won(payable)}</b>
                   </div>
                 </div>
@@ -1092,6 +1110,32 @@ export default function Storefront({
                     <div className={"sf-coupon-msg" + (couponErr ? " err" : " ok")}>{couponMsg}</div>
                   )}
                 </div>
+
+                {/* 적립금 사용 (로그인 손님 + 적립금 켜진 몰) */}
+                {pointsEnabled && (
+                  <div className="sf-coupon">
+                    <div className="sf-coupon-row">
+                      <input
+                        className="sf-co-input sf-coupon-input"
+                        type="number"
+                        inputMode="numeric"
+                        value={pointsInput}
+                        onChange={(e) => setPointsInput(e.target.value)}
+                        placeholder="적립금 사용"
+                      />
+                      <button
+                        type="button"
+                        className="sf-coupon-btn"
+                        onClick={() => setPointsInput(String(pointsMax))}
+                      >
+                        전액
+                      </button>
+                    </div>
+                    <div className="sf-coupon-msg ok">
+                      보유 적립금 {won(pointsAvail)} · 최대 {won(pointsMax)} 사용 가능
+                    </div>
+                  </div>
+                )}
 
                 {/* 받는 사람 정보 */}
                 <label className="sf-co-label">받는 분 이름 *</label>

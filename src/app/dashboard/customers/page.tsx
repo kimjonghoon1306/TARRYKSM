@@ -1,5 +1,7 @@
 import { createClient } from "@/lib/supabase/server";
 import { currentUser } from "@/lib/auth";
+import { listMyCustomers } from "./actions";
+import MemberPoints from "@/components/MemberPoints";
 
 type Row = {
   buyer_name: string;
@@ -61,6 +63,9 @@ export default async function CustomersPage() {
       customers = Array.from(map.values()).sort((a, b) => b.spent - a.spent);
     }
   }
+
+  // 회원(가입한 손님) 적립금 — 주문 집계와 별개로 customers 테이블 기준
+  const members = user ? await listMyCustomers() : [];
 
   const card =
     "rounded-2xl border border-black/5 bg-white p-5 shadow-sm dark:border-white/10 dark:bg-white/[0.03]";
@@ -143,6 +148,17 @@ export default async function CustomersPage() {
               </tbody>
             </table>
           </div>
+        </>
+      )}
+
+      {/* 회원 적립금 — 가입 회원별 잔액 + 지급/차감 + 내역 */}
+      {user && (
+        <>
+          <h2 className="mb-1 mt-10 text-lg font-bold">💰 회원 적립금</h2>
+          <p className="mb-4 text-sm text-neutral-500">
+            회원을 눌러 적립금을 직접 지급·차감하고, 적립·사용 내역을 확인하세요.
+          </p>
+          <MemberPoints members={members} />
         </>
       )}
     </div>
