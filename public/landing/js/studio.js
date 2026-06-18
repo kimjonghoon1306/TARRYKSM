@@ -7,15 +7,27 @@ let createSkin = 'mono';     // 생성 모달에서 고른 스킨
 const malls = [];            // 생성된 쇼핑몰 [{name, skin}]
 
 /* ── 스튜디오 뷰 ── */
-function renderStudio(){
-  const cards = SKINS.map(s=>`
+// 스킨 카드 하나
+function skinCardHTML(s){
+  return `
     <div class="sk-card ${s.id===activeSkin?'active':''}" onclick="applySkin('${s.id}')">
       <div class="sk-mini" data-skin="${s.id}">${buildMini(s.id)}</div>
       <div class="sk-meta">
         <span class="skm-em">${skinThumb(s.id) ? `<img class="skm-em-img" src="${skinThumb(s.id)}" alt="">` : s.emoji}</span>
         <span class="sk-meta-t"><b>${s.name}</b><i>${s.vibe}</i></span>
       </div>
-    </div>`).join('');
+    </div>`;
+}
+
+function renderStudio(){
+  // 느낌별 카테고리로 묶어서 갤러리 렌더
+  const groups = SKIN_GROUPS.map(g=>{
+    const cards = g.ids.map(id=>SKIN_BY_ID[id]).filter(Boolean).map(skinCardHTML).join('');
+    return `<div class="skin-group">
+      <h4 class="skin-group-h">${g.label}<span>${g.ids.length}</span></h4>
+      <div class="skin-gallery">${cards}</div>
+    </div>`;
+  }).join('');
 
   document.getElementById('view').innerHTML = `
     <div class="view-head">
@@ -49,7 +61,7 @@ function renderStudio(){
     <div class="gallery-head">
       <h3>${T('st_gallery')}</h3><span>${T('st_gallery_sub')}</span>
     </div>
-    <div class="skin-gallery">${cards}</div>`;
+    ${groups}`;
 
   const screen = document.getElementById('deviceScreen');
   if(screen) mountStore(screen, activeSkin);

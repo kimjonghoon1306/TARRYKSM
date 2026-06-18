@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 import { useFormStatus } from "react-dom";
 import { createPortal } from "react-dom";
-import { SKINS, SKIN_BY_ID } from "@/lib/skins";
+import { SKINS, SKIN_BY_ID, SKIN_GROUPS } from "@/lib/skins";
 import { sampleProductsForSkin } from "@/lib/sampleData";
 import { setStoreSkin } from "@/app/dashboard/actions";
 
@@ -103,8 +103,8 @@ export default function SkinPicker({
   const sel = SKIN_BY_ID[selected];
   const DEVICE_W = { mobile: 390, tablet: 720, desktop: 980 } as const;
   const DEVICE_COLS = { mobile: 2, tablet: 3, desktop: 4 } as const;
-  const foodSkins = SKINS.filter((s) => s.group === "food");
-  const generalSkins = SKINS.filter((s) => s.group === "general");
+  // 느낌별 카테고리 그룹 (스튜디오와 동일)
+  const groups = SKIN_GROUPS.map((g) => ({ title: g.label, list: g.ids.map((id) => SKIN_BY_ID[id]).filter(Boolean) }));
 
   return (
     <form action={setStoreSkin}>
@@ -159,10 +159,7 @@ export default function SkinPicker({
         )}
       </div>
 
-      {[
-        { title: "🍱 식품 · 농축수산물 특화", list: foodSkins },
-        { title: "✨ 범용 (모든 업태)", list: generalSkins },
-      ].map((grp) => (
+      {groups.map((grp) => (
         <div key={grp.title} className="mb-7">
           <h3 className="mb-3 text-sm font-bold text-neutral-500">{grp.title}</h3>
           <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-4">

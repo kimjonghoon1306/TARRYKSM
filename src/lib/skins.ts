@@ -114,3 +114,13 @@ export const SKIN_IDS = SKINS.map((s) => s.id);
 export const SKIN_BY_ID: Record<string, Skin> = Object.fromEntries(
   SKINS.map((s) => [s.id, s])
 );
+
+// 스킨 갤러리 — 느낌(무드)별 카테고리 (스튜디오 data.js SKIN_GROUPS와 동일하게 유지)
+export const SKIN_GROUPS: { label: string; ids: string[] }[] = [
+  { label: "⬛ 미니멀·모던", ids: ["mono", "slate", "azure"] },
+  { label: "🌑 다크·시크", ids: ["noir", "midnight", "grape"] },
+  { label: "💗 러블리·소프트", ids: ["bloom", "coral", "lavender"] },
+  { label: "⚡ 비비드·팝", ids: ["citrus", "berry", "crimson"] },
+  { label: "🌿 내추럴·우드", ids: ["pine", "mocha"] },
+  { label: "🥬 식품·신선", ids: ["harvest", "ocean", "butcher", "bakery", "orchard", "hanok", "market", "sprout", "dairy", "gourmet"] },
+];
