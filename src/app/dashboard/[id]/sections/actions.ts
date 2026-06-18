@@ -19,7 +19,6 @@ export async function ensureDefaultSections(storeId: string): Promise<Section[]>
   const existing = await fetchSections(supabase, storeId, false);
   if (existing.length) return existing;
   await supabase.from("store_sections").insert(sampleSectionsForStore(storeId));
-  bump(storeId);
   return await fetchSections(supabase, storeId, false);
 }
 
