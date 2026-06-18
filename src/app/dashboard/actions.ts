@@ -9,7 +9,7 @@ import { slugify } from "@/lib/slug";
 import { SKIN_IDS } from "@/lib/skins";
 import { getMe } from "@/lib/role";
 import { planOf } from "@/lib/plans";
-import { sampleRowsForStore, heroForStore } from "@/lib/sampleData";
+import { sampleRowsForStore, heroForStore, sampleSectionsForStore } from "@/lib/sampleData";
 
 export async function createStore(formData: FormData) {
   const supabase = await createClient();
@@ -87,9 +87,11 @@ export async function createStoreOpen(formData: FormData) {
     .select("id")
     .single();
   if (error) back(/duplicate|unique/i.test(error.message) ? "이미 사용 중인 주소예요" : "생성 실패");
-  // 빈 쇼핑몰 대신 미리보기처럼 샘플 상품을 채워서 시작 — 창업자가 보고 이해 후 교체
+  // 빈 쇼핑몰 대신 미리보기처럼 샘플 상품 + 대문 기본 틀을 채워서 시작 — 창업자가 보고 이해 후 교체
   if (created?.id) {
     await supabase.from("products").insert(sampleRowsForStore(created.id, skin));
+    // 대문 구성도 기본 틀(신상·배너·베스트·전체)로 채워 빈 화면 대신 완성본에서 수정하게
+    await supabase.from("store_sections").insert(sampleSectionsForStore(created.id));
   }
   revalidatePath("/dashboard", "layout");
   redirect(created?.id ? `/dashboard/${created.id}` : "/dashboard/stores");

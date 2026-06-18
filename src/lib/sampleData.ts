@@ -48,3 +48,14 @@ export function sampleRowsForStore(storeId: string, skin: string) {
     emoji: it.e ?? null,
   }));
 }
+
+// 신규 쇼핑몰 대문 기본 틀 (store_sections) — 빈 화면 대신 완성된 구성에서 수정하게.
+// 미리보기 리치뷰와 같은 구성: 신상 선반 → 기획전 배너 → 베스트 선반 → 전체 그리드.
+export function sampleSectionsForStore(storeId: string) {
+  return [
+    { store_id: storeId, type: "shelf", position: 0, visible: true, config: { title: "🆕 신상품", subtitle: "방금 들어온 따끈한 신상", source: "new", limit: 8 } },
+    { store_id: storeId, type: "banner", position: 1, visible: true, config: { eyebrow: "SPECIAL PICK", title: "이번 주 추천", subtitle: "놓치면 아쉬운 상품을 모았어요", cta_label: "지금 보기", height: "md" } },
+    { store_id: storeId, type: "shelf", position: 2, visible: true, config: { title: "🔥 베스트", subtitle: "가장 사랑받는 상품", source: "best", limit: 8 } },
+    { store_id: storeId, type: "grid", position: 3, visible: true, config: { title: "전체 상품", source: "all" } },
+  ];
+}
