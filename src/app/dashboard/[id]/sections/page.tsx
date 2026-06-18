@@ -1,6 +1,7 @@
 import { notFound } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { fetchSections } from "@/lib/sections";
+import { sampleSectionsForStore } from "@/lib/sampleData";
 import SectionEditor from "@/components/SectionEditor";
 
 export default async function SectionsPage({ params }: { params: Promise<{ id: string }> }) {
@@ -14,8 +15,12 @@ export default async function SectionsPage({ params }: { params: Promise<{ id: s
     .maybeSingle();
   if (!store) notFound();
 
-  // 숨김 포함 전체 섹션(에디터용)
-  const sections = await fetchSections(supabase, id, false);
+  // 숨김 포함 전체 섹션(에디터용) — 비어 있으면(기존 쇼핑몰 등) 기본 대문 틀을 자동으로 채워 빈 화면 방지
+  let sections = await fetchSections(supabase, id, false);
+  if (sections.length === 0) {
+    await supabase.from("store_sections").insert(sampleSectionsForStore(id));
+    sections = await fetchSections(supabase, id, false);
+  }
 
   const { data: prods } = await supabase
     .from("products")
