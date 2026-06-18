@@ -13,7 +13,19 @@ const data = sample as {
   themes: Record<string, Theme>;
   lifestyle: Theme;
   skinTheme: Record<string, string>;
+  skinMeta: Record<string, { title: string; sub: string; img: string }>;
 };
+
+// 스킨별 대문 히어로(제목·문구·배너 이미지) — 신규 쇼핑몰을 미리보기처럼 채우기
+export function heroForStore(skin: string) {
+  const m = data.skinMeta?.[skin];
+  if (!m) return {};
+  return {
+    hero_title: m.title || null,
+    hero_subtitle: m.sub || null,
+    hero_image_url: m.img || null,
+  };
+}
 
 // 스킨 → 샘플 상품 세트 (식품 스킨은 해당 업태 테마, 그 외는 라이프스타일)
 export function sampleProductsForSkin(skin: string): SampleItem[] {

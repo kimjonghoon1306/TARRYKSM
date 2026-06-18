@@ -9,7 +9,7 @@ import { slugify } from "@/lib/slug";
 import { SKIN_IDS } from "@/lib/skins";
 import { getMe } from "@/lib/role";
 import { planOf } from "@/lib/plans";
-import { sampleRowsForStore } from "@/lib/sampleData";
+import { sampleRowsForStore, heroForStore } from "@/lib/sampleData";
 
 export async function createStore(formData: FormData) {
   const supabase = await createClient();
@@ -83,7 +83,7 @@ export async function createStoreOpen(formData: FormData) {
 
   const { data: created, error } = await supabase
     .from("stores")
-    .insert({ name, skin, slug })
+    .insert({ name, skin, slug, ...heroForStore(skin) })
     .select("id")
     .single();
   if (error) back(/duplicate|unique/i.test(error.message) ? "이미 사용 중인 주소예요" : "생성 실패");
