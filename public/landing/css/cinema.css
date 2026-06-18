@@ -109,9 +109,10 @@
 
 /* 4 · 무한 분양 (매장 증식) */
 .sc-multiply{justify-content:center}
-.cine-mall-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(110px,1fr));gap:14px;width:min(92vw,1040px);perspective:1000px}
+.cine-mall-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(86px,1fr));gap:11px;width:min(95vw,1240px);perspective:1100px}
 .cine-mall{aspect-ratio:4/5;border-radius:12px;overflow:hidden;background:var(--surf);border:1px solid var(--line-2);box-shadow:var(--shadow);opacity:0;transform:scale(.3) translateY(60px);filter:hue-rotate(var(--h,0deg))}
-.sc-multiply.on .cine-mall{animation:mallIn .7s var(--ease) forwards;animation-delay:var(--d,0s)}
+/* 등장(transform)과 둥둥 떠다님(translate)은 서로 다른 속성이라 충돌 없이 합성됨 → 더 역동적 */
+.sc-multiply.on .cine-mall{animation:mallIn .65s var(--ease) var(--d,0s) forwards,mallFloat var(--fdur,4s) ease-in-out var(--fd,1.4s) infinite}
 .cm-bar{height:22%;background:var(--brand);opacity:.9}
 .cm-body{padding:9px;display:flex;flex-direction:column;gap:6px}
 .cm-hero{height:26px;border-radius:6px;background:rgba(109,94,252,.18)}
@@ -124,9 +125,16 @@
 .cine-mall.cm-v3{border-radius:18px}
 .cine-mall.cm-v4{border-radius:8px}
 .cine-mall.cm-v5{border-radius:20px}
+.cine-mall.cm-v6{border-radius:14px}
+.cine-mall.cm-v7{border-radius:10px}
 .cm-bar-sm{height:13%}
 .cm-tiles.cm-4{grid-template-columns:1fr 1fr;grid-template-rows:1fr 1fr}
+.cm-tiles.cm-3{grid-template-columns:1fr 1fr 1fr}
 .cm-tiles.cm-wide{grid-template-columns:1fr}
+/* 매거진형: 세로 큰 이미지 + 얇은 캡션 */
+.cm-mag{padding:0;gap:0;height:100%}
+.cm-mag-img{flex:1;overflow:hidden}
+.cm-cap-sm{height:14%}
 .cm-banner{gap:8px}
 .cm-hero-lg{height:52px;display:grid;place-items:center;font-size:22px}
 .cm-hero-lg b{font-style:normal}
@@ -181,6 +189,7 @@
 @keyframes fadeIn{to{opacity:1}}
 @keyframes fadeUp2{from{opacity:0;transform:translateY(22px)}to{opacity:1;transform:none}}
 @keyframes mallIn{to{opacity:1;transform:none}}
+@keyframes mallFloat{0%,100%{translate:0 0}50%{translate:0 -9px}}
 @keyframes ringCount{to{stroke-dashoffset:0}}
 
 @media (max-width:680px){
