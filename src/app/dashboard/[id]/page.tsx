@@ -2,8 +2,7 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { domainToUnicode } from "node:url";
 import { createClient } from "@/lib/supabase/server";
-import { setStoreDomain, togglePublish, setStoreSlug, setStorePayment, setStorePoints, setStoreShipping, setStoreChat, setStoreBusiness, claimStore } from "../actions";
-import { currentUser } from "@/lib/auth";
+import { setStoreDomain, togglePublish, setStoreSlug, setStorePayment, setStorePoints, setStoreShipping, setStoreChat, setStoreBusiness } from "../actions";
 import { PRIMARY_DOMAIN } from "@/lib/domains";
 import DomainHelp from "@/components/DomainHelp";
 import BrandingForm from "@/components/BrandingForm";
@@ -75,10 +74,6 @@ export default async function StoreAdmin({
   if (!store) notFound();
   const s = store as Store;
 
-  // 이 몰의 주인이 현재 로그인 계정과 다르면(또는 미설정) 저장이 막힘 → 가져오기 안내
-  const me = await currentUser();
-  const notMine = !s.owner || s.owner !== me?.id;
-
   const { count } = await supabase
     .from("products")
     .select("id", { count: "exact", head: true })
@@ -124,20 +119,6 @@ export default async function StoreAdmin({
       <SavedToast message={brmsg || pmsg || ptmsg || shmsg || chmsg || dmsg || smsg} />
       {cherr && (
         <p className="mb-3 rounded-lg bg-rose-500/10 px-3 py-2 text-sm text-rose-600 dark:text-rose-400">{cherr}</p>
-      )}
-      {notMine && (
-        <div className="mb-4 rounded-2xl border border-amber-400/40 bg-amber-50 p-4 dark:border-amber-400/30 dark:bg-amber-400/10">
-          <div className="font-bold text-amber-700 dark:text-amber-300">⚠️ 이 쇼핑몰의 주인이 내 계정으로 설정되어 있지 않아요</div>
-          <p className="mt-1 text-sm text-amber-700/80 dark:text-amber-200/80">
-            그래서 챗봇·배송비·상품 등 <b>저장이 막혀</b> 있어요. 아래 버튼을 누르면 이 쇼핑몰을 <b>지금 로그인한 계정</b>으로 가져와요. (주인 없는 몰만 가능)
-          </p>
-          <form action={claimStore} className="mt-3">
-            <input type="hidden" name="id" value={s.id} />
-            <button className="press-glow rounded-xl bg-gradient-to-r from-amber-500 to-orange-500 px-5 py-2.5 text-sm font-bold text-white shadow-lg shadow-amber-500/25 transition hover:brightness-105">
-              🏠 이 쇼핑몰을 내 계정으로 가져오기
-            </button>
-          </form>
-        </div>
       )}
       <Link href="/dashboard/stores" className="text-sm text-neutral-500 hover:text-violet-500">
         ← 쇼핑몰
