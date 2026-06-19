@@ -1,22 +1,27 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { BotAvatar, BOT_THEMES, type BotStyle } from "@/components/StoreBot";
 
 const STYLES: BotStyle[] = ["designer", "robot", "bear"];
 
-// 챗봇 모양 고르기 + 켜기/끄기 + 인사말. 저장은 부모 form의 SaveButton.
+// 챗봇 모양 고르기 + 켜기/끄기 + 이름 + 인사말. 저장은 부모 form의 SaveButton.
 export default function BotStylePicker({
   on,
   style,
   greeting,
+  name,
 }: {
   on: boolean;
   style: BotStyle;
   greeting: string;
+  name: string;
 }) {
   const [enabled, setEnabled] = useState(on);
   const [sel, setSel] = useState<BotStyle>(STYLES.includes(style) ? style : "designer");
+  // 저장(서버) 후 새 값이 prop으로 내려오면 선택 상태를 그 값으로 동기화 (디자이너로 되돌아가던 문제 방지)
+  useEffect(() => { setSel(STYLES.includes(style) ? style : "designer"); }, [style]);
+  useEffect(() => { setEnabled(on); }, [on]);
 
   return (
     <div className="space-y-4">
@@ -61,6 +66,19 @@ export default function BotStylePicker({
             );
           })}
         </div>
+      </div>
+
+      {/* 챗봇 이름 */}
+      <div className={enabled ? "" : "pointer-events-none opacity-40"}>
+        <label className="mb-1.5 block text-xs font-semibold text-neutral-500">챗봇 이름 (선택)</label>
+        <input
+          name="chat_name"
+          defaultValue={name}
+          placeholder="예: 온종일 도우미 / 사과봇"
+          maxLength={30}
+          className="w-full rounded-xl border border-black/10 bg-white px-4 py-2.5 text-sm outline-none focus:border-violet-500 focus:ring-2 focus:ring-violet-500/25 dark:border-white/10 dark:bg-white/[0.04]"
+        />
+        <p className="mt-1.5 text-xs text-neutral-400">비우면 “(쇼핑몰이름) 챗봇”으로 표시돼요.</p>
       </div>
 
       {/* 인사말 */}

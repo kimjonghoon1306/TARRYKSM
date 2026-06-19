@@ -28,7 +28,8 @@ create policy "faq owner all" on public.store_faqs
   using (exists (select 1 from public.stores s where s.id = store_faqs.store_id and (s.owner = auth.uid() or public.is_admin())))
   with check (exists (select 1 from public.stores s where s.id = store_faqs.store_id and (s.owner = auth.uid() or public.is_admin())));
 
--- [5] (선택) 챗봇 인사말·켜기·모양 설정 (style: designer / robot / bear)
+-- [5] (선택) 챗봇 인사말·켜기·모양·이름 설정 (style: designer / robot / bear)
 alter table public.stores add column if not exists chat_on boolean default true;
 alter table public.stores add column if not exists chat_greeting text;
 alter table public.stores add column if not exists chat_style text default 'designer';
+alter table public.stores add column if not exists chat_name text;

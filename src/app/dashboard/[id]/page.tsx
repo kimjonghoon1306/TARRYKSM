@@ -44,6 +44,7 @@ type Store = {
   chat_on: boolean | null;
   chat_style: string | null;
   chat_greeting: string | null;
+  chat_name: string | null;
   footer_text: string | null;
   biz_company: string | null;
   biz_owner: string | null;
@@ -59,14 +60,14 @@ export default async function StoreAdmin({
   searchParams,
 }: {
   params: Promise<{ id: string }>;
-  searchParams: Promise<{ dmsg?: string; derr?: string; smsg?: string; serr?: string; brmsg?: string; pmsg?: string; ptmsg?: string; shmsg?: string; chmsg?: string }>;
+  searchParams: Promise<{ dmsg?: string; derr?: string; smsg?: string; serr?: string; brmsg?: string; pmsg?: string; ptmsg?: string; shmsg?: string; chmsg?: string; cherr?: string }>;
 }) {
   const { id } = await params;
-  const { dmsg, derr, smsg, serr, brmsg, pmsg, ptmsg, shmsg, chmsg } = await searchParams;
+  const { dmsg, derr, smsg, serr, brmsg, pmsg, ptmsg, shmsg, chmsg, cherr } = await searchParams;
   const supabase = await createClient();
   const { data: store } = await supabase
     .from("stores")
-    .select("id,name,skin,slug,published,custom_domain,logo_url,hero_image_url,hero_title,hero_subtitle,pay_bank,pay_note,pay_bank_on,pay_card_on,pay_vbank_on,points_on,points_rate,ship_on,ship_fee,ship_free_over,ship_extra,chat_on,chat_style,chat_greeting,footer_text,biz_company,biz_owner,biz_number,biz_mailorder,biz_address,biz_phone,biz_email")
+    .select("id,name,skin,slug,published,custom_domain,logo_url,hero_image_url,hero_title,hero_subtitle,pay_bank,pay_note,pay_bank_on,pay_card_on,pay_vbank_on,points_on,points_rate,ship_on,ship_fee,ship_free_over,ship_extra,chat_on,chat_style,chat_greeting,chat_name,footer_text,biz_company,biz_owner,biz_number,biz_mailorder,biz_address,biz_phone,biz_email")
     .eq("id", id)
     .maybeSingle();
   if (!store) notFound();
@@ -336,12 +337,17 @@ export default async function StoreAdmin({
         {chmsg && (
           <p className="mb-3 rounded-lg bg-emerald-500/10 px-3 py-2 text-sm text-emerald-600 dark:text-emerald-400">{chmsg}</p>
         )}
+        {cherr && (
+          <p className="mb-3 rounded-lg bg-rose-500/10 px-3 py-2 text-sm text-rose-600 dark:text-rose-400">{cherr}</p>
+        )}
         <form action={setStoreChat} className="space-y-3">
           <input type="hidden" name="id" value={s.id} />
           <BotStylePicker
+            key={`${s.chat_style || "designer"}|${s.chat_on !== false}|${s.chat_name || ""}|${s.chat_greeting || ""}`}
             on={s.chat_on !== false}
             style={(s.chat_style as BotStyle) || "designer"}
             greeting={s.chat_greeting || ""}
+            name={s.chat_name || ""}
           />
           <SaveButton label="챗봇 설정 저장" />
         </form>

@@ -109,11 +109,13 @@ export default function StoreBot({
   storeName,
   style = "designer",
   greeting,
+  title,
 }: {
   faqs: StoreFaqItem[];
   storeName: string;
   style?: BotStyle;
   greeting?: string | null;
+  title?: string | null;
 }) {
   const [open, setOpen] = useState(false);
   const [qa, setQa] = useState<StoreFaqItem | null>(null);
@@ -180,7 +182,7 @@ export default function StoreBot({
               <span key={burst} style={{ position: "absolute", inset: 0, pointerEvents: "none" }}>{talking && <Sparks />}</span>
             </span>
             <div style={{ flex: 1 }}>
-              <div style={{ fontSize: 15, fontWeight: 800, lineHeight: 1.1 }}>{storeName} 챗봇</div>
+              <div style={{ fontSize: 15, fontWeight: 800, lineHeight: 1.1 }}>{title?.trim() || `${storeName} 챗봇`}</div>
               <div style={{ fontSize: 11, opacity: 0.85 }}>{talking ? "답을 찾는 중… 🎵" : "무엇이든 물어보세요"}</div>
             </div>
             <button type="button" aria-label="닫기" onClick={() => setOpen(false)}
@@ -214,7 +216,7 @@ export default function StoreBot({
           </div>
 
           <div style={{ borderTop: "1px solid rgba(0,0,0,.06)", padding: "9px 14px", textAlign: "center", fontSize: 11, color: "#aaa" }}>
-            {storeName} 챗봇 · 도움이 필요하면 눌러주세요
+            {title?.trim() || `${storeName} 챗봇`} · 도움이 필요하면 눌러주세요
           </div>
         </div>
       )}

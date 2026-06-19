@@ -284,12 +284,16 @@ export async function setStoreChat(formData: FormData) {
   const styleRaw = String(formData.get("chat_style") || "designer");
   const chatStyle = ["designer", "robot", "bear"].includes(styleRaw) ? styleRaw : "designer";
   const greeting = String(formData.get("chat_greeting") || "").trim().slice(0, 200) || null;
+  const chatName = String(formData.get("chat_name") || "").trim().slice(0, 30) || null;
 
-  await supabase
+  const { error } = await supabase
     .from("stores")
-    .update({ chat_on: chatOn, chat_style: chatStyle, chat_greeting: greeting })
+    .update({ chat_on: chatOn, chat_style: chatStyle, chat_greeting: greeting, chat_name: chatName })
     .eq("id", id);
   revalidatePath(`/dashboard/${id}`);
+  if (error) {
+    redirect(`/dashboard/${id}?cherr=` + encodeURIComponent("챗봇 저장 실패: " + error.message));
+  }
   redirect(`/dashboard/${id}?chmsg=` + encodeURIComponent("챗봇 설정을 저장했어요"));
 }
 

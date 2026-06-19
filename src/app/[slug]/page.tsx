@@ -55,6 +55,7 @@ type Store = {
   chat_on: boolean | null;
   chat_style: string | null;
   chat_greeting: string | null;
+  chat_name: string | null;
   footer_text: string | null;
   biz_company: string | null;
   biz_owner: string | null;
@@ -83,7 +84,7 @@ export default async function PrettyStorefront({
   const [{ data: store }, cust, wishlistIdsRaw, myCouponsRaw] = await Promise.all([
     supabase
       .from("stores")
-      .select("id,name,skin,logo_url,hero_image_url,hero_title,hero_subtitle,pay_bank,pay_note,pay_bank_on,points_on,ship_on,ship_fee,ship_free_over,ship_extra,chat_on,chat_style,chat_greeting,footer_text,biz_company,biz_owner,biz_number,biz_mailorder,biz_address,biz_phone,biz_email")
+      .select("id,name,skin,logo_url,hero_image_url,hero_title,hero_subtitle,pay_bank,pay_note,pay_bank_on,points_on,ship_on,ship_fee,ship_free_over,ship_extra,chat_on,chat_style,chat_greeting,chat_name,footer_text,biz_company,biz_owner,biz_number,biz_mailorder,biz_address,biz_phone,biz_email")
       .eq("slug", slug)
       .eq("published", true)
       .maybeSingle(),
@@ -167,6 +168,7 @@ export default async function PrettyStorefront({
           storeName={s.name}
           style={(s.chat_style as BotStyle) || "designer"}
           greeting={s.chat_greeting}
+          title={s.chat_name}
         />
       )}
     </>
