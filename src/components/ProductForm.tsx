@@ -13,7 +13,7 @@ const INPUT =
   "w-full rounded-lg border border-black/10 bg-white px-3 py-2 text-sm outline-none focus:border-violet-500 focus:ring-2 focus:ring-violet-500/25 dark:border-white/10 dark:bg-white/[0.04]";
 const won = (n: number) => "₩" + (n || 0).toLocaleString("ko-KR");
 
-export default function ProductForm({ storeId, skin, cats }: { storeId: string; skin: string; cats?: string[] }) {
+export default function ProductForm({ storeId, skin, cats, canCompareAt = true, compareAtPlan }: { storeId: string; skin: string; cats?: string[]; canCompareAt?: boolean; compareAtPlan?: string }) {
   // 몰에서 직접 만든 카테고리가 있으면 그걸, 없으면 기본 목록
   const CATS = cats && cats.length ? cats : DEFAULT_CATS;
   const sk = SKIN_BY_ID[skin] || SKIN_BY_ID["mono"];
@@ -98,7 +98,13 @@ export default function ProductForm({ storeId, skin, cats }: { storeId: string; 
           <PriceInput required onValue={setPrice} className={INPUT} />
         </L>
         <L label="정가 (할인 전 가격·선택)">
-          <PriceInput name="compare_at" onValue={setCompareAt} className={INPUT} />
+          {canCompareAt ? (
+            <PriceInput name="compare_at" onValue={setCompareAt} className={INPUT} />
+          ) : (
+            <div className="rounded-lg border border-dashed border-amber-400/50 bg-amber-50/60 px-3 py-2 text-xs text-amber-700 dark:border-amber-400/30 dark:bg-amber-400/[0.06] dark:text-amber-300">
+              🔒 {compareAtPlan || "베이직"} 요금제부터 — 정가 취소선·할인율 표시
+            </div>
+          )}
         </L>
         <L label="브랜드">
           <input name="brand" value={brand} onChange={(e) => setBrand(e.target.value)} placeholder="예: AROMA" className={INPUT} />

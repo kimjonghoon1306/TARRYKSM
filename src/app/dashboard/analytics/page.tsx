@@ -1,10 +1,26 @@
 import { createClient } from "@/lib/supabase/server";
 import { SKIN_BY_ID } from "@/lib/skins";
+import LockedFeature from "@/components/LockedFeature";
+import { getMe } from "@/lib/role";
+import { canUse, requiredPlanName } from "@/lib/plans";
 
 const won = (n: number) => "₩" + Math.round(n).toLocaleString("ko-KR");
 
 export default async function AnalyticsPage() {
   const supabase = await createClient();
+
+  const me = await getMe();
+  if (!canUse("analytics", me.plan, me.role)) {
+    return (
+      <div className="mx-auto max-w-3xl">
+        <h1 className="text-2xl font-bold sm:text-3xl">📈 분석</h1>
+        <p className="mt-1 text-sm text-neutral-500">매출·상품·고객 통계를 한눈에 볼 수 있어요.</p>
+        <div className="mt-6">
+          <LockedFeature planName={requiredPlanName("analytics")} desc="매출 추이·상품별 판매·카테고리 분포 등 분석 리포트를 볼 수 있어요." />
+        </div>
+      </div>
+    );
+  }
 
   const { data: stores } = await supabase.from("stores").select("id,skin");
   const storeIds = (stores ?? []).map((s) => s.id);

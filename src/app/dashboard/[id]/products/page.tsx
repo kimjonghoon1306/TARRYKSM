@@ -4,6 +4,8 @@ import { createClient } from "@/lib/supabase/server";
 import { deleteProduct } from "./actions";
 import ProductForm from "@/components/ProductForm";
 import { listStoreCategories } from "../categories/actions";
+import { getMe } from "@/lib/role";
+import { canUse, requiredPlanName } from "@/lib/plans";
 
 type Store = { id: string; name: string; slug: string; skin: string };
 type Product = {
@@ -45,6 +47,8 @@ export default async function ProductsAdmin({
   const items = (products ?? []) as Product[];
 
   const storeCats = (await listStoreCategories(id)).map((c) => c.name);
+  const me = await getMe();
+  const canCompareAt = canUse("compare_at", me.plan, me.role);
 
   return (
     <div className="mx-auto max-w-5xl">
@@ -65,7 +69,7 @@ export default async function ProductsAdmin({
       {/* 상품 추가 폼 + 소비자 미리보기 */}
       <section className={CARD + " mt-6"}>
         <h2 className="mb-4 font-semibold">＋ 상품 추가</h2>
-        <ProductForm storeId={s.id} skin={s.skin} cats={storeCats} />
+        <ProductForm storeId={s.id} skin={s.skin} cats={storeCats} canCompareAt={canCompareAt} compareAtPlan={requiredPlanName("compare_at")} />
       </section>
 
       {/* 상품 목록 */}

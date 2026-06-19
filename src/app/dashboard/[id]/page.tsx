@@ -18,6 +18,9 @@ import BotStylePicker from "@/components/BotStylePicker";
 import { listStoreFaqs } from "./faq/actions";
 import StoreGradeManager from "@/components/StoreGradeManager";
 import { listStoreGrades } from "./grades/actions";
+import LockedFeature from "@/components/LockedFeature";
+import { getMe } from "@/lib/role";
+import { canUse, requiredPlanName } from "@/lib/plans";
 import type { BotStyle } from "@/components/StoreBot";
 import BrandingTutorial from "@/components/BrandingTutorial";
 
@@ -86,6 +89,7 @@ export default async function StoreAdmin({
     storeGrades,
     { data: gr },
     { data: catRows },
+    me,
   ] = await Promise.all([
     supabase.from("products").select("id", { count: "exact", head: true }).eq("store_id", id),
     supabase.from("orders").select("id", { count: "exact", head: true }).eq("store_id", id),
@@ -96,7 +100,12 @@ export default async function StoreAdmin({
     // grades_on은 grades.sql 미실행 환경에서도 안 깨지게 별도 안전 조회 (컬럼 없으면 false)
     supabase.from("stores").select("grades_on").eq("id", id).maybeSingle(),
     supabase.from("products").select("category").eq("store_id", id),
+    getMe(),
   ]);
+  // 요금제별 기능 잠금
+  const canDomain = canUse("domain", me.plan, me.role);
+  const canPoints = canUse("points", me.plan, me.role);
+  const canGrades = canUse("grades", me.plan, me.role);
   const previewItems = (preview ?? []) as {
     id: string;
     emoji: string | null;
@@ -234,6 +243,10 @@ export default async function StoreAdmin({
           보유한 도메인을 이 쇼핑몰에 연결하세요. (예: shop.mybrand.com 또는 mybrand.com)
         </p>
 
+        {!canDomain ? (
+          <LockedFeature planName={requiredPlanName("domain")} desc="내 도메인(mybrand.com)을 이 쇼핑몰에 연결할 수 있어요." />
+        ) : (
+        <>
         {dmsg && (
           <p className="mb-3 rounded-lg bg-emerald-500/10 px-3 py-2 text-sm text-emerald-600 dark:text-emerald-400">{dmsg}</p>
         )}
@@ -282,6 +295,8 @@ export default async function StoreAdmin({
               ✓ 이 도메인은 자동으로 등록됐어요. 위 DNS 레코드만 추가하면 SSL(https)까지 자동 발급됩니다.
             </p>
           </div>
+        )}
+        </>
         )}
       </section>
 
@@ -442,11 +457,15 @@ export default async function StoreAdmin({
         {ptmsg && (
           <p className="mb-3 rounded-lg bg-emerald-500/10 px-3 py-2 text-sm text-emerald-600 dark:text-emerald-400">{ptmsg}</p>
         )}
-        <form action={setStorePoints} className="space-y-3">
-          <input type="hidden" name="id" value={s.id} />
-          <PointsSettings on={s.points_on === true} rate={s.points_rate ?? 1} />
-          <SaveButton label="적립금 설정 저장" />
-        </form>
+        {canPoints ? (
+          <form action={setStorePoints} className="space-y-3">
+            <input type="hidden" name="id" value={s.id} />
+            <PointsSettings on={s.points_on === true} rate={s.points_rate ?? 1} />
+            <SaveButton label="적립금 설정 저장" />
+          </form>
+        ) : (
+          <LockedFeature planName={requiredPlanName("points")} desc="주문 완료 시 손님에게 적립금을 쌓아 단골을 만들 수 있어요." />
+        )}
       </section>
 
       {/* 회원 등급 (VIP) */}
@@ -455,7 +474,11 @@ export default async function StoreAdmin({
         <p className="mb-4 text-xs text-neutral-500">
           단골 손님일수록 더 좋은 혜택을! 누적 구매액에 따라 등급을 나누고 등급별 할인을 줄 수 있어요.
         </p>
-        <StoreGradeManager storeId={s.id} on={gradesOn} initial={storeGrades} />
+        {canGrades ? (
+          <StoreGradeManager storeId={s.id} on={gradesOn} initial={storeGrades} />
+        ) : (
+          <LockedFeature planName={requiredPlanName("grades")} desc="누적 구매액에 따라 VIP 등급을 나누고 등급별 할인을 줄 수 있어요." />
+        )}
       </section>
 
       {/* 사업자 정보 (쇼핑몰 하단 표시) */}

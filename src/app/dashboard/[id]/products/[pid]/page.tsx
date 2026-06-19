@@ -6,6 +6,8 @@ import { listStoreCategories } from "../../categories/actions";
 import OptionsEditor from "@/components/OptionsEditor";
 import ProductImagePicker from "@/components/ProductImagePicker";
 import PriceInput from "@/components/PriceInput";
+import { getMe } from "@/lib/role";
+import { canUse, requiredPlanName } from "@/lib/plans";
 
 type Product = {
   id: string;
@@ -42,6 +44,8 @@ export default async function EditProduct({
     .maybeSingle();
   if (!data) notFound();
   const p = data as Product;
+  const me = await getMe();
+  const canCompareAt = canUse("compare_at", me.plan, me.role);
 
   // 몰에서 만든 카테고리(있으면) + 현재 상품 카테고리 보존
   const managed = (await listStoreCategories(id)).map((c) => c.name);
@@ -81,7 +85,13 @@ export default async function EditProduct({
           <PriceInput required defaultValue={p.price} className={INPUT} />
         </Field>
         <Field label="정가 (할인 전 가격·선택)">
-          <PriceInput name="compare_at" defaultValue={p.compare_at} className={INPUT} />
+          {canCompareAt ? (
+            <PriceInput name="compare_at" defaultValue={p.compare_at} className={INPUT} />
+          ) : (
+            <div className="rounded-lg border border-dashed border-amber-400/50 bg-amber-50/60 px-3 py-2 text-xs text-amber-700 dark:border-amber-400/30 dark:bg-amber-400/[0.06] dark:text-amber-300">
+              🔒 {requiredPlanName("compare_at")} 요금제부터 — 정가 취소선·할인율 표시
+            </div>
+          )}
         </Field>
         <Field label="브랜드">
           <input name="brand" defaultValue={p.brand || ""} className={INPUT} />
