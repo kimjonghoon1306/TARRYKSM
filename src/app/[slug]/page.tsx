@@ -4,6 +4,7 @@ import { createClient } from "@/lib/supabase/server";
 import { fetchSections } from "@/lib/sections";
 import { fetchReviewsByProduct } from "@/lib/reviews";
 import Storefront, { type Product } from "../s/[slug]/Storefront";
+import StoreBot, { type BotStyle } from "@/components/StoreBot";
 import { getCustomer, getWishlistIds, getMyCoupons } from "./customer-actions";
 
 // 각 쇼핑몰 링크 공유 시: 가게 이름·로고(파비콘)·배너(미리보기 이미지)
@@ -51,6 +52,9 @@ type Store = {
   ship_fee: number | null;
   ship_free_over: number | null;
   ship_extra: number | null;
+  chat_on: boolean | null;
+  chat_style: string | null;
+  chat_greeting: string | null;
   footer_text: string | null;
   biz_company: string | null;
   biz_owner: string | null;
@@ -79,7 +83,7 @@ export default async function PrettyStorefront({
   const [{ data: store }, cust, wishlistIdsRaw, myCouponsRaw] = await Promise.all([
     supabase
       .from("stores")
-      .select("id,name,skin,logo_url,hero_image_url,hero_title,hero_subtitle,pay_bank,pay_note,pay_bank_on,points_on,ship_on,ship_fee,ship_free_over,ship_extra,footer_text,biz_company,biz_owner,biz_number,biz_mailorder,biz_address,biz_phone,biz_email")
+      .select("id,name,skin,logo_url,hero_image_url,hero_title,hero_subtitle,pay_bank,pay_note,pay_bank_on,points_on,ship_on,ship_fee,ship_free_over,ship_extra,chat_on,chat_style,chat_greeting,footer_text,biz_company,biz_owner,biz_number,biz_mailorder,biz_address,biz_phone,biz_email")
       .eq("slug", slug)
       .eq("published", true)
       .maybeSingle(),
@@ -90,8 +94,8 @@ export default async function PrettyStorefront({
   if (!store) notFound();
   const s = store as Store;
 
-  // store.id 확정 후 상품/섹션/리뷰 병렬 조회
-  const [{ data: products }, sections, reviewsByProduct] = await Promise.all([
+  // store.id 확정 후 상품/섹션/리뷰/챗봇FAQ 병렬 조회
+  const [{ data: products }, sections, reviewsByProduct, { data: faqRows }] = await Promise.all([
     supabase
       .from("products")
       .select("id,emoji,image_url,name,brand,price,compare_at,category,description,tag,stock,options,created_at")
@@ -99,8 +103,14 @@ export default async function PrettyStorefront({
       .order("position", { ascending: true }),
     fetchSections(supabase, s.id),
     fetchReviewsByProduct(supabase, s.id),
+    supabase
+      .from("store_faqs")
+      .select("id,question,answer")
+      .eq("store_id", s.id)
+      .order("position", { ascending: true }),
   ]);
   const items = (products ?? []) as Product[];
+  const faqs = (faqRows ?? []) as { id: string; question: string; answer: string }[];
   const customer = cust && cust.store_id === s.id ? { id: cust.id, name: cust.name, email: cust.email, points: cust.points } : null;
   const wishlistIds = customer ? wishlistIdsRaw : [];
   // 결제 화면에서 쓸 수 있는 보유 쿠폰 (미사용·유효·기간내)
@@ -151,6 +161,14 @@ export default async function PrettyStorefront({
         sections={sections}
         reviewsByProduct={reviewsByProduct}
       />
+      {s.chat_on !== false && (
+        <StoreBot
+          faqs={faqs}
+          storeName={s.name}
+          style={(s.chat_style as BotStyle) || "designer"}
+          greeting={s.chat_greeting}
+        />
+      )}
     </>
   );
 }

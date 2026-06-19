@@ -463,7 +463,8 @@ export default function OnBot() {
           type="button"
           aria-label="온봇 도우미 열기"
           onClick={openPanel}
-          className="onbot-fab-btn flex items-center gap-2 rounded-full bg-white/90 py-1.5 pl-1.5 pr-4 shadow-xl shadow-violet-500/20 ring-1 ring-black/5 backdrop-blur transition hover:-translate-y-0.5 hover:shadow-2xl active:scale-95 dark:bg-[#191a30]/90 dark:ring-white/10"
+          onMouseEnter={() => { if (!open) { setBubble(true); talk(800); } }}
+          className="onbot-fab-btn flex items-center gap-2 rounded-full bg-white/90 py-1.5 pl-1.5 pr-4 shadow-xl shadow-violet-500/20 ring-1 ring-black/5 backdrop-blur dark:bg-[#191a30]/90 dark:ring-white/10"
         >
           <span className="relative inline-grid place-items-center">
             <span className={open ? "" : "onbot-idle"}>
@@ -578,8 +579,12 @@ export default function OnBot() {
         @keyframes onbot-bubble-in { 0% { opacity: 0; transform: translateY(8px) scale(.9); } 60% { transform: translateY(-2px) scale(1.03); } 100% { opacity: 1; transform: none; } }
         @keyframes onbot-wiggle { 0%,88%,100% { transform: rotate(0); } 91% { transform: rotate(-9deg); } 94% { transform: rotate(9deg); } 97% { transform: rotate(-5deg); } }
 
+        @keyframes onbot-jump { 0% { transform: translateY(0) scale(1); } 30% { transform: translateY(-9px) scale(1.18); } 55% { transform: translateY(0) scale(.94); } 75% { transform: translateY(-3px) scale(1.04); } 100% { transform: translateY(0) scale(1); } }
         .onbot-idle { display: inline-block; animation: onbot-float 3.2s ease-in-out infinite; }
-        .onbot-fab-btn:hover .onbot-idle { animation: onbot-wiggle 0.6s ease-in-out; }
+        .onbot-fab-btn { transition: transform .22s cubic-bezier(.34,1.56,.64,1), box-shadow .22s; }
+        .onbot-fab-btn:hover { transform: scale(1.09) translateY(-3px); box-shadow: 0 18px 42px rgba(124,109,255,.4); }
+        .onbot-fab-btn:active { transform: scale(.95); }
+        .onbot-fab-btn:hover .onbot-idle { animation: onbot-jump .55s cubic-bezier(.34,1.56,.64,1); }
         .onbot-av .onbot-eyes { transform-box: fill-box; transform-origin: center; animation: onbot-blink 4.2s infinite; }
         .onbot-av.talking { animation: onbot-bob 0.5s ease-in-out infinite; transform-origin: 24px 38px; }
         .onbot-av.talking .onbot-mouth { animation: onbot-talkmouth 0.32s ease-in-out infinite; }

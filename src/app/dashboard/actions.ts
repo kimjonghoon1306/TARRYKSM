@@ -270,6 +270,29 @@ export async function setStoreShipping(formData: FormData) {
   redirect(`/dashboard/${id}?shmsg=` + encodeURIComponent("배송비 설정을 저장했어요"));
 }
 
+// 쇼핑몰 챗봇 설정 — 표시 여부 + 모양(디자이너/로봇/곰돌이) + 인사말.
+export async function setStoreChat(formData: FormData) {
+  const supabase = await createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+  if (!user) redirect("/login");
+  const id = String(formData.get("id") || "");
+  if (!id) return;
+
+  const chatOn = String(formData.get("chat_on") || "") === "1";
+  const styleRaw = String(formData.get("chat_style") || "designer");
+  const chatStyle = ["designer", "robot", "bear"].includes(styleRaw) ? styleRaw : "designer";
+  const greeting = String(formData.get("chat_greeting") || "").trim().slice(0, 200) || null;
+
+  await supabase
+    .from("stores")
+    .update({ chat_on: chatOn, chat_style: chatStyle, chat_greeting: greeting })
+    .eq("id", id);
+  revalidatePath(`/dashboard/${id}`);
+  redirect(`/dashboard/${id}?chmsg=` + encodeURIComponent("챗봇 설정을 저장했어요"));
+}
+
 // 사업자 정보 — 쇼핑몰 하단에 표시되는 법적 의무 표시 항목
 export async function setStoreBusiness(formData: FormData) {
   const supabase = await createClient();

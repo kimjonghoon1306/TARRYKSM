@@ -2,7 +2,7 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { domainToUnicode } from "node:url";
 import { createClient } from "@/lib/supabase/server";
-import { setStoreDomain, togglePublish, setStoreSlug, setStorePayment, setStorePoints, setStoreShipping, setStoreBusiness } from "../actions";
+import { setStoreDomain, togglePublish, setStoreSlug, setStorePayment, setStorePoints, setStoreShipping, setStoreChat, setStoreBusiness } from "../actions";
 import { PRIMARY_DOMAIN } from "@/lib/domains";
 import DomainHelp from "@/components/DomainHelp";
 import BrandingForm from "@/components/BrandingForm";
@@ -13,6 +13,10 @@ import PointsSettings from "@/components/PointsSettings";
 import ShippingSettings from "@/components/ShippingSettings";
 import CategoryManager from "@/components/CategoryManager";
 import { listStoreCategories } from "./categories/actions";
+import StoreFaqManager from "@/components/StoreFaqManager";
+import BotStylePicker from "@/components/BotStylePicker";
+import { listStoreFaqs } from "./faq/actions";
+import type { BotStyle } from "@/components/StoreBot";
 import BrandingTutorial from "@/components/BrandingTutorial";
 
 type Store = {
@@ -37,6 +41,9 @@ type Store = {
   ship_fee: number | null;
   ship_free_over: number | null;
   ship_extra: number | null;
+  chat_on: boolean | null;
+  chat_style: string | null;
+  chat_greeting: string | null;
   footer_text: string | null;
   biz_company: string | null;
   biz_owner: string | null;
@@ -52,14 +59,14 @@ export default async function StoreAdmin({
   searchParams,
 }: {
   params: Promise<{ id: string }>;
-  searchParams: Promise<{ dmsg?: string; derr?: string; smsg?: string; serr?: string; brmsg?: string; pmsg?: string; ptmsg?: string; shmsg?: string }>;
+  searchParams: Promise<{ dmsg?: string; derr?: string; smsg?: string; serr?: string; brmsg?: string; pmsg?: string; ptmsg?: string; shmsg?: string; chmsg?: string }>;
 }) {
   const { id } = await params;
-  const { dmsg, derr, smsg, serr, brmsg, pmsg, ptmsg, shmsg } = await searchParams;
+  const { dmsg, derr, smsg, serr, brmsg, pmsg, ptmsg, shmsg, chmsg } = await searchParams;
   const supabase = await createClient();
   const { data: store } = await supabase
     .from("stores")
-    .select("id,name,skin,slug,published,custom_domain,logo_url,hero_image_url,hero_title,hero_subtitle,pay_bank,pay_note,pay_bank_on,pay_card_on,pay_vbank_on,points_on,points_rate,ship_on,ship_fee,ship_free_over,ship_extra,footer_text,biz_company,biz_owner,biz_number,biz_mailorder,biz_address,biz_phone,biz_email")
+    .select("id,name,skin,slug,published,custom_domain,logo_url,hero_image_url,hero_title,hero_subtitle,pay_bank,pay_note,pay_bank_on,pay_card_on,pay_vbank_on,points_on,points_rate,ship_on,ship_fee,ship_free_over,ship_extra,chat_on,chat_style,chat_greeting,footer_text,biz_company,biz_owner,biz_number,biz_mailorder,biz_address,biz_phone,biz_email")
     .eq("id", id)
     .maybeSingle();
   if (!store) notFound();
@@ -91,6 +98,7 @@ export default async function StoreAdmin({
   }[];
 
   const storeCats = await listStoreCategories(id);
+  const storeFaqs = await listStoreFaqs(id);
   // 기존 상품들이 이미 쓰는 카테고리 (관리 목록 자동 채우기용)
   const { data: catRows } = await supabase.from("products").select("category").eq("store_id", id);
   const productCats = [
@@ -106,7 +114,7 @@ export default async function StoreAdmin({
 
   return (
     <div className="mx-auto max-w-4xl">
-      <SavedToast message={brmsg || pmsg || ptmsg || shmsg || dmsg || smsg} />
+      <SavedToast message={brmsg || pmsg || ptmsg || shmsg || chmsg || dmsg || smsg} />
       <Link href="/dashboard/stores" className="text-sm text-neutral-500 hover:text-violet-500">
         ← 쇼핑몰
       </Link>
@@ -316,6 +324,31 @@ export default async function StoreAdmin({
           쇼핑몰 카테고리를 직접 만들고 순서·이름을 바꾸세요. 상품 등록 시 여기서 고른 카테고리로 분류됩니다.
         </p>
         <CategoryManager storeId={s.id} initial={storeCats} productCats={productCats} />
+      </section>
+
+      {/* 쇼핑몰 챗봇 (FAQ) */}
+      <section className={card + " mt-4"}>
+        <h2 className="mb-1 font-semibold">💬 쇼핑몰 챗봇 (자주 묻는 질문)</h2>
+        <p className="mb-4 text-xs text-neutral-500">
+          자주 묻는 질문과 답을 직접 넣으면, 손님 쇼핑몰 오른쪽 아래에 <b>챗봇</b>이 떠서 손님이 눌러 바로 답을 봐요.
+          챗봇 모양은 3가지 중에 스킨 분위기에 맞게 고를 수 있어요.
+        </p>
+        {chmsg && (
+          <p className="mb-3 rounded-lg bg-emerald-500/10 px-3 py-2 text-sm text-emerald-600 dark:text-emerald-400">{chmsg}</p>
+        )}
+        <form action={setStoreChat} className="space-y-3">
+          <input type="hidden" name="id" value={s.id} />
+          <BotStylePicker
+            on={s.chat_on !== false}
+            style={(s.chat_style as BotStyle) || "designer"}
+            greeting={s.chat_greeting || ""}
+          />
+          <SaveButton label="챗봇 설정 저장" />
+        </form>
+        <div className="mt-5 border-t border-black/5 pt-4 dark:border-white/10">
+          <div className="mb-2 text-xs font-semibold text-neutral-500">질문/답 관리</div>
+          <StoreFaqManager storeId={s.id} initial={storeFaqs} />
+        </div>
       </section>
 
       {/* 결제 설정 */}
