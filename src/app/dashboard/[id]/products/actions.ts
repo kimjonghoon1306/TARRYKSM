@@ -26,6 +26,12 @@ function parseOptions(raw: FormDataEntryValue | null): unknown[] {
   }
 }
 
+// 정가(compare_at) 파싱 — 비었거나 판매가 이하면 null(할인 표시 안 함)
+function parseCompareAt(raw: FormDataEntryValue | null, price: number): number | null {
+  const n = parseInt(String(raw || "").replace(/[^0-9]/g, ""), 10);
+  return Number.isFinite(n) && n > price ? n : null;
+}
+
 // 소유 확인: 이 store가 현재 유저 것인지 (RLS가 막지만 UX용 선검사)
 async function assertOwner(storeId: string) {
   const supabase = await createClient();
@@ -75,6 +81,7 @@ export async function addProduct(formData: FormData) {
   const name = String(formData.get("name") || "").trim();
   if (!name) return;
   const price = parseInt(String(formData.get("price") || "0"), 10) || 0;
+  const compareAt = parseCompareAt(formData.get("compare_at"), price);
   const stockRaw = String(formData.get("stock") || "").trim();
   const stock = stockRaw === "" ? null : Math.max(0, parseInt(stockRaw, 10) || 0);
   // 업로드 파일 우선, 없으면 무료 라이브러리에서 고른 이미지 경로 사용
@@ -85,6 +92,7 @@ export async function addProduct(formData: FormData) {
     store_id: storeId,
     name,
     price,
+    compare_at: compareAt,
     stock,
     options: parseOptions(formData.get("options")),
     emoji: String(formData.get("emoji") || "📦").trim() || "📦",
@@ -107,6 +115,7 @@ export async function updateProduct(formData: FormData) {
   const name = String(formData.get("name") || "").trim();
   if (!name) return;
   const price = parseInt(String(formData.get("price") || "0"), 10) || 0;
+  const compareAt = parseCompareAt(formData.get("compare_at"), price);
   const stockRaw = String(formData.get("stock") || "").trim();
   const stock = stockRaw === "" ? null : Math.max(0, parseInt(stockRaw, 10) || 0);
   const stockUrl = stockImageUrl(formData.get("stock_image_url"));
@@ -115,6 +124,7 @@ export async function updateProduct(formData: FormData) {
   const patch: Record<string, unknown> = {
     name,
     price,
+    compare_at: compareAt,
     stock,
     options: parseOptions(formData.get("options")),
     emoji: String(formData.get("emoji") || "📦").trim() || "📦",

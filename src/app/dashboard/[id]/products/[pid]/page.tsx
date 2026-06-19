@@ -15,6 +15,7 @@ type Product = {
   brand: string | null;
   category: string | null;
   price: number;
+  compare_at: number | null;
   tag: string | null;
   description: string | null;
   stock: number | null;
@@ -35,7 +36,7 @@ export default async function EditProduct({
 
   const { data } = await supabase
     .from("products")
-    .select("id,emoji,image_url,name,brand,category,price,tag,description,stock,options")
+    .select("id,emoji,image_url,name,brand,category,price,compare_at,tag,description,stock,options")
     .eq("id", pid)
     .eq("store_id", id)
     .maybeSingle();
@@ -78,6 +79,9 @@ export default async function EditProduct({
         </Field>
         <Field label="가격(원) *">
           <PriceInput required defaultValue={p.price} className={INPUT} />
+        </Field>
+        <Field label="정가 (할인 전 가격·선택)">
+          <PriceInput name="compare_at" defaultValue={p.compare_at} className={INPUT} />
         </Field>
         <Field label="브랜드">
           <input name="brand" defaultValue={p.brand || ""} className={INPUT} />

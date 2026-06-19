@@ -20,6 +20,7 @@ export default function ProductForm({ storeId, skin, cats }: { storeId: string; 
   const [name, setName] = useState("");
   const [brand, setBrand] = useState("");
   const [price, setPrice] = useState("");
+  const [compareAt, setCompareAt] = useState("");
   const [emoji, setEmoji] = useState("📦");
   const [tag, setTag] = useState("");
   const [desc, setDesc] = useState("");
@@ -58,7 +59,17 @@ export default function ProductForm({ storeId, skin, cats }: { storeId: string; 
           <div className={(full ? "mt-2 text-sm" : "mt-1.5 text-xs") + " leading-relaxed"} style={{ opacity: 0.7 }}>{desc}</div>
         )}
         <div className="mt-3 flex items-center justify-between">
-          <div className={(full ? "text-2xl" : "text-lg") + " font-bold"}>{won(Number(price))}</div>
+          <div className={(full ? "text-2xl" : "text-lg") + " font-bold"}>
+            {Number(compareAt) > Number(price) && Number(price) > 0 && (
+              <span className="mr-1.5 align-middle text-[0.65em] font-extrabold text-red-500">
+                {Math.round((1 - Number(price) / Number(compareAt)) * 100)}%
+              </span>
+            )}
+            {Number(compareAt) > Number(price) && (
+              <span className="mr-1.5 align-middle text-[0.65em] font-medium line-through" style={{ opacity: 0.55 }}>{won(Number(compareAt))}</span>
+            )}
+            {won(Number(price))}
+          </div>
           <span className={(full ? "px-6 py-3 text-base" : "px-4 py-2 text-sm") + " rounded-lg font-bold"} style={{ background: sk.color, color: sk.bg }}>
             담기
           </span>
@@ -85,6 +96,9 @@ export default function ProductForm({ storeId, skin, cats }: { storeId: string; 
         </L>
         <L label="가격(원) *">
           <PriceInput required onValue={setPrice} className={INPUT} />
+        </L>
+        <L label="정가 (할인 전 가격·선택)">
+          <PriceInput name="compare_at" onValue={setCompareAt} className={INPUT} />
         </L>
         <L label="브랜드">
           <input name="brand" value={brand} onChange={(e) => setBrand(e.target.value)} placeholder="예: AROMA" className={INPUT} />

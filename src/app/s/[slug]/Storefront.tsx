@@ -24,6 +24,7 @@ export type Product = {
   name: string;
   brand: string | null;
   price: number;
+  compare_at?: number | null; // 정가(할인 전 가격). price보다 크면 할인 표시
   category: string | null;
   description: string | null;
   tag: string | null;
@@ -120,6 +121,12 @@ type Store = {
 };
 
 const won = (n: number) => "₩" + n.toLocaleString("ko-KR");
+
+// 정가(compare_at)가 판매가보다 크면 할인율(%) 반환, 아니면 0
+function discountPct(price: number, compareAt?: number | null) {
+  if (!compareAt || compareAt <= price) return 0;
+  return Math.round((1 - price / compareAt) * 100);
+}
 
 const SORTS = [
   { id: "recommend", label: "추천" },
@@ -466,7 +473,15 @@ export default function Storefront({
             <div className="sf-stock-low">{p.stock}개 남음</div>
           )}
           <div className="sf-bottom">
-            <div className="sf-price">{won(p.price)}</div>
+            <div className="sf-price">
+              {discountPct(p.price, p.compare_at) > 0 && (
+                <>
+                  <span className="sf-discount-pct">{discountPct(p.price, p.compare_at)}%</span>
+                  <span className="sf-compare">{won(p.compare_at!)}</span>
+                </>
+              )}
+              <span className="sf-price-now">{won(p.price)}</span>
+            </div>
             <button
               className="sf-add"
               disabled={soldOut}
@@ -855,7 +870,15 @@ export default function Storefront({
           <div className="sf-sheet-body">
             {detail.brand && <div className="sf-brand">{detail.brand}</div>}
             <h2>{detail.name}</h2>
-            <div className="sf-detail-price">{won(detail.price)}{dOpts.length > 0 && <span className="sf-detail-from"> 부터</span>}</div>
+            <div className="sf-detail-price">
+              {discountPct(detail.price, detail.compare_at) > 0 && (
+                <>
+                  <span className="sf-discount-pct">{discountPct(detail.price, detail.compare_at)}%</span>
+                  <span className="sf-compare">{won(detail.compare_at!)}</span>
+                </>
+              )}
+              {won(detail.price)}{dOpts.length > 0 && <span className="sf-detail-from"> 부터</span>}
+            </div>
             <div className="sf-sheet-desc">{detail.description || "정성껏 준비한 상품입니다."}</div>
 
             {/* 옵션 선택 */}

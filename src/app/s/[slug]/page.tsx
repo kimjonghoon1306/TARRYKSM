@@ -45,7 +45,7 @@ export default async function StorefrontPage({
   const [{ data: products }, sections, reviewsByProduct] = await Promise.all([
     supabase
       .from("products")
-      .select("id,emoji,image_url,name,brand,price,category,description,tag,stock,options,created_at")
+      .select("id,emoji,image_url,name,brand,price,compare_at,category,description,tag,stock,options,created_at")
       .eq("store_id", s.id)
       .order("position", { ascending: true }),
     fetchSections(supabase, s.id),

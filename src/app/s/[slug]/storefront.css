@@ -192,7 +192,11 @@
 .sf-meta { padding: 12px 13px 14px; display: flex; flex-direction: column; gap: 3px; }
 .sf-brand { font-size: 10px; font-weight: 800; letter-spacing: .08em; text-transform: uppercase; color: var(--s-sub); }
 .sf-name { font-size: 14px; font-weight: 600; line-height: 1.3; }
-.sf-price { font-family: var(--s-fd); font-weight: 700; font-size: 15px; }
+.sf-price { font-family: var(--s-fd); font-weight: 700; font-size: 15px; display: inline-flex; align-items: baseline; flex-wrap: wrap; gap: 5px; }
+.sf-price-now { color: inherit; }
+.sf-compare { font-weight: 500; font-size: .82em; color: var(--s-sub); text-decoration: line-through; opacity: .75; }
+.sf-discount-pct { font-weight: 800; font-size: .9em; color: #ef4444; }
+.sf-detail-price .sf-compare, .sf-detail-price .sf-discount-pct { font-size: .65em; vertical-align: middle; margin-right: 4px; }
 .sf-add { flex: none; padding: 8px 14px; border: 0; border-radius: var(--s-radd); background: var(--s-brand); color: var(--s-brand-ink); font-weight: 700; font-size: 13px; cursor: pointer; transition: .18s var(--ease); }
 .sf-add:hover { filter: brightness(1.06); transform: translateY(-1px); }
 .sf-add:active { transform: scale(.94); }
