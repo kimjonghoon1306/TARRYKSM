@@ -18,7 +18,7 @@ export default async function MyPage({ params }: { params: Promise<{ slug: strin
 
   // 쇼핑몰 + 손님 정보 병렬 조회 (독립 → 순차 왕복 제거)
   const [{ data: store }, cust] = await Promise.all([
-    supabase.from("stores").select("id,name,skin").eq("slug", slug).eq("published", true).maybeSingle(),
+    supabase.from("stores").select("id,name,skin,grades_on").eq("slug", slug).eq("published", true).maybeSingle(),
     getCustomer(),
   ]);
   if (!store) notFound();
@@ -56,6 +56,24 @@ export default async function MyPage({ params }: { params: Promise<{ slug: strin
   const totalSpent = list.filter((o) => o.status !== "취소").reduce((s, o) => s + (o.total || 0), 0);
   const done = list.filter((o) => o.status === "완료").length;
 
+  // 회원 등급 — 등급 사용 켜진 몰에서만. 누적구매액(완료 기준) 기준 현재 등급 + 다음 등급 진행도.
+  let grade: { name: string; pct: number } | null = null;
+  let nextGrade: { name: string; need: number } | null = null;
+  if ((store as { grades_on?: boolean }).grades_on) {
+    const { data: c2 } = await supabase.from("customers").select("total_spent").eq("id", cust.id).maybeSingle();
+    const spent = (c2 as { total_spent?: number } | null)?.total_spent ?? 0;
+    const { data: gradeRows } = await supabase
+      .from("store_grades")
+      .select("name,min_spent,discount_pct")
+      .eq("store_id", store.id)
+      .order("min_spent", { ascending: true });
+    const gl = (gradeRows ?? []) as { name: string; min_spent: number; discount_pct: number }[];
+    const cur = [...gl].reverse().find((g) => g.min_spent <= spent);
+    if (cur) grade = { name: cur.name, pct: cur.discount_pct };
+    const nx = gl.find((g) => g.min_spent > spent);
+    if (nx) nextGrade = { name: nx.name, need: nx.min_spent - spent };
+  }
+
   return (
     <main style={{ minHeight: "100vh", background: "linear-gradient(180deg,#eef0f7 0%,#f7f8fb 360px)", padding: "0 0 80px", color: "#1a1a1a" }}>
       <header style={{ display: "flex", alignItems: "center", gap: 12, padding: "16px 24px", background: "rgba(255,255,255,.8)", backdropFilter: "blur(12px)", position: "sticky", top: 0, zIndex: 10, borderBottom: "1px solid rgba(0,0,0,.05)" }}>
@@ -74,9 +92,16 @@ export default async function MyPage({ params }: { params: Promise<{ slug: strin
             <div>
               <div style={{ fontSize: 24, fontWeight: 900, letterSpacing: "-.5px" }}>{cust.name}님</div>
               <div style={{ fontSize: 13.5, opacity: .9, marginTop: 3 }}>{cust.email}</div>
-              <div style={{ display: "inline-block", marginTop: 9, fontSize: 11.5, fontWeight: 800, padding: "4px 12px", borderRadius: 999, background: "rgba(255,255,255,.22)" }}>⭐ {store.name} 회원</div>
+              <div style={{ display: "inline-block", marginTop: 9, fontSize: 11.5, fontWeight: 800, padding: "4px 12px", borderRadius: 999, background: "rgba(255,255,255,.22)" }}>
+                {grade ? <>💎 {grade.name} 등급{grade.pct > 0 ? ` · ${grade.pct}% 할인` : ""}</> : <>⭐ {store.name} 회원</>}
+              </div>
             </div>
           </div>
+          {grade && nextGrade && (
+            <div style={{ position: "relative", marginTop: 16, fontSize: 12.5, opacity: 0.95 }}>
+              다음 등급 <b>{nextGrade.name}</b>까지 <b>{won(nextGrade.need)}</b> 남았어요 🎯
+            </div>
+          )}
         </div>
 
         {/* 통계 4칸 */}

@@ -56,6 +56,7 @@ type Store = {
   chat_style: string | null;
   chat_greeting: string | null;
   chat_name: string | null;
+  grades_on: boolean | null;
   footer_text: string | null;
   biz_company: string | null;
   biz_owner: string | null;
@@ -84,7 +85,7 @@ export default async function PrettyStorefront({
   const [{ data: store }, cust, wishlistIdsRaw, myCouponsRaw] = await Promise.all([
     supabase
       .from("stores")
-      .select("id,name,skin,logo_url,hero_image_url,hero_title,hero_subtitle,pay_bank,pay_note,pay_bank_on,points_on,ship_on,ship_fee,ship_free_over,ship_extra,chat_on,chat_style,chat_greeting,chat_name,footer_text,biz_company,biz_owner,biz_number,biz_mailorder,biz_address,biz_phone,biz_email")
+      .select("id,name,skin,logo_url,hero_image_url,hero_title,hero_subtitle,pay_bank,pay_note,pay_bank_on,points_on,ship_on,ship_fee,ship_free_over,ship_extra,chat_on,chat_style,chat_greeting,chat_name,grades_on,footer_text,biz_company,biz_owner,biz_number,biz_mailorder,biz_address,biz_phone,biz_email")
       .eq("slug", slug)
       .eq("published", true)
       .maybeSingle(),
@@ -121,6 +122,15 @@ export default async function PrettyStorefront({
         .map((c) => ({ code: c.code, kind: c.kind, value: c.value, min_order: c.min_order }))
     : [];
 
+  // 로그인 회원의 현재 등급(할인%) — 등급 사용 켜진 몰에서만. (grades.sql 미실행이면 null)
+  let memberGrade: { name: string; pct: number } | null = null;
+  if (customer && s.grades_on) {
+    const { data: c2 } = await supabase.from("customers").select("total_spent").eq("id", customer.id).maybeSingle();
+    const { data: g } = await supabase.rpc("grade_for_spent", { p_store: s.id, p_spent: (c2 as { total_spent?: number } | null)?.total_spent ?? 0 });
+    const gr = (Array.isArray(g) ? g[0] : g) as { name?: string; discount_pct?: number } | null;
+    if (gr && (gr.discount_pct ?? 0) > 0) memberGrade = { name: gr.name || "회원", pct: gr.discount_pct as number };
+  }
+
   return (
     <>
       <link
@@ -133,6 +143,7 @@ export default async function PrettyStorefront({
         wishlistIds={wishlistIds}
         myCoupons={myCoupons}
         openAuth={openAuth}
+        memberGrade={memberGrade}
         store={{
           id: s.id,
           name: s.name,

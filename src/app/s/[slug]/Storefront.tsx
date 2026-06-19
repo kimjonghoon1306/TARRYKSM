@@ -147,6 +147,7 @@ export default function Storefront({
   wishlistIds,
   myCoupons,
   openAuth,
+  memberGrade,
 }: {
   store: Store;
   products: Product[];
@@ -157,6 +158,7 @@ export default function Storefront({
   wishlistIds?: string[];
   myCoupons?: { code: string; kind: string; value: number; min_order: number }[];
   openAuth?: "login" | "signup";
+  memberGrade?: { name: string; pct: number } | null;
 }) {
   const [cart, setCart] = useState<Record<string, CartLine>>({});
   // 비로그인 손님이 마이페이지 등에서 넘어오면 로그인/회원가입 시트를 자동으로 연다
@@ -412,10 +414,14 @@ export default function Storefront({
   // 쿠폰 적용/해제. 표시 할인은 현재 장바구니 총액으로 클램프, 최종은 서버 재검증.
   const effectDiscount = Math.min(couponDiscount, total);
   const afterCoupon = total - effectDiscount;
+  // 회원 등급 할인 — 등급 사용 + 로그인 손님. 상품합계 기준, 쿠폰 차감 후 금액 한도.
+  const memberPct = memberGrade?.pct ?? 0;
+  const memberDiscount = memberPct > 0 ? Math.min(afterCoupon, Math.floor((total * memberPct) / 100)) : 0;
+  const afterGrade = afterCoupon - memberDiscount;
   // 적립금 사용 — 로그인 손님 + 적립금 사용 켜진 몰에서만. 잔액·결제금액 한도로 클램프.
   const pointsEnabled = !!customer && store.points_on === true && (customer.points ?? 0) > 0;
   const pointsAvail = customer?.points ?? 0;
-  const pointsMax = Math.min(pointsAvail, afterCoupon);
+  const pointsMax = Math.min(pointsAvail, afterGrade);
   const pointsUsed = pointsEnabled ? Math.max(0, Math.min(Math.trunc(Number(pointsInput) || 0), pointsMax)) : 0;
   // 배송비 — 켜진 몰만. 무료배송 기준은 상품 합계(total) 기준. 도서산간 체크 시 추가비.
   const shipOn = store.ship_on === true;
@@ -424,7 +430,7 @@ export default function Storefront({
   const shipExtra = shipBase > 0 && buyer.remote ? store.ship_extra || 0 : 0;
   const shipping = shipBase + shipExtra;
   const freeShipGap = shipOn && shipFreeOver > 0 && total > 0 && total < shipFreeOver ? shipFreeOver - total : 0;
-  const payable = afterCoupon - pointsUsed + shipping;
+  const payable = afterGrade - pointsUsed + shipping;
 
   async function applyCoupon(codeArg?: string) {
     setCouponErr(false);
@@ -1208,7 +1214,7 @@ export default function Storefront({
                       <b>{won(l.unit * l.qty)}</b>
                     </div>
                   ))}
-                  {(effectDiscount > 0 || pointsUsed > 0 || shipOn) && (
+                  {(effectDiscount > 0 || memberDiscount > 0 || pointsUsed > 0 || shipOn) && (
                     <>
                       <div className="sf-co-line">
                         <span>상품 합계</span>
@@ -1218,6 +1224,12 @@ export default function Storefront({
                         <div className="sf-co-line sf-co-discount">
                           <span>쿠폰 할인{couponCode ? ` (${couponCode})` : ""}</span>
                           <b>-{won(effectDiscount)}</b>
+                        </div>
+                      )}
+                      {memberDiscount > 0 && (
+                        <div className="sf-co-line sf-co-discount">
+                          <span>등급 할인{memberGrade ? ` (${memberGrade.name} ${memberPct}%)` : ""}</span>
+                          <b>-{won(memberDiscount)}</b>
                         </div>
                       )}
                       {pointsUsed > 0 && (
@@ -1235,7 +1247,7 @@ export default function Storefront({
                     </>
                   )}
                   <div className="sf-co-total">
-                    <span>{effectDiscount > 0 || pointsUsed > 0 || shipOn ? "결제 예정" : "합계"}</span>
+                    <span>{effectDiscount > 0 || memberDiscount > 0 || pointsUsed > 0 || shipOn ? "결제 예정" : "합계"}</span>
                     <b>{won(payable)}</b>
                   </div>
                   {freeShipGap > 0 && (

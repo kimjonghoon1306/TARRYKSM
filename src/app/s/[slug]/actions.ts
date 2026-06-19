@@ -100,26 +100,48 @@ export async function placeOrder(
   }
   const afterCoupon = subtotal - discount;
 
-  // 적립금 사용 — 로그인 손님 + 적립금 사용 켜진 몰에서만. 잔액·결제금액 한도로 클램프(서버 재검증).
+  // 회원 식별 (적립금·등급 공용)
   let custId: string | null = null;
-  let pointsToUse = 0;
+  let custPoints = 0;
   const token = (await cookies()).get("cust_session")?.value;
   try {
     const { getCustomer } = await import("@/app/[slug]/customer-actions");
     const cust = await getCustomer();
     if (cust && cust.store_id === storeId) {
       custId = cust.id;
-      const want = Math.max(0, Math.trunc(Number(usePoints) || 0));
-      if (want > 0 && token) {
-        const { data: st } = await supabase.from("stores").select("points_on").eq("id", storeId).maybeSingle();
-        if (st && (st as { points_on?: boolean }).points_on) {
-          pointsToUse = Math.min(want, cust.points || 0, afterCoupon);
-        }
-      }
+      custPoints = cust.points || 0;
     }
   } catch { /* 비회원 주문은 그대로 */ }
 
-  const afterPoints = afterCoupon - pointsToUse;
+  // 회원 등급 할인 — 등급 사용 켜진 몰 + 로그인 손님. 누적구매액 기준 등급의 할인%를 상품합계에 적용.
+  // (grades.sql 미실행이면 조회 실패 → 0, 하위호환)
+  let gradeDiscount = 0;
+  if (custId) {
+    const { data: stg } = await supabase.from("stores").select("grades_on").eq("id", storeId).maybeSingle();
+    if (stg && (stg as { grades_on?: boolean }).grades_on) {
+      const { data: c2 } = await supabase.from("customers").select("total_spent").eq("id", custId).maybeSingle();
+      const spent = (c2 as { total_spent?: number } | null)?.total_spent ?? 0;
+      const { data: g } = await supabase.rpc("grade_for_spent", { p_store: storeId, p_spent: spent });
+      const gr = (Array.isArray(g) ? g[0] : g) as { discount_pct?: number } | null;
+      const pct = Math.max(0, Math.min(100, gr?.discount_pct ?? 0));
+      gradeDiscount = Math.min(afterCoupon, Math.floor((subtotal * pct) / 100));
+    }
+  }
+  const afterGrade = afterCoupon - gradeDiscount;
+
+  // 적립금 사용 — 로그인 손님 + 적립금 사용 켜진 몰에서만. 잔액·결제금액 한도로 클램프(서버 재검증).
+  let pointsToUse = 0;
+  if (custId && token) {
+    const want = Math.max(0, Math.trunc(Number(usePoints) || 0));
+    if (want > 0) {
+      const { data: st } = await supabase.from("stores").select("points_on").eq("id", storeId).maybeSingle();
+      if (st && (st as { points_on?: boolean }).points_on) {
+        pointsToUse = Math.min(want, custPoints, afterGrade);
+      }
+    }
+  }
+
+  const afterPoints = afterGrade - pointsToUse;
 
   // 배송비 — 켜진 몰만. 무료배송 기준은 상품 합계(subtotal) 기준. 도서산간이면 추가비.
   // (배송비 컬럼 미생성 환경에선 조회 에러→shipping 0, 하위호환)
@@ -158,6 +180,7 @@ export async function placeOrder(
   if (custId) orderRow.customer_id = custId;
   if (pointsToUse > 0) orderRow.points_used = pointsToUse;
   if (shipping > 0) orderRow.shipping = shipping;
+  if (gradeDiscount > 0) orderRow.grade_discount = gradeDiscount;
 
   // id를 미리 생성해 insert (RLS상 anon은 insert 후 되읽기(select)가 막힐 수 있어 select 생략)
   const orderId = crypto.randomUUID();

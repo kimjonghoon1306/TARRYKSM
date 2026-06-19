@@ -12,6 +12,8 @@ export async function updateOrderStatus(orderId: string, status: string) {
   await supabase.from("orders").update({ status }).eq("id", orderId);
   // 적립금 동기화: '완료'면 적립, 완료에서 벗어나면 회수 (멱등, points.sql 미실행 환경이면 무시)
   await supabase.rpc("sync_order_points", { p_order: orderId });
+  // 회원 등급 누적구매액 동기화: '완료'면 누적+, 완료취소면 누적- (멱등, grades.sql 미실행 환경이면 무시)
+  await supabase.rpc("sync_order_grade", { p_order: orderId });
   revalidatePath("/dashboard/orders");
   revalidatePath("/dashboard");
 }
