@@ -239,6 +239,11 @@ export async function placeOrder(
     await supabase.rpc("customer_use_points", { p_token: token, p_amount: pointsToUse, p_order: orderId });
   }
 
+  // 재구매 쿠폰 자동 발급 (로그인 손님 + 설정된 몰만, 같은 쿠폰 중복발급은 RPC가 막음. SQL 없으면 무시)
+  if (token) {
+    await supabase.rpc("auto_issue_coupon", { p_token: token, p_reason: "repurchase" });
+  }
+
   return { ok: true, orderId };
 }
 

@@ -12,6 +12,18 @@ export type CouponInput = {
   expires_at: string | null;
 };
 
+// 자동 발급 쿠폰 설정 (가입축하·재구매). null이면 해당 자동발급 끔. (RLS: 몰 소유자/관리자만)
+export async function setAutoCoupons(storeId: string, welcome: string | null, repurchase: string | null): Promise<{ ok: boolean; error?: string }> {
+  const supabase = await createClient();
+  const { error } = await supabase
+    .from("stores")
+    .update({ welcome_coupon: welcome || null, repurchase_coupon: repurchase || null })
+    .eq("id", storeId);
+  if (error) return { ok: false, error: error.message };
+  revalidatePath(`/dashboard/${storeId}/coupons`);
+  return { ok: true };
+}
+
 // 쿠폰 발급 (RLS: 몰 소유자/관리자만)
 export async function addCoupon(storeId: string, input: CouponInput) {
   const code = (input.code || "").trim().toUpperCase();

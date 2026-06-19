@@ -45,7 +45,15 @@ export async function customerSignup(
     return { ok: false, error: "가입에 실패했어요. 잠시 후 다시 시도해 주세요." };
   }
   // 가입 후 자동 로그인
-  return customerLogin(storeId, { email, password: input.password });
+  const res = await customerLogin(storeId, { email, password: input.password });
+  // 가입축하 쿠폰 자동 발급 (설정된 몰만, RPC/SQL 없으면 무시)
+  if (res.ok) {
+    try {
+      const token = (await cookies()).get(COOKIE)?.value;
+      if (token) await supabase.rpc("auto_issue_coupon", { p_token: token, p_reason: "welcome" });
+    } catch { /* 자동쿠폰 미설정/미실행 환경 무시 */ }
+  }
+  return res;
 }
 
 // 로그인 — 해시 검증은 클라가 보낸 비번을 서버에서 해시해 RPC로 대조

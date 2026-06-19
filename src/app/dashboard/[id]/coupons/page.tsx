@@ -2,6 +2,7 @@ import { notFound } from "next/navigation";
 import Link from "next/link";
 import { createClient } from "@/lib/supabase/server";
 import CouponManager, { type Coupon } from "@/components/CouponManager";
+import AutoCouponSettings from "@/components/AutoCouponSettings";
 import LockedFeature from "@/components/LockedFeature";
 import { getMe } from "@/lib/role";
 import { canUse, requiredPlanName } from "@/lib/plans";
@@ -26,6 +27,10 @@ export default async function CouponsPage({ params }: { params: Promise<{ id: st
   if (error) tableMissing = true;
   else coupons = (data ?? []) as Coupon[];
 
+  // 자동쿠폰 설정 안전 조회 (auto-coupon.sql 미실행이면 컬럼 없음 → null)
+  const { data: ac } = await supabase.from("stores").select("welcome_coupon,repurchase_coupon").eq("id", id).maybeSingle();
+  const auto = (ac ?? {}) as { welcome_coupon?: string | null; repurchase_coupon?: string | null };
+
   return (
     <div className="mx-auto max-w-3xl">
       <Link href={`/dashboard/${id}`} className="text-sm text-neutral-500 hover:text-violet-500">
@@ -43,9 +48,24 @@ export default async function CouponsPage({ params }: { params: Promise<{ id: st
           쿠폰 기능을 켜려면 <code className="font-mono">supabase/coupons.sql</code>을 한 번 실행해 주세요.
         </div>
       ) : (
-        <div className="mt-6">
-          <CouponManager storeId={id} coupons={coupons} />
-        </div>
+        <>
+          <div className="mt-6">
+            <CouponManager storeId={id} coupons={coupons} />
+          </div>
+          {/* 자동 쿠폰 발급 */}
+          <section className="mt-6 rounded-2xl border border-black/5 bg-white p-5 shadow-sm dark:border-white/10 dark:bg-white/[0.03]">
+            <h2 className="mb-1 font-semibold">✨ 자동 쿠폰 발급</h2>
+            <p className="mb-4 text-xs text-neutral-500">
+              위에서 만든 쿠폰을 <b>가입축하·재구매</b> 시 손님에게 자동으로 발급해요. 단골을 만드는 데 좋아요.
+            </p>
+            <AutoCouponSettings
+              storeId={id}
+              coupons={coupons.map((c) => ({ id: c.id, code: c.code, kind: c.kind, value: c.value }))}
+              welcome={auto.welcome_coupon ?? null}
+              repurchase={auto.repurchase_coupon ?? null}
+            />
+          </section>
+        </>
       )}
     </div>
   );
