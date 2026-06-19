@@ -50,6 +50,7 @@ export default async function ProductsAdmin({
   const storeCats = (await listStoreCategories(id)).map((c) => c.name);
   const me = await getMe();
   const canCompareAt = canUse("compare_at", me.plan, me.role);
+  const canBulk = canUse("bulk", me.plan, me.role);
 
   return (
     <div className="mx-auto max-w-5xl">
@@ -69,7 +70,7 @@ export default async function ProductsAdmin({
 
       {/* 대량 등록 (엑셀·CSV) */}
       <div className="mt-6">
-        <BulkUpload storeId={s.id} />
+        <BulkUpload storeId={s.id} locked={!canBulk} planName={requiredPlanName("bulk")} />
       </div>
 
       {/* 상품 추가 폼 + 소비자 미리보기 */}

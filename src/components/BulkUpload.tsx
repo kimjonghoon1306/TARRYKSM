@@ -8,8 +8,8 @@ const SAMPLE = `상품명,가격,카테고리,설명,재고,이모지
 제주 감귤 3kg,15000,과일,새콤달콤 노지 감귤,30,🍊
 한우 등심 200g,39000,정육,1++ 등급,10,🥩`;
 
-// 상품 대량 등록 — 엑셀에서 복사한 CSV를 붙여넣어 한 번에 등록.
-export default function BulkUpload({ storeId }: { storeId: string }) {
+// 상품 대량 등록 — 엑셀에서 복사한 CSV를 붙여넣어 한 번에 등록. (locked면 프로 요금제 안내)
+export default function BulkUpload({ storeId, locked, planName }: { storeId: string; locked?: boolean; planName?: string }) {
   const [open, setOpen] = useState(false);
   const [csv, setCsv] = useState("");
   const [pending, start] = useTransition();
@@ -27,6 +27,18 @@ export default function BulkUpload({ storeId }: { storeId: string }) {
         }
       });
     });
+  }
+
+  // 프로 요금제 미만이면 잠금 안내
+  if (locked) {
+    return (
+      <a
+        href="/dashboard/plan"
+        className="flex items-center gap-2 rounded-lg border border-dashed border-amber-400/50 bg-amber-50/60 px-4 py-2 text-sm font-semibold text-amber-700 transition hover:brightness-105 dark:border-amber-400/30 dark:bg-amber-400/[0.06] dark:text-amber-300"
+      >
+        🔒 📋 대량 등록 (엑셀·CSV) — {planName || "프로"} 요금제부터 →
+      </a>
+    );
   }
 
   if (!open) {

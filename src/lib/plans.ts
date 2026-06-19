@@ -31,7 +31,7 @@ export const PLANS: Record<Plan, PlanInfo> = {
     name: "프로",
     price: 49000,
     maxStores: 5,
-    features: ["쇼핑몰 5개", "모든 베이직 기능", "💎 회원 등급(VIP)", "우선 지원", "향후 카드결제(PG) 우선 적용"],
+    features: ["쇼핑몰 5개", "모든 베이직 기능", "💎 회원 등급(VIP)", "📋 상품 대량등록(엑셀)", "우선 지원", "향후 카드결제(PG) 우선 적용"],
   },
   premium: {
     id: "premium",
@@ -59,7 +59,8 @@ export type Feature =
   | "points"       // 적립금
   | "domain"       // 커스텀 도메인
   | "analytics"    // 매출·분석
-  | "grades";      // 회원 등급(VIP)
+  | "grades"       // 회원 등급(VIP)
+  | "bulk";        // 상품 대량 등록(엑셀/CSV)
 
 export const FEATURE_MIN: Record<Feature, Plan> = {
   compare_at: "basic",
@@ -68,6 +69,7 @@ export const FEATURE_MIN: Record<Feature, Plan> = {
   domain: "basic",
   analytics: "basic",
   grades: "pro",
+  bulk: "pro",
 };
 
 // 현재 plan으로 이 기능을 쓸 수 있는지 (admin은 항상 가능)

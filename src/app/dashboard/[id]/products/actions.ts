@@ -2,6 +2,8 @@
 
 import { revalidatePath } from "next/cache";
 import { createClient } from "@/lib/supabase/server";
+import { getMe } from "@/lib/role";
+import { canUse } from "@/lib/plans";
 
 // 옵션 JSON 파싱·검증 ([{name, choices:[{label, add}]}])
 function parseOptions(raw: FormDataEntryValue | null): unknown[] {
@@ -195,6 +197,9 @@ export async function bulkAddProducts(
 ): Promise<{ ok: boolean; added?: number; error?: string }> {
   const { supabase, ok } = await assertOwner(storeId);
   if (!ok) return { ok: false, error: "권한이 없어요." };
+  // 대량등록은 프로 요금제부터 (UI 우회 방지 서버 검증)
+  const me = await getMe();
+  if (!canUse("bulk", me.plan, me.role)) return { ok: false, error: "대량 등록은 프로 요금제부터 사용할 수 있어요." };
   const lines = (csv || "").split(/\r?\n/).map((l) => l.trim()).filter(Boolean);
   if (!lines.length) return { ok: false, error: "붙여넣은 내용이 없어요." };
 
