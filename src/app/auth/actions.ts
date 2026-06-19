@@ -1,6 +1,7 @@
 "use server";
 
 import { redirect } from "next/navigation";
+import { revalidatePath } from "next/cache";
 import { createClient } from "@/lib/supabase/server";
 
 function authMsg(m: string) {
@@ -40,6 +41,8 @@ export async function login(formData: FormData) {
     }
   }
 
+  // 캐시 무효화: 이전 계정의 대시보드 화면이 남아 보이는 것 방지 (멀티테넌트 격리)
+  revalidatePath("/", "layout");
   redirect("/dashboard");
 }
 
@@ -58,6 +61,7 @@ export async function signup(formData: FormData) {
   if (error) redirect("/signup?error=" + encodeURIComponent(authMsg(error.message)));
   if (!data.session)
     redirect("/login?msg=" + encodeURIComponent("확인 메일을 보냈어요. 인증 후 로그인하세요."));
+  revalidatePath("/", "layout");
   redirect("/dashboard");
 }
 
@@ -92,5 +96,6 @@ export async function resetPassword(formData: FormData) {
 export async function signout() {
   const supabase = await createClient();
   await supabase.auth.signOut();
+  revalidatePath("/", "layout");
   redirect("/login");
 }

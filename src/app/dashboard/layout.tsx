@@ -4,6 +4,9 @@ import { getMe } from "@/lib/role";
 import { createClient } from "@/lib/supabase/server";
 import { fetchNotifications } from "@/lib/notifications";
 
+// 대시보드는 계정별 데이터 → 절대 캐시 금지(다른 계정 화면이 남아 보이는 것 방지)
+export const dynamic = "force-dynamic";
+
 export default async function DashboardLayout({
   children,
 }: {
