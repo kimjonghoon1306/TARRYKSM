@@ -3,7 +3,7 @@
 import { useState, useEffect, useRef } from "react";
 
 export type StoreFaqItem = { id: string; question: string; answer: string };
-export type BotStyle = "designer" | "robot" | "bear" | "modern" | "pop" | "pro" | "cat";
+export type BotStyle = "designer" | "robot" | "bear" | "modern" | "pop" | "pro" | "cat" | "chick" | "panda";
 
 // 챗봇 모양 — 색 테마 + 캐릭터. 스킨 분위기에 맞춰 사장님이 고름.
 export const BOT_THEMES: Record<BotStyle, { name: string; emoji: string; from: string; to: string; ink: string }> = {
@@ -14,6 +14,8 @@ export const BOT_THEMES: Record<BotStyle, { name: string; emoji: string; from: s
   pop: { name: "톡톡팝", emoji: "✨", from: "#ff6ec7", to: "#ffd23f", ink: "#5b1d4a" },
   pro: { name: "전문상담", emoji: "🎧", from: "#38bdf8", to: "#1e3a8a", ink: "#fff" },
   cat: { name: "고양이", emoji: "🐱", from: "#c4b5fd", to: "#f9a8d4", ink: "#4a2a5a" },
+  chick: { name: "병아리", emoji: "🐥", from: "#fde047", to: "#f59e0b", ink: "#5b3a1a" },
+  panda: { name: "판다", emoji: "🐼", from: "#34d399", to: "#059669", ink: "#fff" },
 };
 
 export function BotAvatar({ style, size = 40, talking = false }: { style: BotStyle; size?: number; talking?: boolean }) {
@@ -161,6 +163,52 @@ export function BotAvatar({ style, size = 40, talking = false }: { style: BotSty
           <line x1="9.5" y1="25.5" x2="16.5" y2="26" /><line x1="9.5" y1="28.5" x2="16.5" y2="27.6" />
           <line x1="38.5" y1="25.5" x2="31.5" y2="26" /><line x1="38.5" y1="28.5" x2="31.5" y2="27.6" />
         </g>
+      </svg>
+    );
+  }
+  if (style === "chick") {
+    return (
+      <svg width={size} height={size} viewBox="0 0 48 48" aria-hidden className={cls}>
+        <defs><linearGradient id={gid} x1="0" y1="0" x2="1" y2="1"><stop offset="0" stopColor={t.from} /><stop offset="1" stopColor={t.to} /></linearGradient></defs>
+        <circle cx="24" cy="24" r="24" fill={`url(#${gid})`} />
+        {/* 머리 깃털 */}
+        <g stroke="#f59e0b" strokeWidth="1.6" strokeLinecap="round">
+          <line x1="24" y1="13" x2="24" y2="9.5" /><line x1="21.5" y1="13.5" x2="20" y2="10.5" /><line x1="26.5" y1="13.5" x2="28" y2="10.5" />
+        </g>
+        {/* 얼굴 */}
+        <circle cx="24" cy="25" r="12.5" fill="#ffe066" />
+        {/* 눈 */}
+        <g className="sb-eyes" fill="#3a2a12">
+          <circle cx="19.5" cy="23" r="2.1" /><circle cx="28.5" cy="23" r="2.1" />
+          <circle cx="20.3" cy="22.1" r="0.7" fill="#fff" /><circle cx="29.3" cy="22.1" r="0.7" fill="#fff" />
+        </g>
+        {/* 부리 */}
+        <path d="M21.5 27L24 25.3 26.5 27 24 29z" fill="#f97316" />
+        {/* 볼터치 */}
+        <circle cx="15.5" cy="27" r="1.8" fill="#fb923c" opacity="0.45" /><circle cx="32.5" cy="27" r="1.8" fill="#fb923c" opacity="0.45" />
+      </svg>
+    );
+  }
+  if (style === "panda") {
+    return (
+      <svg width={size} height={size} viewBox="0 0 48 48" aria-hidden className={cls}>
+        <defs><linearGradient id={gid} x1="0" y1="0" x2="1" y2="1"><stop offset="0" stopColor={t.from} /><stop offset="1" stopColor={t.to} /></linearGradient></defs>
+        <circle cx="24" cy="24" r="24" fill={`url(#${gid})`} />
+        {/* 귀 */}
+        <circle cx="14.5" cy="15" r="4.8" fill="#1f2937" /><circle cx="33.5" cy="15" r="4.8" fill="#1f2937" />
+        {/* 얼굴 */}
+        <circle cx="24" cy="25" r="12.5" fill="#ffffff" />
+        {/* 눈 패치 */}
+        <ellipse cx="19" cy="24" rx="3.1" ry="4.1" fill="#1f2937" transform="rotate(-18 19 24)" />
+        <ellipse cx="29" cy="24" rx="3.1" ry="4.1" fill="#1f2937" transform="rotate(18 29 24)" />
+        {/* 눈 */}
+        <g className="sb-eyes" fill="#fff">
+          <circle cx="19.3" cy="24" r="1.5" /><circle cx="28.7" cy="24" r="1.5" />
+          <circle cx="19.3" cy="24" r="0.8" fill="#1f2937" /><circle cx="28.7" cy="24" r="0.8" fill="#1f2937" />
+        </g>
+        {/* 코 + 입 */}
+        <ellipse cx="24" cy="28" rx="1.7" ry="1.2" fill="#1f2937" />
+        <path className="sb-mouth" d="M24 29.2v0.8m0 0c-.9 1-2.1.9-2.7 0m2.7 0c.9 1 2.1.9 2.7 0" fill="none" stroke="#1f2937" strokeWidth="1.1" strokeLinecap="round" />
       </svg>
     );
   }

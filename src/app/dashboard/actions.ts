@@ -311,7 +311,7 @@ export async function setStoreChat(formData: FormData) {
 
   const chatOn = String(formData.get("chat_on") || "") === "1";
   const styleRaw = String(formData.get("chat_style") || "designer");
-  const chatStyle = ["designer", "robot", "bear", "modern", "pop", "pro", "cat"].includes(styleRaw) ? styleRaw : "designer";
+  const chatStyle = ["designer", "robot", "bear", "modern", "pop", "pro", "cat", "chick", "panda"].includes(styleRaw) ? styleRaw : "designer";
   const greeting = String(formData.get("chat_greeting") || "").trim().slice(0, 200) || null;
   const chatName = String(formData.get("chat_name") || "").trim().slice(0, 30) || null;
 
