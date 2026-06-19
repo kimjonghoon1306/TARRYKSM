@@ -523,8 +523,8 @@ export default function OnBot() {
               </div>
             ) : qa ? (
               <div className="onbot-pop">
-                <button onClick={() => setQa(null)} className="mb-3 text-xs font-semibold text-violet-500 transition active:scale-95">
-                  ← {cat.label}
+                <button onClick={() => setQa(null)} className="onbot-back mb-3 inline-flex items-center gap-1 rounded-full border border-violet-500/30 bg-violet-500/10 px-3 py-1 text-xs font-bold text-violet-600 dark:text-violet-300">
+                  <span className="onbot-back-arrow">←</span> {cat.label}
                 </button>
                 <div className="mb-2 font-bold">{qa.q}</div>
                 {typing ? (
@@ -537,8 +537,8 @@ export default function OnBot() {
               </div>
             ) : (
               <div className="onbot-pop">
-                <button onClick={reset} className="mb-3 text-xs font-semibold text-violet-500 transition active:scale-95">
-                  ← 처음으로
+                <button onClick={reset} className="onbot-back mb-3 inline-flex items-center gap-1 rounded-full border border-violet-500/30 bg-violet-500/10 px-3 py-1 text-xs font-bold text-violet-600 dark:text-violet-300">
+                  <span className="onbot-back-arrow">←</span> 처음으로 🏠
                 </button>
                 <div className="mb-2 flex items-center gap-2 font-bold">
                   <span>{cat.icon}</span>
@@ -588,6 +588,12 @@ export default function OnBot() {
         .onbot-av .onbot-eyes { transform-box: fill-box; transform-origin: center; animation: onbot-blink 4.2s infinite; }
         .onbot-av.talking { animation: onbot-bob 0.5s ease-in-out infinite; transform-origin: 24px 38px; }
         .onbot-av.talking .onbot-mouth { animation: onbot-talkmouth 0.32s ease-in-out infinite; }
+        @keyframes onbot-arrow { 0%,100% { transform: translateX(-3px); } 50% { transform: translateX(-7px); } }
+        .onbot-back { transition: transform .15s, background .15s, box-shadow .15s; cursor: pointer; }
+        .onbot-back:hover { background: rgba(124,109,255,.2); box-shadow: 0 5px 14px rgba(124,109,255,.28); transform: translateY(-1px); }
+        .onbot-back:active { transform: scale(.9); }
+        .onbot-back .onbot-back-arrow { display: inline-block; transition: transform .2s; }
+        .onbot-back:hover .onbot-back-arrow { animation: onbot-arrow .5s ease-in-out infinite; }
         .onbot-pop { animation: onbot-pop .28s ease-out; }
         .onbot-rise { animation: onbot-rise .35s ease-out both; }
         .onbot-answer { animation: onbot-pop .3s ease-out; }
