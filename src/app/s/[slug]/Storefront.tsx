@@ -30,6 +30,7 @@ export type Product = {
   tag: string | null;
   stock?: number | null;
   options?: OptGroup[] | null;
+  variants?: { key: string; stock: number }[] | null; // 옵션 조합별 재고(SKU)
   created_at?: string | null;
 };
 
@@ -372,6 +373,21 @@ export default function Storefront({
   const dAllSelected = dOpts.every((g) => detailOpts[g.name]);
   const dUnit = detail ? detail.price + dAddPrice : 0;
   const dOptLabel = dOpts.map((g) => `${g.name}: ${detailOpts[g.name]}`).join(" / ");
+  // 옵션 조합별 재고(SKU) — variants 있으면 SKU 모드
+  const dVariants = detail?.variants || [];
+  const skuMode = dVariants.length > 0;
+  // 특정 그룹(idx)의 라벨이 포함된 조합이 전부 품절이면 그 선택지 품절
+  function labelSoldOut(groupIdx: number, label: string): boolean {
+    if (!skuMode) return false;
+    const rel = dVariants.filter((v) => v.key.split("|")[groupIdx] === label);
+    return rel.length > 0 && rel.every((v) => (v.stock || 0) <= 0);
+  }
+  // 선택 완료된 조합의 재고
+  const dComboKey = dAllSelected ? dOpts.map((g) => detailOpts[g.name]).join("|") : "";
+  const dComboStock: number | null = skuMode && dComboKey ? (dVariants.find((v) => v.key === dComboKey)?.stock ?? 0) : null;
+  const dComboSoldOut = skuMode && dAllSelected && (dComboStock ?? 0) <= 0;
+  // 담기 가능 최대 수량 (조합 재고가 있으면 그 한도)
+  const dMaxQty = dComboStock != null ? dComboStock : 999;
 
   // 상세 시트 리뷰 (서버 + 이번에 작성한 것)
   const dReviews: Review[] = detail
@@ -928,45 +944,58 @@ export default function Storefront({
 
             {/* 옵션 선택 */}
             {dOpts.length > 0 && <div className="sf-opt-guide">옵션을 선택해 주세요</div>}
-            {dOpts.map((g) => (
+            {dOpts.map((g, gi) => (
               <div key={g.name} className="sf-opt">
                 <div className="sf-opt-name">{g.name}</div>
                 <div className="sf-opt-choices">
-                  {g.choices.map((c) => (
-                    <button
-                      key={c.label}
-                      className={"sf-opt-chip" + (detailOpts[g.name] === c.label ? " on" : "")}
-                      onClick={() => setDetailOpts((o) => ({ ...o, [g.name]: c.label }))}
-                    >
-                      {c.label}
-                      {c.add > 0 && <span className="sf-opt-add"> +{won(c.add)}</span>}
-                    </button>
-                  ))}
+                  {g.choices.map((c) => {
+                    const soldOut = labelSoldOut(gi, c.label);
+                    return (
+                      <button
+                        key={c.label}
+                        disabled={soldOut}
+                        className={"sf-opt-chip" + (detailOpts[g.name] === c.label ? " on" : "") + (soldOut ? " sf-opt-soldout" : "")}
+                        onClick={() => { if (!soldOut) setDetailOpts((o) => ({ ...o, [g.name]: c.label })); }}
+                      >
+                        {c.label}
+                        {soldOut ? <span className="sf-opt-add"> (품절)</span> : c.add > 0 && <span className="sf-opt-add"> +{won(c.add)}</span>}
+                      </button>
+                    );
+                  })}
                 </div>
               </div>
             ))}
+
+            {/* 선택 조합 재고 안내 */}
+            {skuMode && dAllSelected && (
+              dComboSoldOut
+                ? <div className="sf-opt-guide" style={{ color: "#e0245e" }}>선택하신 조합은 품절됐어요</div>
+                : (dComboStock != null && dComboStock <= 5) && <div className="sf-opt-guide">선택 조합 {dComboStock}개 남음</div>
+            )}
 
             <div className="sf-sheet-buy">
               <div className="sf-qty">
                 <button onClick={() => setDetailQty((q) => Math.max(1, q - 1))}>−</button>
                 <span>{detailQty}</span>
-                <button onClick={() => setDetailQty((q) => q + 1)}>+</button>
+                <button onClick={() => setDetailQty((q) => Math.min(dMaxQty, q + 1))} disabled={detailQty >= dMaxQty}>+</button>
               </div>
               <div className="sf-price" style={{ fontSize: 20 }}>{won(dUnit * detailQty)}</div>
             </div>
             <button
               className="sf-add"
               style={{ marginTop: 16, padding: 13, fontSize: 15 }}
+              disabled={dComboSoldOut}
               onClick={() => {
                 if (!dAllSelected) {
                   flash("옵션을 선택해 주세요");
                   return;
                 }
-                add(detail, detailQty, detailOpts, dUnit, dOptLabel);
+                if (dComboSoldOut) { flash("품절된 조합이에요"); return; }
+                add(detail, Math.min(detailQty, dMaxQty), detailOpts, dUnit, dOptLabel);
                 setDetail(null);
               }}
             >
-              장바구니에 담기
+              {dComboSoldOut ? "품절" : "장바구니에 담기"}
             </button>
 
             {/* 리뷰 (켜진 몰만) */}

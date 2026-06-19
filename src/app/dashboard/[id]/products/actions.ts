@@ -26,6 +26,19 @@ function parseOptions(raw: FormDataEntryValue | null): unknown[] {
   }
 }
 
+// 옵션 조합별 재고(variants) 파싱 ([{key, stock}])
+function parseVariants(raw: FormDataEntryValue | null): { key: string; stock: number }[] {
+  try {
+    const arr = JSON.parse(String(raw || "[]"));
+    if (!Array.isArray(arr)) return [];
+    return arr
+      .map((v) => ({ key: String(v?.key || "").trim(), stock: Math.max(0, parseInt(String(v?.stock ?? 0), 10) || 0) }))
+      .filter((v) => v.key);
+  } catch {
+    return [];
+  }
+}
+
 // 정가(compare_at) 파싱 — 비었거나 판매가 이하면 null(할인 표시 안 함)
 function parseCompareAt(raw: FormDataEntryValue | null, price: number): number | null {
   const n = parseInt(String(raw || "").replace(/[^0-9]/g, ""), 10);
@@ -95,6 +108,7 @@ export async function addProduct(formData: FormData) {
     compare_at: compareAt,
     stock,
     options: parseOptions(formData.get("options")),
+    variants: parseVariants(formData.get("variants")),
     emoji: String(formData.get("emoji") || "📦").trim() || "📦",
     image_url: imageUrl,
     brand: String(formData.get("brand") || "").trim() || null,
@@ -127,6 +141,7 @@ export async function updateProduct(formData: FormData) {
     compare_at: compareAt,
     stock,
     options: parseOptions(formData.get("options")),
+    variants: parseVariants(formData.get("variants")),
     emoji: String(formData.get("emoji") || "📦").trim() || "📦",
     brand: String(formData.get("brand") || "").trim() || null,
     category: String(formData.get("category") || "전체").trim() || "전체",

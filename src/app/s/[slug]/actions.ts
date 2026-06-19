@@ -33,7 +33,7 @@ export async function placeOrder(
   const ids = items.map((i) => i.product_id);
   const { data: prods } = await supabase
     .from("products")
-    .select("id,name,price,store_id,stock,options")
+    .select("id,name,price,store_id,stock,options,variants")
     .in("id", ids)
     .eq("store_id", storeId);
   if (!prods || prods.length === 0) return { ok: false, error: "상품 정보를 찾을 수 없어요." };
@@ -48,24 +48,36 @@ export async function placeOrder(
       const groups = (Array.isArray(p.options) ? p.options : []) as OptGroup[];
       let addPrice = 0;
       const labelParts: string[] = [];
+      const comboLabels: string[] = [];
       for (const g of groups) {
         const sel = i.opts?.[g.name];
         const ch = g.choices.find((c) => c.label === sel);
         if (ch) {
           addPrice += ch.add || 0;
           labelParts.push(`${g.name}: ${ch.label}`);
+          comboLabels.push(ch.label);
         }
       }
       const optText = labelParts.length ? ` (${labelParts.join(" / ")})` : "";
+      // 옵션 조합별 재고(SKU) — variants 있고 모든 그룹 선택됐으면 그 조합 재고를 사용, key 보관
+      const variants = (Array.isArray(p.variants) ? p.variants : []) as { key: string; stock: number }[];
+      let variantKey: string | null = null;
+      let effStock = (p.stock ?? null) as number | null;
+      if (variants.length && groups.length > 0 && comboLabels.length === groups.length) {
+        variantKey = comboLabels.join("|");
+        const v = variants.find((x) => x.key === variantKey);
+        effStock = v ? (v.stock ?? 0) : 0;
+      }
       return {
         product_id: p.id as string,
         name: (p.name as string) + optText,
         price: (p.price as number) + addPrice,
         qty,
-        stock: (p.stock ?? null) as number | null,
+        stock: effStock,
+        variantKey,
       };
     })
-    .filter((l): l is { product_id: string; name: string; price: number; qty: number; stock: number | null } => !!l);
+    .filter((l): l is { product_id: string; name: string; price: number; qty: number; stock: number | null; variantKey: string | null } => !!l);
   if (!lines.length) return { ok: false, error: "주문할 상품이 없어요." };
 
   // 재고 확인 (관리 중인 상품만)
@@ -202,11 +214,15 @@ export async function placeOrder(
     return { ok: false, error: "주문 상품 저장에 실패했어요." };
   }
 
-  // 재고 차감 (관리 중인 상품만, RPC가 null이면 무시)
+  // 재고 차감 (관리 중인 상품만, RPC가 null이면 무시). 조합(variant) 있으면 조합 재고 차감, 아니면 상품 재고.
   await Promise.all(
     lines
       .filter((l) => typeof l.stock === "number")
-      .map((l) => supabase.rpc("decrement_stock", { pid: l.product_id, qty: l.qty }))
+      .map((l) =>
+        l.variantKey
+          ? supabase.rpc("decrement_variant_stock", { pid: l.product_id, p_key: l.variantKey, qty: l.qty })
+          : supabase.rpc("decrement_stock", { pid: l.product_id, qty: l.qty })
+      )
   );
 
   // 쿠폰 사용횟수 +1 (적용된 경우만, RPC 없으면 무시)

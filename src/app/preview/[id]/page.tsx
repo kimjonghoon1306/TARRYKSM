@@ -26,7 +26,7 @@ export default async function StorePreview({ params }: { params: Promise<{ id: s
 
   const { data: products } = await supabase
     .from("products")
-    .select("id,emoji,image_url,name,brand,price,compare_at,category,description,tag,stock,options,created_at")
+    .select("id,emoji,image_url,name,brand,price,compare_at,category,description,tag,stock,options,variants,created_at")
     .eq("store_id", id)
     .order("position", { ascending: true });
   const items = (products ?? []) as Product[];

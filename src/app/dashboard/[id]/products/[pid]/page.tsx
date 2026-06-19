@@ -22,6 +22,7 @@ type Product = {
   description: string | null;
   stock: number | null;
   options: { name: string; choices: { label: string; add: number }[] }[] | null;
+  variants: { key: string; stock: number }[] | null;
 };
 
 const DEFAULT_CATS = ["전체", "식품", "농산물", "수산물", "축산물", "베이커리", "가공·반찬", "패션", "리빙", "뷰티", "액세서리", "테크"];
@@ -38,7 +39,7 @@ export default async function EditProduct({
 
   const { data } = await supabase
     .from("products")
-    .select("id,emoji,image_url,name,brand,category,price,compare_at,tag,description,stock,options")
+    .select("id,emoji,image_url,name,brand,category,price,compare_at,tag,description,stock,options,variants")
     .eq("id", pid)
     .eq("store_id", id)
     .maybeSingle();
@@ -114,7 +115,7 @@ export default async function EditProduct({
         </div>
         <div className="sm:col-span-2">
           <Field label="옵션 (색상·사이즈 등)">
-            <OptionsEditor initial={p.options || []} />
+            <OptionsEditor initial={p.options || []} initialVariants={p.variants || []} />
           </Field>
         </div>
         <div className="flex gap-2 sm:col-span-2">
