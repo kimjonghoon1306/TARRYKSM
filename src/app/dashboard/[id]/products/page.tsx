@@ -3,6 +3,7 @@ import { notFound } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { deleteProduct } from "./actions";
 import ProductForm from "@/components/ProductForm";
+import BulkUpload from "@/components/BulkUpload";
 import { listStoreCategories } from "../categories/actions";
 import { getMe } from "@/lib/role";
 import { canUse, requiredPlanName } from "@/lib/plans";
@@ -66,9 +67,14 @@ export default async function ProductsAdmin({
         </Link>
       </div>
 
+      {/* 대량 등록 (엑셀·CSV) */}
+      <div className="mt-6">
+        <BulkUpload storeId={s.id} />
+      </div>
+
       {/* 상품 추가 폼 + 소비자 미리보기 */}
-      <section className={CARD + " mt-6"}>
-        <h2 className="mb-4 font-semibold">＋ 상품 추가</h2>
+      <section className={CARD + " mt-4"}>
+        <h2 className="mb-4 font-semibold">＋ 상품 추가 (하나씩)</h2>
         <ProductForm storeId={s.id} skin={s.skin} cats={storeCats} canCompareAt={canCompareAt} compareAtPlan={requiredPlanName("compare_at")} />
       </section>
 

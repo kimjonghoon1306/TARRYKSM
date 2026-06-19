@@ -165,3 +165,60 @@ export async function deleteProduct(formData: FormData) {
   await supabase.from("products").delete().eq("id", id).eq("store_id", storeId);
   revalidatePath(`/dashboard/${storeId}/products`);
 }
+
+// CSV 한 줄 파싱 (쉼표 구분, 따옴표 감싼 값 안의 쉼표 허용)
+function parseCsvLine(line: string): string[] {
+  const out: string[] = [];
+  let cur = "";
+  let q = false;
+  for (let i = 0; i < line.length; i++) {
+    const ch = line[i];
+    if (q) {
+      if (ch === '"' && line[i + 1] === '"') { cur += '"'; i++; }
+      else if (ch === '"') q = false;
+      else cur += ch;
+    } else {
+      if (ch === '"') q = true;
+      else if (ch === ",") { out.push(cur); cur = ""; }
+      else cur += ch;
+    }
+  }
+  out.push(cur);
+  return out.map((s) => s.trim());
+}
+
+// 상품 대량 등록 — CSV(상품명,가격,카테고리,설명,재고,이모지) 텍스트를 받아 일괄 insert.
+// 헤더 줄은 자동 감지(첫 칸이 '상품명'/'name'이면 건너뜀). 가격 없는 줄은 무시.
+export async function bulkAddProducts(
+  storeId: string,
+  csv: string
+): Promise<{ ok: boolean; added?: number; error?: string }> {
+  const { supabase, ok } = await assertOwner(storeId);
+  if (!ok) return { ok: false, error: "권한이 없어요." };
+  const lines = (csv || "").split(/\r?\n/).map((l) => l.trim()).filter(Boolean);
+  if (!lines.length) return { ok: false, error: "붙여넣은 내용이 없어요." };
+
+  const rows: Record<string, unknown>[] = [];
+  for (let i = 0; i < lines.length; i++) {
+    const cells = parseCsvLine(lines[i]);
+    const first = (cells[0] || "").toLowerCase();
+    if (i === 0 && (first === "상품명" || first === "name" || first.includes("상품"))) continue; // 헤더 스킵
+    const name = (cells[0] || "").trim();
+    const price = parseInt((cells[1] || "").replace(/[^0-9]/g, ""), 10) || 0;
+    if (!name || price <= 0) continue; // 이름·가격 없으면 무시
+    const category = (cells[2] || "").trim() || "전체";
+    const description = (cells[3] || "").trim() || null;
+    const stockRaw = (cells[4] || "").trim();
+    const stock = stockRaw === "" ? null : Math.max(0, parseInt(stockRaw.replace(/[^0-9]/g, ""), 10) || 0);
+    const emoji = (cells[5] || "").trim() || "📦";
+    rows.push({ store_id: storeId, name, price, category, description, stock, emoji });
+    if (rows.length >= 500) break; // 한 번에 최대 500개
+  }
+  if (!rows.length) return { ok: false, error: "등록할 상품이 없어요. 형식을 확인해 주세요. (상품명,가격 필수)" };
+
+  const { error } = await supabase.from("products").insert(rows);
+  if (error) return { ok: false, error: "등록 실패: " + error.message };
+  revalidatePath(`/dashboard/${storeId}/products`);
+  revalidatePath(`/${storeId}`);
+  return { ok: true, added: rows.length };
+}
