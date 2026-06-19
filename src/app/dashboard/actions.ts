@@ -13,6 +13,10 @@ import { sampleRowsForStore, heroForStore, sampleSectionsForStore } from "@/lib/
 
 export async function createStore(formData: FormData) {
   const supabase = await createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+  if (!user) redirect("/login");
   const name = String(formData.get("name") || "").trim();
   let skin = String(formData.get("skin") || "mono");
   if (!name) return;
@@ -31,7 +35,7 @@ export async function createStore(formData: FormData) {
     slug = `${base}-${Math.random().toString(36).slice(2, 6)}`;
   }
 
-  await supabase.from("stores").insert({ name, skin, slug }); // owner = auth.uid() (DB default)
+  await supabase.from("stores").insert({ name, skin, slug, owner: user.id });
   revalidatePath("/dashboard", "layout");
 }
 
@@ -83,7 +87,7 @@ export async function createStoreOpen(formData: FormData) {
 
   const { data: created, error } = await supabase
     .from("stores")
-    .insert({ name, skin, slug, ...heroForStore(skin) })
+    .insert({ name, skin, slug, owner: user.id, ...heroForStore(skin) })
     .select("id")
     .single();
   if (error) back(/duplicate|unique/i.test(error.message) ? "이미 사용 중인 주소예요" : "생성 실패");
@@ -97,6 +101,26 @@ export async function createStoreOpen(formData: FormData) {
   }
   revalidatePath("/dashboard", "layout");
   redirect(created?.id ? `/dashboard/${created.id}` : "/dashboard/stores");
+}
+
+// 주인 없는 쇼핑몰을 현재 로그인 계정으로 가져오기 (생성 초기 버그로 owner 비어있던 몰 복구용)
+export async function claimStore(formData: FormData) {
+  const supabase = await createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+  if (!user) redirect("/login");
+  const id = String(formData.get("id") || "");
+  if (!id) return;
+  const { data, error } = await supabase.rpc("claim_store", { p_store: id });
+  revalidatePath(`/dashboard/${id}`);
+  if (error) {
+    redirect(`/dashboard/${id}?cherr=` + encodeURIComponent("가져오기 실패: " + error.message + " (claim-store.sql 실행 필요)"));
+  }
+  redirect(
+    `/dashboard/${id}?chmsg=` +
+      encodeURIComponent(data ? "이 쇼핑몰을 내 계정으로 가져왔어요! 이제 저장이 됩니다 🎉" : "이미 다른 주인이 있어 가져올 수 없어요")
+  );
 }
 
 export async function deleteStore(formData: FormData) {
