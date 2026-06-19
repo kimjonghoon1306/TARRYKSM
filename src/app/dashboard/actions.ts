@@ -286,15 +286,22 @@ export async function setStoreChat(formData: FormData) {
   const greeting = String(formData.get("chat_greeting") || "").trim().slice(0, 200) || null;
   const chatName = String(formData.get("chat_name") || "").trim().slice(0, 30) || null;
 
-  const { error } = await supabase
+  const { data, error } = await supabase
     .from("stores")
     .update({ chat_on: chatOn, chat_style: chatStyle, chat_greeting: greeting, chat_name: chatName })
-    .eq("id", id);
+    .eq("id", id)
+    .select("id,chat_style");
   revalidatePath(`/dashboard/${id}`);
   if (error) {
     redirect(`/dashboard/${id}?cherr=` + encodeURIComponent("챗봇 저장 실패: " + error.message));
   }
-  redirect(`/dashboard/${id}?chmsg=` + encodeURIComponent("챗봇 설정을 저장했어요"));
+  if (!data || data.length === 0) {
+    // 에러는 없는데 저장된 행이 0건 = RLS(소유자) 권한으로 막힘 = 이 몰의 소유 계정이 아님
+    redirect(`/dashboard/${id}?cherr=` + encodeURIComponent("저장 0건 — 이 쇼핑몰의 소유자 계정으로 로그인했는지 확인하세요 (로그인 계정과 몰 소유자가 다르면 저장이 막혀요)"));
+  }
+  // 저장된 실제 값을 표시(진단용) — 보낸 모양과 다르면 폼 전송 문제, 같은데 화면이 다르면 캐시 문제
+  const savedStyle = (data[0] as { chat_style?: string }).chat_style;
+  redirect(`/dashboard/${id}?chmsg=` + encodeURIComponent(`챗봇 설정 저장됨 (저장된 모양: ${savedStyle})`));
 }
 
 // 사업자 정보 — 쇼핑몰 하단에 표시되는 법적 의무 표시 항목
