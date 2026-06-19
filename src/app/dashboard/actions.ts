@@ -379,6 +379,31 @@ export async function setStorePromo(formData: FormData) {
   redirect(`/dashboard/${id}?prmsg=` + encodeURIComponent("이벤트 설정을 저장했어요"));
 }
 
+// 검색 노출(SEO) 설정 — 검색 제목·설명·키워드·노출 끄기
+export async function setStoreSeo(formData: FormData) {
+  const supabase = await createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+  if (!user) redirect("/login");
+  const id = String(formData.get("id") || "");
+  if (!id) return;
+
+  const t = (k: string, max = 200) => String(formData.get(k) || "").trim().slice(0, max) || null;
+  const { error } = await supabase
+    .from("stores")
+    .update({
+      seo_title: t("seo_title", 60),
+      seo_desc: t("seo_desc", 160),
+      seo_keywords: t("seo_keywords", 200),
+      seo_noindex: String(formData.get("seo_noindex") || "") === "1",
+    })
+    .eq("id", id);
+  revalidatePath(`/dashboard/${id}`);
+  if (error) redirect(`/dashboard/${id}?seoerr=` + encodeURIComponent("SEO 저장 실패: " + error.message + " (seo.sql 실행 필요)"));
+  redirect(`/dashboard/${id}?seomsg=` + encodeURIComponent("검색 노출 설정을 저장했어요"));
+}
+
 // 사업자 정보 — 쇼핑몰 하단에 표시되는 법적 의무 표시 항목
 export async function setStoreBusiness(formData: FormData) {
   const supabase = await createClient();

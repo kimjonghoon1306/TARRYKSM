@@ -2,7 +2,7 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { domainToUnicode } from "node:url";
 import { createClient } from "@/lib/supabase/server";
-import { setStoreDomain, togglePublish, setStoreSlug, setStorePayment, setStorePoints, setStoreShipping, setStoreChat, setStorePromo, setStoreBusiness } from "../actions";
+import { setStoreDomain, togglePublish, setStoreSlug, setStorePayment, setStorePoints, setStoreShipping, setStoreChat, setStorePromo, setStoreSeo, setStoreBusiness } from "../actions";
 import { PRIMARY_DOMAIN } from "@/lib/domains";
 import DomainHelp from "@/components/DomainHelp";
 import BrandingForm from "@/components/BrandingForm";
@@ -69,10 +69,10 @@ export default async function StoreAdmin({
   searchParams,
 }: {
   params: Promise<{ id: string }>;
-  searchParams: Promise<{ dmsg?: string; derr?: string; smsg?: string; serr?: string; brmsg?: string; pmsg?: string; ptmsg?: string; shmsg?: string; chmsg?: string; cherr?: string; prmsg?: string; prerr?: string }>;
+  searchParams: Promise<{ dmsg?: string; derr?: string; smsg?: string; serr?: string; brmsg?: string; pmsg?: string; ptmsg?: string; shmsg?: string; chmsg?: string; cherr?: string; prmsg?: string; prerr?: string; seomsg?: string; seoerr?: string }>;
 }) {
   const { id } = await params;
-  const { dmsg, derr, smsg, serr, brmsg, pmsg, ptmsg, shmsg, chmsg, cherr, prmsg, prerr } = await searchParams;
+  const { dmsg, derr, smsg, serr, brmsg, pmsg, ptmsg, shmsg, chmsg, cherr, prmsg, prerr, seomsg, seoerr } = await searchParams;
   const supabase = await createClient();
   const { data: store } = await supabase
     .from("stores")
@@ -105,7 +105,7 @@ export default async function StoreAdmin({
     listStoreFaqs(id),
     listStoreGrades(id),
     // grades_on·qa_on·reviews_on·프로모는 SQL 미실행 환경에서도 안 깨지게 별도 안전 조회
-    supabase.from("stores").select("grades_on,qa_on,reviews_on,bar_on,bar_text,bar_link,bar_bg,bar_fg,popup_on,popup_title,popup_body,popup_image,popup_btn_text,popup_btn_link").eq("id", id).maybeSingle(),
+    supabase.from("stores").select("grades_on,qa_on,reviews_on,bar_on,bar_text,bar_link,bar_bg,bar_fg,popup_on,popup_title,popup_body,popup_image,popup_btn_text,popup_btn_link,seo_title,seo_desc,seo_keywords,seo_noindex").eq("id", id).maybeSingle(),
     supabase.from("products").select("category").eq("store_id", id),
     getMe(),
   ]);
@@ -123,10 +123,12 @@ export default async function StoreAdmin({
     grades_on?: boolean; qa_on?: boolean; reviews_on?: boolean;
     bar_on?: boolean; bar_text?: string | null; bar_link?: string | null; bar_bg?: string | null; bar_fg?: string | null;
     popup_on?: boolean; popup_title?: string | null; popup_body?: string | null; popup_image?: string | null; popup_btn_text?: string | null; popup_btn_link?: string | null;
+    seo_title?: string | null; seo_desc?: string | null; seo_keywords?: string | null; seo_noindex?: boolean | null;
   };
   const gradesOn = grow.grades_on === true;
   const qaOn = grow.qa_on !== false; // 컬럼 없거나 true면 ON
   const reviewsOn = grow.reviews_on !== false;
+  const canSeo = canUse("analytics", me.plan, me.role); // SEO는 분석과 함께 베이직+
   // 기존 상품들이 이미 쓰는 카테고리 (관리 목록 자동 채우기용)
   const productCats = [
     ...new Set(
@@ -523,6 +525,43 @@ export default async function StoreAdmin({
           <StoreGradeManager storeId={s.id} on={gradesOn} initial={storeGrades} />
         ) : (
           <LockedFeature planName={requiredPlanName("grades")} desc="누적 구매액에 따라 VIP 등급을 나누고 등급별 할인을 줄 수 있어요." />
+        )}
+      </section>
+
+      {/* 검색 노출 (SEO) */}
+      <section className={card + " mt-4"}>
+        <h2 className="mb-1 font-semibold">🔎 검색 노출 (SEO)</h2>
+        <p className="mb-4 text-xs text-neutral-500">
+          구글·네이버 검색에 잘 뜨도록 제목·설명·키워드를 정하세요. (비우면 쇼핑몰 이름·소개로 자동) 발행한 몰은 사이트맵에 자동 등록돼요.
+        </p>
+        {seomsg && <p className="mb-3 rounded-lg bg-emerald-500/10 px-3 py-2 text-sm text-emerald-600 dark:text-emerald-400">{seomsg}</p>}
+        {seoerr && <p className="mb-3 rounded-lg bg-rose-500/10 px-3 py-2 text-sm text-rose-600 dark:text-rose-400">{seoerr}</p>}
+        {canSeo ? (
+          <form action={setStoreSeo} className="space-y-3">
+            <input type="hidden" name="id" value={s.id} />
+            <div>
+              <label className="mb-1.5 block text-xs font-semibold text-neutral-500">검색 제목</label>
+              <input name="seo_title" defaultValue={grow.seo_title || ""} placeholder={`예: ${s.name} — 신선식품 전문몰`} maxLength={60}
+                className="w-full rounded-xl border border-black/10 bg-white px-4 py-2.5 text-sm outline-none focus:border-violet-500 focus:ring-2 focus:ring-violet-500/25 dark:border-white/10 dark:bg-white/[0.04]" />
+            </div>
+            <div>
+              <label className="mb-1.5 block text-xs font-semibold text-neutral-500">검색 설명 (한 줄 소개)</label>
+              <textarea name="seo_desc" defaultValue={grow.seo_desc || ""} placeholder="예: 산지직송 제철 과일·채소를 합리적인 가격에 만나보세요." rows={2} maxLength={160}
+                className="w-full rounded-xl border border-black/10 bg-white px-4 py-2.5 text-sm outline-none focus:border-violet-500 focus:ring-2 focus:ring-violet-500/25 dark:border-white/10 dark:bg-white/[0.04]" />
+            </div>
+            <div>
+              <label className="mb-1.5 block text-xs font-semibold text-neutral-500">키워드 (쉼표로 구분)</label>
+              <input name="seo_keywords" defaultValue={grow.seo_keywords || ""} placeholder="예: 제철과일, 산지직송, 유기농 채소" maxLength={200}
+                className="w-full rounded-xl border border-black/10 bg-white px-4 py-2.5 text-sm outline-none focus:border-violet-500 focus:ring-2 focus:ring-violet-500/25 dark:border-white/10 dark:bg-white/[0.04]" />
+            </div>
+            <label className="flex cursor-pointer items-center gap-2 text-sm">
+              <input type="checkbox" name="seo_noindex" value="1" defaultChecked={grow.seo_noindex === true} />
+              검색 노출 끄기 <span className="text-xs text-neutral-400">(체크하면 검색엔진에 안 보여요)</span>
+            </label>
+            <SaveButton label="검색 설정 저장" />
+          </form>
+        ) : (
+          <LockedFeature planName={requiredPlanName("analytics")} desc="검색 제목·설명·키워드를 정해 구글·네이버 노출을 높일 수 있어요." />
         )}
       </section>
 

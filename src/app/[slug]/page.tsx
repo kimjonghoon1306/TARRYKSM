@@ -23,15 +23,27 @@ export async function generateMetadata({
     .eq("published", true)
     .maybeSingle();
   if (!data) return { title: "쇼핑몰" };
+  // SEO 커스텀 필드 안전 조회 (seo.sql 미실행이면 컬럼 없음 → 기본값)
+  let seo: { seo_title?: string | null; seo_desc?: string | null; seo_keywords?: string | null; seo_noindex?: boolean | null } = {};
+  try {
+    const { data: sd } = await supabase.from("stores").select("seo_title,seo_desc,seo_keywords,seo_noindex").eq("slug", slug).maybeSingle();
+    seo = (sd ?? {}) as typeof seo;
+  } catch { /* 컬럼 없으면 무시 */ }
+
   const img = data.hero_image_url || data.logo_url || undefined;
-  const desc = data.hero_subtitle || `${data.name} — ONJONGIL로 만든 쇼핑몰`;
+  const title = (seo.seo_title || "").trim() || data.name;
+  const desc = (seo.seo_desc || "").trim() || data.hero_subtitle || `${data.name} — ONJONGIL로 만든 쇼핑몰`;
+  const keywords = (seo.seo_keywords || "").split(",").map((k) => k.trim()).filter(Boolean);
   return {
-    title: data.name,
+    title,
     description: desc,
+    keywords: keywords.length ? keywords : undefined,
+    robots: seo.seo_noindex ? { index: false, follow: false } : undefined,
     openGraph: {
-      title: data.name,
+      title,
       description: desc,
       images: img ? [img] : undefined,
+      type: "website",
     },
     icons: data.logo_url ? { icon: data.logo_url } : undefined,
   };
