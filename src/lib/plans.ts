@@ -16,7 +16,7 @@ export const PLANS: Record<Plan, PlanInfo> = {
     name: "무료",
     price: 0,
     maxStores: 1,
-    features: ["쇼핑몰 1개", "상품·스킨·대문 꾸미기", "주문·송장 관리", "🤖 챗봇", "🚚 배송비", "💬 상품문의", "⭐ 리뷰"],
+    features: ["쇼핑몰 1개", "상품·스킨·대문 꾸미기", "주문·송장 관리", "🤖 챗봇", "🚚 배송비", "💬 상품문의·⭐리뷰", "🎉 이벤트 팝업·띠배너"],
   },
   basic: {
     id: "basic",
