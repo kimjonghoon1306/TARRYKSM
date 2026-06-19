@@ -883,6 +883,14 @@ export default function Storefront({
           );
         })()}
 
+        {slug && (
+          <div className="sf-legal">
+            <a href={`/${slug}/terms`}>이용약관</a>
+            <span className="sf-legal-sep">·</span>
+            <a href={`/${slug}/privacy`}>개인정보처리방침</a>
+          </div>
+        )}
+
         <div className="sf-foot" style={{ whiteSpace: "pre-line" }}>
           {store.footer_text && store.footer_text.trim()
             ? store.footer_text
