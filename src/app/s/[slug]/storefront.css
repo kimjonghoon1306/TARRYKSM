@@ -395,8 +395,8 @@
    B · 상품 진열 고도화 (2026-06-15) — 신상/베스트 선반 + 기획전 배너
 ════════════════════════════════════════ */
 .sf-shelf { margin: 0 0 32px; position: relative; }
-/* 오른쪽 페이드 — 가로 스크롤로 상품이 더 있음을 자연스럽게 암시(잘린 느낌 제거) */
-.sf-shelf::after { content: ""; position: absolute; top: 42px; right: 0; bottom: 14px; width: 48px; background: linear-gradient(to right, transparent, var(--s-bg)); pointer-events: none; z-index: 1; }
+/* 오른쪽 페이드 — 가로 스크롤(선반)에만 적용. 전체상품 '그리드'에는 적용 안 함(끝 카드 흐려짐 방지) */
+.sf-shelf:has(.sf-shelf-rail)::after { content: ""; position: absolute; top: 42px; right: 0; bottom: 14px; width: 48px; background: linear-gradient(to right, transparent, var(--s-bg)); pointer-events: none; z-index: 1; }
 .sf-shelf-head { display: flex; align-items: baseline; justify-content: space-between; gap: 12px; margin: 6px 2px 14px; }
 .sf-shelf-head h2 { font-family: var(--s-fd); font-weight: var(--s-fw); font-size: 19px; letter-spacing: var(--s-hls); }
 .sf-shelf-sub { font-size: 12.5px; color: var(--s-sub); font-weight: 600; }

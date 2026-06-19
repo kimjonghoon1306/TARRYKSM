@@ -3,6 +3,7 @@ import { createClient } from "@/lib/supabase/server";
 import { fetchSections } from "@/lib/sections";
 import { fetchReviewsByProduct } from "@/lib/reviews";
 import Storefront, { type Product } from "./Storefront";
+import StoreBot, { type BotStyle } from "@/components/StoreBot";
 
 type Store = {
   id: string;
@@ -15,6 +16,9 @@ type Store = {
   pay_bank: string | null;
   pay_note: string | null;
   pay_bank_on: boolean | null;
+  chat_on: boolean | null;
+  chat_style: string | null;
+  chat_greeting: string | null;
   footer_text: string | null;
   biz_company: string | null;
   biz_owner: string | null;
@@ -35,14 +39,14 @@ export default async function StorefrontPage({
 
   const { data: store } = await supabase
     .from("stores")
-    .select("id,name,skin,logo_url,hero_image_url,hero_title,hero_subtitle,pay_bank,pay_note,pay_bank_on,footer_text,biz_company,biz_owner,biz_number,biz_mailorder,biz_address,biz_phone,biz_email")
+    .select("id,name,skin,logo_url,hero_image_url,hero_title,hero_subtitle,pay_bank,pay_note,pay_bank_on,chat_on,chat_style,chat_greeting,footer_text,biz_company,biz_owner,biz_number,biz_mailorder,biz_address,biz_phone,biz_email")
     .eq("slug", slug)
     .eq("published", true)
     .maybeSingle();
   if (!store) notFound();
   const s = store as Store;
 
-  const [{ data: products }, sections, reviewsByProduct] = await Promise.all([
+  const [{ data: products }, sections, reviewsByProduct, { data: faqRows }] = await Promise.all([
     supabase
       .from("products")
       .select("id,emoji,image_url,name,brand,price,compare_at,category,description,tag,stock,options,created_at")
@@ -50,8 +54,10 @@ export default async function StorefrontPage({
       .order("position", { ascending: true }),
     fetchSections(supabase, s.id),
     fetchReviewsByProduct(supabase, s.id),
+    supabase.from("store_faqs").select("id,question,answer").eq("store_id", s.id).order("position", { ascending: true }),
   ]);
   const items = (products ?? []) as Product[];
+  const faqs = (faqRows ?? []) as { id: string; question: string; answer: string }[];
 
   return (
     <>
@@ -84,6 +90,9 @@ export default async function StorefrontPage({
         sections={sections}
         reviewsByProduct={reviewsByProduct}
       />
+      {s.chat_on !== false && (
+        <StoreBot faqs={faqs} storeName={s.name} style={(s.chat_style as BotStyle) || "designer"} greeting={s.chat_greeting} />
+      )}
     </>
   );
 }
