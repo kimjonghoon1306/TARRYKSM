@@ -399,9 +399,9 @@ export async function setStoreSeo(formData: FormData) {
       seo_noindex: String(formData.get("seo_noindex") || "") === "1",
     })
     .eq("id", id);
-  revalidatePath(`/dashboard/${id}`);
-  if (error) redirect(`/dashboard/${id}?seoerr=` + encodeURIComponent("SEO 저장 실패: " + error.message + " (seo.sql 실행 필요)"));
-  redirect(`/dashboard/${id}?seomsg=` + encodeURIComponent("검색 노출 설정을 저장했어요"));
+  revalidatePath(`/dashboard/${id}/seo`);
+  if (error) redirect(`/dashboard/${id}/seo?seoerr=` + encodeURIComponent("SEO 저장 실패: " + error.message + " (seo.sql 실행 필요)"));
+  redirect(`/dashboard/${id}/seo?seomsg=` + encodeURIComponent("검색 노출 설정을 저장했어요"));
 }
 
 // 사업자 정보 — 쇼핑몰 하단에 표시되는 법적 의무 표시 항목
