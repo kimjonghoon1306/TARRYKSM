@@ -1,5 +1,5 @@
 // 구독 요금제 정의 — 창업자(founder) 플랜
-export type Plan = "free" | "basic" | "pro";
+export type Plan = "free" | "basic" | "pro" | "premium";
 
 export type PlanInfo = {
   id: Plan;
@@ -22,25 +22,32 @@ export const PLANS: Record<Plan, PlanInfo> = {
     id: "basic",
     name: "베이직",
     price: 19000,
-    maxStores: 5,
-    features: ["쇼핑몰 5개", "무료 기능 전체", "🏷️ 할인가/정가", "🎟️ 쿠폰", "💰 적립금", "🌐 커스텀 도메인", "📈 매출·분석"],
+    maxStores: 2,
+    features: ["쇼핑몰 2개", "무료 기능 전체", "🏷️ 할인가/정가", "🎟️ 쿠폰", "💰 적립금", "🌐 커스텀 도메인", "📈 매출·분석"],
     highlight: true,
   },
   pro: {
     id: "pro",
     name: "프로",
     price: 49000,
-    maxStores: Infinity,
-    features: ["쇼핑몰 무제한", "모든 베이직 기능", "💎 회원 등급(VIP)", "우선 지원", "향후 카드결제(PG) 우선 적용"],
+    maxStores: 5,
+    features: ["쇼핑몰 5개", "모든 베이직 기능", "💎 회원 등급(VIP)", "우선 지원", "향후 카드결제(PG) 우선 적용"],
+  },
+  premium: {
+    id: "premium",
+    name: "프리미엄",
+    price: 79000,
+    maxStores: 10,
+    features: ["쇼핑몰 10개", "모든 프로 기능", "최우선 지원", "향후 신기능 우선 제공"],
   },
 };
 
-export const PLAN_ORDER: Plan[] = ["free", "basic", "pro"];
+export const PLAN_ORDER: Plan[] = ["free", "basic", "pro", "premium"];
 
 export function planOf(role?: string | null, plan?: string | null): PlanInfo {
-  // 관리자는 제한 없음(pro 취급)
-  if (role === "admin") return PLANS.pro;
-  if (plan === "basic" || plan === "pro") return PLANS[plan];
+  // 관리자는 제한 없음(프리미엄 기능 + 쇼핑몰 무제한)
+  if (role === "admin") return { ...PLANS.premium, maxStores: Infinity };
+  if (plan === "basic" || plan === "pro" || plan === "premium") return PLANS[plan];
   return PLANS.free;
 }
 
@@ -66,7 +73,7 @@ export const FEATURE_MIN: Record<Feature, Plan> = {
 // 현재 plan으로 이 기능을 쓸 수 있는지 (admin은 항상 가능)
 export function canUse(feature: Feature, plan?: string | null, role?: string | null): boolean {
   if (role === "admin") return true;
-  const cur = plan === "basic" || plan === "pro" ? plan : "free";
+  const cur = plan === "basic" || plan === "pro" || plan === "premium" ? plan : "free";
   return PLAN_ORDER.indexOf(cur) >= PLAN_ORDER.indexOf(FEATURE_MIN[feature]);
 }
 

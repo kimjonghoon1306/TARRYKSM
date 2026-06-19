@@ -36,7 +36,7 @@ export function DeleteUserButton({ userId, email, isSelf }: { userId: string; em
 
 // 회원 요금제 변경 — 드롭다운으로 고르고 저장 버튼으로 확정 (저장 피드백 표시)
 export function PlanToggle({ userId, plan }: { userId: string; plan: string }) {
-  const init = plan === "basic" || plan === "pro" ? plan : "free";
+  const init = plan === "basic" || plan === "pro" || plan === "premium" ? plan : "free";
   const [cur, setCur] = useState(init);
   const [saved, setSaved] = useState(init); // 마지막으로 저장된 값
   const [pending, start] = useTransition();
@@ -56,12 +56,13 @@ export function PlanToggle({ userId, plan }: { userId: string; plan: string }) {
         <option value="free">무료</option>
         <option value="basic">베이직</option>
         <option value="pro">프로</option>
+        <option value="premium">프리미엄</option>
       </select>
       <button
         disabled={!dirty || pending}
         onClick={() =>
           start(() =>
-            setUserPlan(userId, cur as "free" | "basic" | "pro").then(() => {
+            setUserPlan(userId, cur as "free" | "basic" | "pro" | "premium").then(() => {
               setSaved(cur);
               setDone(true);
             })

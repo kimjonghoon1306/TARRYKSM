@@ -18,8 +18,8 @@ export async function setUserRole(userId: string, role: "admin" | "founder") {
   revalidatePath("/dashboard/platform");
 }
 
-// 회원 요금제 변경 (free/basic/pro) — 실결제 전 수동 적용
-export async function setUserPlan(userId: string, plan: "free" | "basic" | "pro") {
+// 회원 요금제 변경 (free/basic/pro/premium) — 실결제 전 수동 적용
+export async function setUserPlan(userId: string, plan: "free" | "basic" | "pro" | "premium") {
   if (!(await assertAdmin())) return;
   const supabase = await createClient();
   await supabase.from("profiles").update({ plan }).eq("id", userId);
