@@ -19,26 +19,58 @@ export function BotAvatar({ style, size = 40, talking = false }: { style: BotSty
   if (style === "robot") {
     return (
       <svg width={size} height={size} viewBox="0 0 48 48" aria-hidden className={cls}>
-        <defs><linearGradient id={gid} x1="0" y1="0" x2="1" y2="1"><stop offset="0" stopColor={t.from} /><stop offset="1" stopColor={t.to} /></linearGradient></defs>
+        <defs>
+          <linearGradient id={gid} x1="0" y1="0" x2="1" y2="1"><stop offset="0" stopColor={t.from} /><stop offset="1" stopColor={t.to} /></linearGradient>
+          <linearGradient id={`${gid}-f`} x1="0" y1="0" x2="0" y2="1"><stop offset="0" stopColor="#ffffff" /><stop offset="1" stopColor="#dbeafe" /></linearGradient>
+        </defs>
         <circle cx="24" cy="24" r="24" fill={`url(#${gid})`} />
-        <rect x="13" y="16" width="22" height="18" rx="6" fill="#eef6ff" />
-        <line x1="24" y1="9" x2="24" y2="14" stroke="#fff" strokeWidth="2" /><circle cx="24" cy="8" r="2.4" fill="#fff" />
-        <g className="sb-eyes" fill="#2563eb"><circle cx="19" cy="24" r="2.4" /><circle cx="29" cy="24" r="2.4" /></g>
-        <rect className="sb-mouth" x="19" y="29" width="10" height="2.4" rx="1.2" fill="#60a5fa" />
+        {/* 안테나 */}
+        <line x1="24" y1="6.5" x2="24" y2="11" stroke="#fff" strokeWidth="2" strokeLinecap="round" />
+        <circle cx="24" cy="6" r="2.6" fill="#fff" /><circle cx="24" cy="6" r="1.2" fill={t.to} />
+        {/* 귀(헤드폰) */}
+        <rect x="9.5" y="20" width="4" height="9" rx="2" fill="#fff" opacity="0.9" />
+        <rect x="34.5" y="20" width="4" height="9" rx="2" fill="#fff" opacity="0.9" />
+        {/* 머리 */}
+        <rect x="12.5" y="12.5" width="23" height="22" rx="9" fill={`url(#${gid}-f)`} stroke="#bcd4f5" strokeWidth="0.8" />
+        {/* 눈 (큰 글로시) */}
+        <g className="sb-eyes">
+          <circle cx="19" cy="23" r="3.4" fill="#1e3a8a" /><circle cx="29" cy="23" r="3.4" fill="#1e3a8a" />
+          <circle cx="20.1" cy="21.8" r="1.1" fill="#fff" /><circle cx="30.1" cy="21.8" r="1.1" fill="#fff" />
+        </g>
+        {/* 볼 라이트 */}
+        <circle cx="15.5" cy="28" r="1.6" fill="#7dd3fc" opacity="0.8" />
+        <circle cx="32.5" cy="28" r="1.6" fill="#7dd3fc" opacity="0.8" />
+        {/* 입 (미소) */}
+        <path className="sb-mouth" d="M20.5 29.5c1.5 1.7 5.5 1.7 7 0" fill="none" stroke="#60a5fa" strokeWidth="1.8" strokeLinecap="round" />
       </svg>
     );
   }
   if (style === "bear") {
     return (
       <svg width={size} height={size} viewBox="0 0 48 48" aria-hidden className={cls}>
-        <defs><linearGradient id={gid} x1="0" y1="0" x2="1" y2="1"><stop offset="0" stopColor={t.from} /><stop offset="1" stopColor={t.to} /></linearGradient></defs>
+        <defs>
+          <linearGradient id={gid} x1="0" y1="0" x2="1" y2="1"><stop offset="0" stopColor={t.from} /><stop offset="1" stopColor={t.to} /></linearGradient>
+          <radialGradient id={`${gid}-f`} cx="0.5" cy="0.42" r="0.65"><stop offset="0" stopColor="#f0c89a" /><stop offset="1" stopColor="#d9a566" /></radialGradient>
+        </defs>
         <circle cx="24" cy="24" r="24" fill={`url(#${gid})`} />
-        <circle cx="15" cy="15" r="5" fill="#a9744f" /><circle cx="33" cy="15" r="5" fill="#a9744f" />
-        <circle cx="24" cy="25" r="13" fill="#d6a06b" />
-        <circle cx="24" cy="28" r="6" fill="#f1d4b0" />
-        <g className="sb-eyes" fill="#3a2a12"><circle cx="19.5" cy="23" r="1.7" /><circle cx="28.5" cy="23" r="1.7" /></g>
-        <ellipse cx="24" cy="26.5" rx="2" ry="1.4" fill="#3a2a12" />
-        <path className="sb-mouth" d="M21 30c1.5 1.6 4.5 1.6 6 0" fill="none" stroke="#3a2a12" strokeWidth="1.5" strokeLinecap="round" />
+        {/* 귀 */}
+        <circle cx="14.5" cy="14.5" r="5.5" fill="#c98a52" /><circle cx="14.5" cy="14.5" r="2.6" fill="#f7d9b8" />
+        <circle cx="33.5" cy="14.5" r="5.5" fill="#c98a52" /><circle cx="33.5" cy="14.5" r="2.6" fill="#f7d9b8" />
+        {/* 얼굴 */}
+        <circle cx="24" cy="25" r="13.5" fill={`url(#${gid}-f)`} stroke="#cf9a5f" strokeWidth="0.6" />
+        {/* 주둥이 */}
+        <ellipse cx="24" cy="29" rx="7" ry="5.5" fill="#f7e3c8" />
+        {/* 눈 (큰 반짝) */}
+        <g className="sb-eyes">
+          <circle cx="19" cy="23" r="2.4" fill="#3a2a12" /><circle cx="29" cy="23" r="2.4" fill="#3a2a12" />
+          <circle cx="19.8" cy="22.1" r="0.8" fill="#fff" /><circle cx="29.8" cy="22.1" r="0.8" fill="#fff" />
+        </g>
+        {/* 볼터치 */}
+        <circle cx="15" cy="28.5" r="2" fill="#ff9a8b" opacity="0.5" />
+        <circle cx="33" cy="28.5" r="2" fill="#ff9a8b" opacity="0.5" />
+        {/* 코 + 입 */}
+        <ellipse cx="24" cy="27" rx="2.1" ry="1.5" fill="#5a3d22" />
+        <path className="sb-mouth" d="M24 28.5v1.6m0 0c-1.2 1.3-3 1-3.6-.2m3.6.2c1.2 1.3 3 1 3.6-.2" fill="none" stroke="#5a3d22" strokeWidth="1.2" strokeLinecap="round" />
       </svg>
     );
   }
