@@ -2,7 +2,7 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { domainToUnicode } from "node:url";
 import { createClient } from "@/lib/supabase/server";
-import { setStoreDomain, togglePublish, setStoreSlug, setStorePayment, setStorePoints, setStoreShipping, setStoreChat, setStoreBusiness } from "../actions";
+import { setStoreDomain, togglePublish, setStoreSlug, setStorePayment, setStorePoints, setStoreShipping, setStoreChat, setStorePromo, setStoreBusiness } from "../actions";
 import { PRIMARY_DOMAIN } from "@/lib/domains";
 import DomainHelp from "@/components/DomainHelp";
 import BrandingForm from "@/components/BrandingForm";
@@ -20,6 +20,7 @@ import StoreGradeManager from "@/components/StoreGradeManager";
 import { listStoreGrades } from "./grades/actions";
 import LockedFeature from "@/components/LockedFeature";
 import FeatureToggle from "@/components/FeatureToggle";
+import PromoSettings from "@/components/PromoSettings";
 import { getMe } from "@/lib/role";
 import { canUse, requiredPlanName } from "@/lib/plans";
 import type { BotStyle } from "@/components/StoreBot";
@@ -67,10 +68,10 @@ export default async function StoreAdmin({
   searchParams,
 }: {
   params: Promise<{ id: string }>;
-  searchParams: Promise<{ dmsg?: string; derr?: string; smsg?: string; serr?: string; brmsg?: string; pmsg?: string; ptmsg?: string; shmsg?: string; chmsg?: string; cherr?: string }>;
+  searchParams: Promise<{ dmsg?: string; derr?: string; smsg?: string; serr?: string; brmsg?: string; pmsg?: string; ptmsg?: string; shmsg?: string; chmsg?: string; cherr?: string; prmsg?: string; prerr?: string }>;
 }) {
   const { id } = await params;
-  const { dmsg, derr, smsg, serr, brmsg, pmsg, ptmsg, shmsg, chmsg, cherr } = await searchParams;
+  const { dmsg, derr, smsg, serr, brmsg, pmsg, ptmsg, shmsg, chmsg, cherr, prmsg, prerr } = await searchParams;
   const supabase = await createClient();
   const { data: store } = await supabase
     .from("stores")
@@ -98,8 +99,8 @@ export default async function StoreAdmin({
     listStoreCategories(id),
     listStoreFaqs(id),
     listStoreGrades(id),
-    // grades_on·qa_on·reviews_on은 SQL 미실행 환경에서도 안 깨지게 별도 안전 조회
-    supabase.from("stores").select("grades_on,qa_on,reviews_on").eq("id", id).maybeSingle(),
+    // grades_on·qa_on·reviews_on·프로모는 SQL 미실행 환경에서도 안 깨지게 별도 안전 조회
+    supabase.from("stores").select("grades_on,qa_on,reviews_on,bar_on,bar_text,bar_link,bar_bg,bar_fg,popup_on,popup_title,popup_body,popup_image,popup_btn_text,popup_btn_link").eq("id", id).maybeSingle(),
     supabase.from("products").select("category").eq("store_id", id),
     getMe(),
   ]);
@@ -113,7 +114,11 @@ export default async function StoreAdmin({
     image_url: string | null;
     name: string;
   }[];
-  const grow = (gr as { grades_on?: boolean; qa_on?: boolean; reviews_on?: boolean } | null) ?? {};
+  const grow = (gr ?? {}) as {
+    grades_on?: boolean; qa_on?: boolean; reviews_on?: boolean;
+    bar_on?: boolean; bar_text?: string | null; bar_link?: string | null; bar_bg?: string | null; bar_fg?: string | null;
+    popup_on?: boolean; popup_title?: string | null; popup_body?: string | null; popup_image?: string | null; popup_btn_text?: string | null; popup_btn_link?: string | null;
+  };
   const gradesOn = grow.grades_on === true;
   const qaOn = grow.qa_on !== false; // 컬럼 없거나 true면 ON
   const reviewsOn = grow.reviews_on !== false;
@@ -362,6 +367,25 @@ export default async function StoreAdmin({
           <FeatureToggle storeId={s.id} toggleKey="reviews_on" on={reviewsOn} label="⭐ 구매 후기 (리뷰)" desc="켜짐 — 손님이 별점 후기를 남길 수 있어요" />
           <FeatureToggle storeId={s.id} toggleKey="qa_on" on={qaOn} label="💬 상품 문의 (Q&A)" desc="켜짐 — 손님이 상품에 질문할 수 있어요" />
         </div>
+      </section>
+
+      {/* 이벤트 팝업 / 띠배너 */}
+      <section className={card + " mt-4"}>
+        <h2 className="mb-1 font-semibold">🎉 이벤트 팝업·띠배너</h2>
+        <p className="mb-4 text-xs text-neutral-500">
+          대문 맨 위 <b>띠배너</b>와 접속 시 뜨는 <b>팝업</b>으로 이벤트·공지를 알릴 수 있어요. 각각 켜고 끌 수 있어요.
+        </p>
+        {prmsg && (
+          <p className="mb-3 rounded-lg bg-emerald-500/10 px-3 py-2 text-sm text-emerald-600 dark:text-emerald-400">{prmsg}</p>
+        )}
+        {prerr && (
+          <p className="mb-3 rounded-lg bg-rose-500/10 px-3 py-2 text-sm text-rose-600 dark:text-rose-400">{prerr}</p>
+        )}
+        <form action={setStorePromo} className="space-y-3">
+          <input type="hidden" name="id" value={s.id} />
+          <PromoSettings init={grow} />
+          <SaveButton label="이벤트 설정 저장" />
+        </form>
       </section>
 
       {/* 쇼핑몰 챗봇 (FAQ) */}

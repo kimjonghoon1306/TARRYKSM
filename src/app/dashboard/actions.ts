@@ -347,6 +347,38 @@ export async function setStoreToggle(storeId: string, key: "qa_on" | "reviews_on
   return { ok: true };
 }
 
+// 이벤트 띠배너 + 진입 팝업 설정
+export async function setStorePromo(formData: FormData) {
+  const supabase = await createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+  if (!user) redirect("/login");
+  const id = String(formData.get("id") || "");
+  if (!id) return;
+
+  const t = (k: string, max = 500) => String(formData.get(k) || "").trim().slice(0, max) || null;
+  const { error } = await supabase
+    .from("stores")
+    .update({
+      bar_on: String(formData.get("bar_on") || "") === "1",
+      bar_text: t("bar_text", 120),
+      bar_link: t("bar_link", 300),
+      bar_bg: t("bar_bg", 20) || "#7c5cff",
+      bar_fg: t("bar_fg", 20) || "#ffffff",
+      popup_on: String(formData.get("popup_on") || "") === "1",
+      popup_title: t("popup_title", 60),
+      popup_body: t("popup_body", 500),
+      popup_image: t("popup_image", 500),
+      popup_btn_text: t("popup_btn_text", 30),
+      popup_btn_link: t("popup_btn_link", 300),
+    })
+    .eq("id", id);
+  revalidatePath(`/dashboard/${id}`);
+  if (error) redirect(`/dashboard/${id}?prerr=` + encodeURIComponent("이벤트 저장 실패: " + error.message + " (promo.sql 실행 필요)"));
+  redirect(`/dashboard/${id}?prmsg=` + encodeURIComponent("이벤트 설정을 저장했어요"));
+}
+
 // 사업자 정보 — 쇼핑몰 하단에 표시되는 법적 의무 표시 항목
 export async function setStoreBusiness(formData: FormData) {
   const supabase = await createClient();

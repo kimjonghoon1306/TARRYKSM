@@ -5,6 +5,7 @@ import { fetchSections } from "@/lib/sections";
 import { fetchReviewsByProduct } from "@/lib/reviews";
 import Storefront, { type Product } from "../s/[slug]/Storefront";
 import StoreBot, { type BotStyle } from "@/components/StoreBot";
+import StorePromo from "@/components/StorePromo";
 import { getCustomer, getWishlistIds, getMyCoupons } from "./customer-actions";
 
 // 각 쇼핑몰 링크 공유 시: 가게 이름·로고(파비콘)·배너(미리보기 이미지)
@@ -109,12 +110,20 @@ export default async function PrettyStorefront({
       .select("id,question,answer")
       .eq("store_id", s.id)
       .order("position", { ascending: true }),
-    // qa_on/reviews_on 안전 조회 (컬럼 없으면 null → 기본 ON 취급)
-    supabase.from("stores").select("qa_on,reviews_on").eq("id", s.id).maybeSingle(),
+    // qa_on/reviews_on + 프로모(띠배너·팝업) 안전 조회 (컬럼 없으면 null → 미적용)
+    supabase
+      .from("stores")
+      .select("qa_on,reviews_on,bar_on,bar_text,bar_link,bar_bg,bar_fg,popup_on,popup_title,popup_body,popup_image,popup_btn_text,popup_btn_link")
+      .eq("id", s.id)
+      .maybeSingle(),
   ]);
   const items = (products ?? []) as Product[];
   const faqs = (faqRows ?? []) as { id: string; question: string; answer: string }[];
-  const toggles = (tg ?? {}) as { qa_on?: boolean | null; reviews_on?: boolean | null };
+  const toggles = (tg ?? {}) as {
+    qa_on?: boolean | null; reviews_on?: boolean | null;
+    bar_on?: boolean | null; bar_text?: string | null; bar_link?: string | null; bar_bg?: string | null; bar_fg?: string | null;
+    popup_on?: boolean | null; popup_title?: string | null; popup_body?: string | null; popup_image?: string | null; popup_btn_text?: string | null; popup_btn_link?: string | null;
+  };
   const customer = cust && cust.store_id === s.id ? { id: cust.id, name: cust.name, email: cust.email, points: cust.points } : null;
   const wishlistIds = customer ? wishlistIdsRaw : [];
   // 결제 화면에서 쓸 수 있는 보유 쿠폰 (미사용·유효·기간내)
@@ -141,6 +150,11 @@ export default async function PrettyStorefront({
       <link
         href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Inter:wght@400;500;600;700&family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600&family=Archivo:wght@500;700;800&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap"
         rel="stylesheet"
+      />
+      <StorePromo
+        storeId={s.id}
+        bar={{ on: toggles.bar_on === true, text: toggles.bar_text, link: toggles.bar_link, bg: toggles.bar_bg, fg: toggles.bar_fg }}
+        popup={{ on: toggles.popup_on === true, title: toggles.popup_title, body: toggles.popup_body, image: toggles.popup_image, btnText: toggles.popup_btn_text, btnLink: toggles.popup_btn_link }}
       />
       <Storefront
         slug={slug}
