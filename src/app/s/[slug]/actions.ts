@@ -230,6 +230,52 @@ export async function submitReview(input: {
   };
 }
 
+// ── 상품 문의(Q&A) ──
+export type ProductQuestion = {
+  id: string;
+  buyer_name: string;
+  question: string | null; // 비밀글이고 본인 아니면 null
+  answer: string | null;
+  secret: boolean;
+  answered: boolean;
+  is_mine: boolean;
+  created_at: string;
+};
+
+// 상품 문의 목록 (비밀글은 작성 본인 외 내용 마스킹 — RPC에서 처리). 없으면 빈 배열.
+export async function listQuestions(productId: string): Promise<ProductQuestion[]> {
+  const supabase = await createClient();
+  const token = (await cookies()).get("cust_session")?.value || null;
+  const { data } = await supabase.rpc("list_product_questions", { p_product: productId, p_token: token });
+  return (data ?? []) as ProductQuestion[];
+}
+
+// 손님 문의 등록 (발행몰이면 비로그인도 가능, 로그인 손님이면 작성자로 기록).
+export async function askQuestion(input: {
+  storeId: string;
+  productId: string;
+  name: string;
+  question: string;
+  secret?: boolean;
+}): Promise<{ ok: boolean; error?: string }> {
+  const name = (input.name || "").trim();
+  const q = (input.question || "").trim();
+  if (!name) return { ok: false, error: "이름을 입력해 주세요." };
+  if (!q) return { ok: false, error: "문의 내용을 입력해 주세요." };
+  const supabase = await createClient();
+  const token = (await cookies()).get("cust_session")?.value || null;
+  const { data, error } = await supabase.rpc("ask_product_question", {
+    p_store: input.storeId,
+    p_product: input.productId,
+    p_name: name,
+    p_question: q,
+    p_secret: !!input.secret,
+    p_token: token,
+  });
+  if (error || data !== true) return { ok: false, error: "문의 등록에 실패했어요. 잠시 후 다시 시도해 주세요." };
+  return { ok: true };
+}
+
 // 체크아웃 쿠폰 검증 (코드+소계 → 할인액). coupons 테이블/RPC 없으면 무시(할인 0).
 export async function checkCoupon(
   storeId: string,

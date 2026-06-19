@@ -2,7 +2,7 @@
 
 import { useEffect, useMemo, useRef, useState } from "react";
 import type { Section } from "@/lib/sections";
-import { placeOrder, submitReview, checkCoupon } from "./actions";
+import { placeOrder, submitReview, checkCoupon, listQuestions, askQuestion, type ProductQuestion } from "./actions";
 import { toggleWishlist } from "@/app/[slug]/customer-actions";
 import CustomerAuthSheet from "@/components/CustomerAuthSheet";
 import "./storefront.css";
@@ -194,6 +194,14 @@ export default function Storefront({
   const [revComment, setRevComment] = useState("");
   const [revBusy, setRevBusy] = useState(false);
   const [revErr, setRevErr] = useState("");
+  // 상품 문의(Q&A) — 상세 시트
+  const [questions, setQuestions] = useState<ProductQuestion[]>([]);
+  const [qaName, setQaName] = useState("");
+  const [qaText, setQaText] = useState("");
+  const [qaSecret, setQaSecret] = useState(false);
+  const [qaBusy, setQaBusy] = useState(false);
+  const [qaErr, setQaErr] = useState("");
+  const [qaDone, setQaDone] = useState(false);
   // 찜(위시리스트) — 로그인 손님만. 서버에서 받은 찜 id로 초기화, 낙관적 토글.
   const [favs, setFavs] = useState<Set<string>>(() => new Set(wishlistIds || []));
 
@@ -320,6 +328,35 @@ export default function Storefront({
     setRevRating(5);
     setRevComment("");
     setRevErr("");
+    // 문의 초기화 + 로딩
+    setQuestions([]);
+    setQaName(customer?.name || "");
+    setQaText("");
+    setQaSecret(false);
+    setQaErr("");
+    setQaDone(false);
+    listQuestions(p.id).then(setQuestions).catch(() => {});
+  }
+
+  async function postQuestion() {
+    setQaErr("");
+    if (!detail) return;
+    if (!qaName.trim()) return setQaErr("이름을 입력해 주세요.");
+    if (!qaText.trim()) return setQaErr("문의 내용을 입력해 주세요.");
+    setQaBusy(true);
+    const res = await askQuestion({
+      storeId: store.id,
+      productId: detail.id,
+      name: qaName,
+      question: qaText,
+      secret: qaSecret,
+    });
+    setQaBusy(false);
+    if (!res.ok) return setQaErr(res.error || "문의 등록에 실패했어요.");
+    setQaText("");
+    setQaSecret(false);
+    setQaDone(true);
+    listQuestions(detail.id).then(setQuestions).catch(() => {});
   }
 
   // 상세 시트 옵션 계산
@@ -988,6 +1025,71 @@ export default function Storefront({
                 {revErr && <div className="sf-rev-err">{revErr}</div>}
                 <button className="sf-rev-submit" onClick={postReview} disabled={revBusy}>
                   {revBusy ? "등록 중…" : "후기 등록"}
+                </button>
+              </div>
+            </div>
+
+            {/* 상품 문의 (Q&A) */}
+            <div className="sf-reviews sf-qa">
+              <div className="sf-rev-head">
+                <h3>상품 문의</h3>
+                {questions.length > 0 && <span className="sf-rev-avg"><b>{questions.length}</b></span>}
+              </div>
+
+              {questions.length === 0 ? (
+                <div className="sf-rev-empty">아직 문의가 없어요. 궁금한 점을 남겨보세요!</div>
+              ) : (
+                <ul className="sf-rev-list">
+                  {questions.map((q) => (
+                    <li key={q.id} className="sf-rev-item">
+                      <div className="sf-rev-top">
+                        <b>{q.buyer_name}</b>
+                        {q.secret && <span className="sf-qa-secret">🔒 비밀글</span>}
+                        {q.answered ? (
+                          <span className="sf-qa-badge done">답변완료</span>
+                        ) : (
+                          <span className="sf-qa-badge wait">답변대기</span>
+                        )}
+                      </div>
+                      {q.question === null ? (
+                        <p className="sf-rev-body sf-qa-locked">🔒 비밀글입니다. 작성자와 판매자만 볼 수 있어요.</p>
+                      ) : (
+                        <p className="sf-rev-body">{q.question}</p>
+                      )}
+                      {q.answer && (
+                        <div className="sf-rev-reply">
+                          <b>판매자</b> {q.answer}
+                        </div>
+                      )}
+                    </li>
+                  ))}
+                </ul>
+              )}
+
+              {/* 문의 작성 폼 */}
+              <div className="sf-rev-form">
+                {qaDone && <div className="sf-qa-ok">문의가 등록됐어요. 답변이 달리면 확인할 수 있어요 🙌</div>}
+                <input
+                  className="sf-rev-input"
+                  placeholder="이름"
+                  value={qaName}
+                  onChange={(e) => setQaName(e.target.value)}
+                  maxLength={20}
+                />
+                <textarea
+                  className="sf-rev-input sf-rev-area"
+                  placeholder="궁금한 점을 남겨주세요 (배송·옵션·재고 등)"
+                  value={qaText}
+                  onChange={(e) => setQaText(e.target.value)}
+                  maxLength={1000}
+                />
+                <label className="sf-qa-secret-check">
+                  <input type="checkbox" checked={qaSecret} onChange={(e) => setQaSecret(e.target.checked)} />
+                  <span>🔒 비밀글로 문의 (작성자와 판매자만 볼 수 있어요)</span>
+                </label>
+                {qaErr && <div className="sf-rev-err">{qaErr}</div>}
+                <button className="sf-rev-submit" onClick={postQuestion} disabled={qaBusy}>
+                  {qaBusy ? "등록 중…" : "문의 등록"}
                 </button>
               </div>
             </div>
