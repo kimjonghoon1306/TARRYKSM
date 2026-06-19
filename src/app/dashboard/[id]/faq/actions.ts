@@ -32,7 +32,7 @@ export async function addFaq(storeId: string, question: string, answer: string):
     .order("position", { ascending: false }).limit(1).maybeSingle();
   const pos = (maxRow?.position ?? -1) + 1;
   const { error } = await supabase.from("store_faqs").insert({ store_id: storeId, question: q, answer: a.slice(0, 2000), position: pos });
-  if (error) return { ok: false, error: "추가에 실패했어요. (챗봇 SQL 실행/권한 확인)" };
+  if (error) return { ok: false, error: `추가 실패 [${error.code || "?"}] ${error.message}` };
   rv(storeId);
   return { ok: true };
 }
