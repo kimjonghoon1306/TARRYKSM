@@ -22,6 +22,7 @@ import LockedFeature from "@/components/LockedFeature";
 import FeatureToggle from "@/components/FeatureToggle";
 import PromoSettings from "@/components/PromoSettings";
 import { getMe } from "@/lib/role";
+import { currentUser } from "@/lib/auth";
 import { canUse, requiredPlanName } from "@/lib/plans";
 import type { BotStyle } from "@/components/StoreBot";
 import BrandingTutorial from "@/components/BrandingTutorial";
@@ -80,6 +81,10 @@ export default async function StoreAdmin({
     .maybeSingle();
   if (!store) notFound();
   const s = store as Store;
+
+  // ⚠️ 멀티테넌트 격리: 내 소유 몰이 아니면 접근 차단 (발행몰이면 RLS read로 타인이 URL로 열 수 있어 가드 필요)
+  const guard = await currentUser();
+  if (!guard || s.owner !== guard.id) notFound();
 
   // store 확정 후 나머지 조회는 전부 병렬(서로 독립) — 순차 왕복 9회 → 1라운드로 단축
   const [

@@ -15,11 +15,11 @@ export default async function Overview({
 }) {
   const { smsg, serr } = await searchParams;
   const supabase = await createClient();
-  // 인증 확인과 목록 조회를 병렬로 (전환 속도 개선)
-  const [user, { data: stores }] = await Promise.all([
-    currentUser(),
-    supabase.from("stores").select("id,name,skin,slug").order("created_at", { ascending: false }),
-  ]);
+  const user = await currentUser();
+  // ⚠️ 멀티테넌트 격리: 반드시 내 소유(owner) 몰만 조회 (발행몰 공개 RLS로 타인 몰 새는 것 방지)
+  const { data: stores } = user
+    ? await supabase.from("stores").select("id,name,skin,slug").eq("owner", user.id).order("created_at", { ascending: false })
+    : { data: [] };
   const list = (stores ?? []) as Store[];
 
   const storeIds = list.map((s) => s.id);

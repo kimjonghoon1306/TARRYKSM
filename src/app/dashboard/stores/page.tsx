@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { createClient } from "@/lib/supabase/server";
+import { currentUser } from "@/lib/auth";
 import { deleteStore } from "../actions";
 import { PRIMARY_DOMAIN } from "@/lib/domains";
 
@@ -7,10 +8,11 @@ type Store = { id: string; name: string; skin: string; slug: string };
 
 export default async function StoresPage() {
   const supabase = await createClient();
-  const { data: stores } = await supabase
-    .from("stores")
-    .select("id,name,skin,slug")
-    .order("created_at", { ascending: false });
+  const user = await currentUser();
+  // ⚠️ 멀티테넌트 격리: 내 소유 몰만
+  const { data: stores } = user
+    ? await supabase.from("stores").select("id,name,skin,slug").eq("owner", user.id).order("created_at", { ascending: false })
+    : { data: [] };
   const list = (stores ?? []) as Store[];
 
   const card =

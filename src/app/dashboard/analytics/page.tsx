@@ -22,7 +22,10 @@ export default async function AnalyticsPage() {
     );
   }
 
-  const { data: stores } = await supabase.from("stores").select("id,skin");
+  // ⚠️ 멀티테넌트 격리: 내 소유 몰만
+  const { data: stores } = me.userId
+    ? await supabase.from("stores").select("id,skin").eq("owner", me.userId)
+    : { data: [] };
   const storeIds = (stores ?? []).map((s) => s.id);
 
   let products: { price: number; category: string | null }[] = [];

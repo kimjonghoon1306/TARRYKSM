@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { createClient } from "@/lib/supabase/server";
+import { currentUser } from "@/lib/auth";
 
 type Row = {
   id: string;
@@ -17,8 +18,12 @@ const won = (n: number) => "₩" + n.toLocaleString("ko-KR");
 
 export default async function AllProductsPage() {
   const supabase = await createClient();
+  const user = await currentUser();
 
-  const { data: stores } = await supabase.from("stores").select("id,name");
+  // ⚠️ 멀티테넌트 격리: 내 소유 몰만
+  const { data: stores } = user
+    ? await supabase.from("stores").select("id,name").eq("owner", user.id)
+    : { data: [] };
   const storeIds = (stores ?? []).map((s) => s.id);
 
   let rows: Row[] = [];
