@@ -76,42 +76,35 @@ export default async function StoreAdmin({
   if (!store) notFound();
   const s = store as Store;
 
-  const { count } = await supabase
-    .from("products")
-    .select("id", { count: "exact", head: true })
-    .eq("store_id", id);
-
-  // 이 몰의 주문 수 (orders 테이블 없으면 null)
-  const { count: orderCount } = await supabase
-    .from("orders")
-    .select("id", { count: "exact", head: true })
-    .eq("store_id", id);
-
-  // 미리보기용 상품 썸네일 몇 개
-  const { data: preview } = await supabase
-    .from("products")
-    .select("id,emoji,image_url,name")
-    .eq("store_id", id)
-    .order("created_at", { ascending: false })
-    .limit(5);
+  // store 확정 후 나머지 조회는 전부 병렬(서로 독립) — 순차 왕복 9회 → 1라운드로 단축
+  const [
+    { count },
+    { count: orderCount },
+    { data: preview },
+    storeCats,
+    storeFaqs,
+    storeGrades,
+    { data: gr },
+    { data: catRows },
+  ] = await Promise.all([
+    supabase.from("products").select("id", { count: "exact", head: true }).eq("store_id", id),
+    supabase.from("orders").select("id", { count: "exact", head: true }).eq("store_id", id),
+    supabase.from("products").select("id,emoji,image_url,name").eq("store_id", id).order("created_at", { ascending: false }).limit(5),
+    listStoreCategories(id),
+    listStoreFaqs(id),
+    listStoreGrades(id),
+    // grades_on은 grades.sql 미실행 환경에서도 안 깨지게 별도 안전 조회 (컬럼 없으면 false)
+    supabase.from("stores").select("grades_on").eq("id", id).maybeSingle(),
+    supabase.from("products").select("category").eq("store_id", id),
+  ]);
   const previewItems = (preview ?? []) as {
     id: string;
     emoji: string | null;
     image_url: string | null;
     name: string;
   }[];
-
-  const storeCats = await listStoreCategories(id);
-  const storeFaqs = await listStoreFaqs(id);
-  const storeGrades = await listStoreGrades(id);
-  // grades_on은 grades.sql 미실행 환경에서도 안 깨지게 별도 안전 조회 (컬럼 없으면 false)
-  let gradesOn = false;
-  {
-    const { data: gr } = await supabase.from("stores").select("grades_on").eq("id", id).maybeSingle();
-    gradesOn = (gr as { grades_on?: boolean } | null)?.grades_on === true;
-  }
+  const gradesOn = (gr as { grades_on?: boolean } | null)?.grades_on === true;
   // 기존 상품들이 이미 쓰는 카테고리 (관리 목록 자동 채우기용)
-  const { data: catRows } = await supabase.from("products").select("category").eq("store_id", id);
   const productCats = [
     ...new Set(
       ((catRows as { category: string | null }[] | null) ?? [])
