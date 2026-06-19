@@ -28,7 +28,7 @@ export default async function PlanPage() {
         {current.maxStores === Infinity ? "" : ` / ${current.maxStores}`}개 사용 중
       </p>
 
-      <div className="mt-6 grid gap-4 lg:grid-cols-3">
+      <div className="mt-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
         {PLAN_ORDER.map((id) => {
           const p = PLANS[id];
           const isCurrent = current.id === id;
@@ -66,10 +66,12 @@ export default async function PlanPage() {
                   </div>
                 ) : (
                   <a
-                    href="mailto:tarry9653@daum.net?subject=무한분양 요금제 변경 문의"
+                    href="https://open.kakao.com/o/sg6vJgAi"
+                    target="_blank"
+                    rel="noopener noreferrer"
                     className="block rounded-xl bg-gradient-to-r from-violet-500 to-pink-500 py-2.5 text-center text-sm font-semibold text-white shadow-lg shadow-violet-500/25 transition hover:brightness-105"
                   >
-                    {p.price > (current.price || 0) ? "업그레이드 문의" : "변경 문의"}
+                    💬 {p.price > (current.price || 0) ? "업그레이드 문의" : "변경 문의"}
                   </a>
                 )}
               </div>
@@ -78,8 +80,17 @@ export default async function PlanPage() {
         })}
       </div>
 
-      <p className="mt-6 text-center text-xs text-neutral-400">
-        결제 연동은 준비 중이에요. 지금은 문의 주시면 플랜을 적용해 드립니다. (관리자 수동 적용)
+      <p className="mt-6 text-center text-sm text-neutral-500">
+        결제·요금제 문의는{" "}
+        <a
+          href="https://open.kakao.com/o/sg6vJgAi"
+          target="_blank"
+          rel="noopener noreferrer"
+          className="font-semibold text-violet-500 hover:underline"
+        >
+          💬 카카오톡 오픈채팅
+        </a>
+        으로 주세요. 확인 후 플랜을 적용해 드려요.
       </p>
     </div>
   );
