@@ -10,6 +10,7 @@ import { SKIN_IDS } from "@/lib/skins";
 import { getMe } from "@/lib/role";
 import { planOf } from "@/lib/plans";
 import { sampleRowsForStore, heroForStore, sampleSectionsForStore } from "@/lib/sampleData";
+import { DEFAULT_FAQS } from "@/lib/defaultFaqs";
 
 export async function createStore(formData: FormData) {
   const supabase = await createClient();
@@ -98,6 +99,10 @@ export async function createStoreOpen(formData: FormData) {
     // RLS 우회 함수 우선, 없으면 직접 insert 폴백.
     const { error: secErr } = await supabase.rpc("seed_default_sections", { p_store: created.id });
     if (secErr) await supabase.from("store_sections").insert(sampleSectionsForStore(created.id));
+    // 챗봇 기본 질문/답도 미리 채워서 "이렇게 쓰는구나" 보고 수정하게 (store-faq.sql 미실행이면 조용히 무시)
+    await supabase
+      .from("store_faqs")
+      .insert(DEFAULT_FAQS.map((f, i) => ({ store_id: created.id, question: f.question, answer: f.answer, position: i })));
   }
   revalidatePath("/dashboard", "layout");
   redirect(created?.id ? `/dashboard/${created.id}` : "/dashboard/stores");
@@ -306,7 +311,7 @@ export async function setStoreChat(formData: FormData) {
 
   const chatOn = String(formData.get("chat_on") || "") === "1";
   const styleRaw = String(formData.get("chat_style") || "designer");
-  const chatStyle = ["designer", "robot", "bear"].includes(styleRaw) ? styleRaw : "designer";
+  const chatStyle = ["designer", "robot", "bear", "modern", "pop", "pro", "cat"].includes(styleRaw) ? styleRaw : "designer";
   const greeting = String(formData.get("chat_greeting") || "").trim().slice(0, 200) || null;
   const chatName = String(formData.get("chat_name") || "").trim().slice(0, 30) || null;
 

@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { addFaq, updateFaq, deleteFaq, moveFaq, type StoreFaq } from "@/app/dashboard/[id]/faq/actions";
+import { addFaq, updateFaq, deleteFaq, moveFaq, seedDefaultFaqs, type StoreFaq } from "@/app/dashboard/[id]/faq/actions";
 
 const INPUT =
   "w-full rounded-lg border border-black/10 bg-white px-3 py-2 text-sm outline-none focus:border-violet-500 focus:ring-2 focus:ring-violet-500/25 dark:border-white/10 dark:bg-white/[0.04]";
@@ -27,6 +27,15 @@ export default function StoreFaqManager({ storeId, initial }: { storeId: string;
     setList((l) => [...l, { id: `tmp-${Date.now()}`, question: q.trim(), answer: a.trim(), position: l.length }]);
     setQ("");
     setA("");
+  }
+
+  async function seedDefaults() {
+    setErr("");
+    setBusy(true);
+    const res = await seedDefaultFaqs(storeId);
+    setBusy(false);
+    if (!res.ok) return setErr(res.error || "기본 질문 채우기 실패");
+    if (res.list) setList(res.list);
   }
 
   async function save(id: string) {
@@ -65,9 +74,15 @@ export default function StoreFaqManager({ storeId, initial }: { storeId: string;
         <input className={INPUT + " mb-2"} placeholder="질문 (예: 배송은 얼마나 걸려요?)" value={q} onChange={(e) => setQ(e.target.value)} maxLength={100} />
         <textarea className={INPUT} placeholder="답변 (예: 결제 후 2~3일 내 출고돼요.)" value={a} onChange={(e) => setA(e.target.value)} rows={2} maxLength={2000} />
         {err && <div className="mt-1.5 text-xs text-rose-500">{err}</div>}
-        <button onClick={add} disabled={busy} className="press-glow mt-2 rounded-lg bg-gradient-to-r from-violet-500 to-pink-500 px-4 py-2 text-sm font-semibold text-white shadow disabled:opacity-50">
-          ＋ 질문 추가
-        </button>
+        <div className="mt-2 flex flex-wrap gap-2">
+          <button onClick={add} disabled={busy} className="press-glow rounded-lg bg-gradient-to-r from-violet-500 to-pink-500 px-4 py-2 text-sm font-semibold text-white shadow disabled:opacity-50">
+            ＋ 질문 추가
+          </button>
+          <button onClick={seedDefaults} disabled={busy} className="rounded-lg border border-violet-400/50 px-4 py-2 text-sm font-semibold text-violet-600 transition hover:bg-violet-500/10 disabled:opacity-50 dark:text-violet-300">
+            ✨ 기본 질문 자동 채우기
+          </button>
+        </div>
+        <p className="mt-1.5 text-xs text-neutral-400">‘기본 질문 자동 채우기’를 누르면 배송·교환·입금 등 자주 묻는 질문이 예시로 들어와요. 보고 고쳐 쓰세요.</p>
       </div>
 
       {/* 목록 */}

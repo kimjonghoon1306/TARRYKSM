@@ -3,7 +3,7 @@
 import { useState, useEffect } from "react";
 import { BotAvatar, BOT_THEMES, type BotStyle } from "@/components/StoreBot";
 
-const STYLES: BotStyle[] = ["designer", "robot", "bear"];
+const STYLES: BotStyle[] = ["designer", "robot", "bear", "modern", "pop", "pro", "cat"];
 
 // 챗봇 모양 고르기 + 켜기/끄기 + 이름 + 인사말. 저장은 부모 form의 SaveButton.
 export default function BotStylePicker({

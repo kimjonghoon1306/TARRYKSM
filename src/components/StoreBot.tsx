@@ -3,13 +3,17 @@
 import { useState, useEffect, useRef } from "react";
 
 export type StoreFaqItem = { id: string; question: string; answer: string };
-export type BotStyle = "designer" | "robot" | "bear";
+export type BotStyle = "designer" | "robot" | "bear" | "modern" | "pop" | "pro" | "cat";
 
-// 3가지 챗봇 모양 — 색 테마 + 캐릭터. 스킨 분위기에 맞춰 사장님이 고름.
+// 챗봇 모양 — 색 테마 + 캐릭터. 스킨 분위기에 맞춰 사장님이 고름.
 export const BOT_THEMES: Record<BotStyle, { name: string; emoji: string; from: string; to: string; ink: string }> = {
   designer: { name: "디자이너", emoji: "🎨", from: "#7c6dff", to: "#ff6ec7", ink: "#fff" },
   robot: { name: "로봇", emoji: "🤖", from: "#22d3ee", to: "#3b82f6", ink: "#fff" },
   bear: { name: "곰돌이", emoji: "🐻", from: "#f7b955", to: "#fb7185", ink: "#3a2a12" },
+  modern: { name: "모던", emoji: "⬛", from: "#64748b", to: "#0f172a", ink: "#fff" },
+  pop: { name: "톡톡팝", emoji: "✨", from: "#ff6ec7", to: "#ffd23f", ink: "#5b1d4a" },
+  pro: { name: "전문상담", emoji: "🎧", from: "#38bdf8", to: "#1e3a8a", ink: "#fff" },
+  cat: { name: "고양이", emoji: "🐱", from: "#c4b5fd", to: "#f9a8d4", ink: "#4a2a5a" },
 };
 
 export function BotAvatar({ style, size = 40, talking = false }: { style: BotStyle; size?: number; talking?: boolean }) {
@@ -71,6 +75,92 @@ export function BotAvatar({ style, size = 40, talking = false }: { style: BotSty
         {/* 코 + 입 */}
         <ellipse cx="24" cy="27" rx="2.1" ry="1.5" fill="#5a3d22" />
         <path className="sb-mouth" d="M24 28.5v1.6m0 0c-1.2 1.3-3 1-3.6-.2m3.6.2c1.2 1.3 3 1 3.6-.2" fill="none" stroke="#5a3d22" strokeWidth="1.2" strokeLinecap="round" />
+      </svg>
+    );
+  }
+  if (style === "modern") {
+    return (
+      <svg width={size} height={size} viewBox="0 0 48 48" aria-hidden className={cls}>
+        <defs><linearGradient id={gid} x1="0" y1="0" x2="1" y2="1"><stop offset="0" stopColor={t.from} /><stop offset="1" stopColor={t.to} /></linearGradient></defs>
+        <circle cx="24" cy="24" r="24" fill={`url(#${gid})`} />
+        {/* 미니멀 라운드 페이스 */}
+        <rect x="13" y="13" width="22" height="22" rx="11" fill="#f8fafc" />
+        {/* 가는 선 눈 */}
+        <g className="sb-eyes" stroke="#0f172a" strokeWidth="2.2" strokeLinecap="round">
+          <line x1="19" y1="22.5" x2="19" y2="25.5" /><line x1="29" y1="22.5" x2="29" y2="25.5" />
+        </g>
+        {/* 미니멀 미소 */}
+        <path className="sb-mouth" d="M20 29.5c1.5 1.3 6.5 1.3 8 0" fill="none" stroke="#0f172a" strokeWidth="1.8" strokeLinecap="round" />
+        {/* 포인트 점 */}
+        <circle cx="31.5" cy="16.5" r="1.5" fill={t.from} />
+      </svg>
+    );
+  }
+  if (style === "pop") {
+    return (
+      <svg width={size} height={size} viewBox="0 0 48 48" aria-hidden className={cls}>
+        <defs><linearGradient id={gid} x1="0" y1="0" x2="1" y2="1"><stop offset="0" stopColor={t.from} /><stop offset="1" stopColor={t.to} /></linearGradient></defs>
+        <circle cx="24" cy="24" r="24" fill={`url(#${gid})`} />
+        <circle cx="24" cy="24.5" r="13" fill="#fffaf0" />
+        {/* 큰 반짝 눈 */}
+        <g className="sb-eyes" fill="#7c2d12">
+          <circle cx="19" cy="22.5" r="3.1" /><circle cx="29" cy="22.5" r="3.1" />
+          <circle cx="20.1" cy="21.3" r="1" fill="#fff" /><circle cx="30.1" cy="21.3" r="1" fill="#fff" />
+        </g>
+        {/* 활짝 웃음 */}
+        <path className="sb-mouth" d="M18.5 27.5c2.2 4 8.8 4 11 0" fill="none" stroke="#e11d48" strokeWidth="2.2" strokeLinecap="round" />
+        {/* 볼터치 */}
+        <circle cx="14.5" cy="27" r="2" fill="#fb7185" opacity="0.6" /><circle cx="33.5" cy="27" r="2" fill="#fb7185" opacity="0.6" />
+        {/* 별 반짝 */}
+        <path d="M34 13l1 2.4 2.4 1-2.4 1-1 2.4-1-2.4-2.4-1 2.4-1z" fill="#ffd23f" stroke="#f59e0b" strokeWidth="0.4" />
+      </svg>
+    );
+  }
+  if (style === "pro") {
+    return (
+      <svg width={size} height={size} viewBox="0 0 48 48" aria-hidden className={cls}>
+        <defs><linearGradient id={gid} x1="0" y1="0" x2="1" y2="1"><stop offset="0" stopColor={t.from} /><stop offset="1" stopColor={t.to} /></linearGradient></defs>
+        <circle cx="24" cy="24" r="24" fill={`url(#${gid})`} />
+        {/* 얼굴 */}
+        <circle cx="24" cy="25" r="12" fill="#ffe3cf" />
+        {/* 단정한 머리 */}
+        <path d="M12.5 23c0-7 5.5-11.5 11.5-11.5S35.5 16 35.5 23c-3-2.2-7-3.2-11.5-3.2S15.5 20.8 12.5 23z" fill="#2f2a3a" />
+        {/* 헤드셋 밴드 */}
+        <path d="M12 25a12 12 0 0 1 24 0" fill="none" stroke="#0f172a" strokeWidth="2.2" strokeLinecap="round" />
+        {/* 이어컵 */}
+        <rect x="10" y="24" width="4" height="6.5" rx="2" fill="#0f172a" />
+        <rect x="34" y="24" width="4" height="6.5" rx="2" fill="#0f172a" />
+        {/* 마이크 붐 */}
+        <path d="M12.5 30c-1 3.2 1.2 5.2 4.2 5.6" fill="none" stroke="#0f172a" strokeWidth="1.6" strokeLinecap="round" />
+        <circle cx="17.2" cy="35.7" r="1.5" fill="#0f172a" />
+        {/* 눈 */}
+        <g className="sb-eyes" fill="#1e293b"><circle cx="20" cy="24.5" r="1.5" /><circle cx="28" cy="24.5" r="1.5" /></g>
+        {/* 자신감 미소 */}
+        <path className="sb-mouth" d="M20.5 28.5c1.6 1.4 5.4 1.4 7 0" fill="none" stroke="#b06a45" strokeWidth="1.6" strokeLinecap="round" />
+      </svg>
+    );
+  }
+  if (style === "cat") {
+    return (
+      <svg width={size} height={size} viewBox="0 0 48 48" aria-hidden className={cls}>
+        <defs><linearGradient id={gid} x1="0" y1="0" x2="1" y2="1"><stop offset="0" stopColor={t.from} /><stop offset="1" stopColor={t.to} /></linearGradient></defs>
+        <circle cx="24" cy="24" r="24" fill={`url(#${gid})`} />
+        {/* 귀 */}
+        <path d="M13 19L15 9l6.5 6z" fill="#f3d4a6" /><path d="M16 16.5l-.6-4 3 2.6z" fill="#f7a8b8" />
+        <path d="M35 19L33 9l-6.5 6z" fill="#f3d4a6" /><path d="M32 16.5l.6-4-3 2.6z" fill="#f7a8b8" />
+        {/* 얼굴 */}
+        <circle cx="24" cy="25" r="12.5" fill="#f6d9ad" />
+        {/* 눈 */}
+        <g className="sb-eyes" fill="#3a2a12"><circle cx="19.5" cy="24" r="1.9" /><circle cx="28.5" cy="24" r="1.9" /></g>
+        {/* 코 */}
+        <path d="M24 27.2l-1.5 1.3h3z" fill="#e8788a" />
+        {/* 입 */}
+        <path className="sb-mouth" d="M24 28.5v1m0 0c-.9 1.1-2.2 1-2.9 0m2.9 0c.9 1.1 2.2 1 2.9 0" fill="none" stroke="#6b4423" strokeWidth="1.1" strokeLinecap="round" />
+        {/* 수염 */}
+        <g stroke="#b89b6e" strokeWidth="0.8" strokeLinecap="round">
+          <line x1="9.5" y1="25.5" x2="16.5" y2="26" /><line x1="9.5" y1="28.5" x2="16.5" y2="27.6" />
+          <line x1="38.5" y1="25.5" x2="31.5" y2="26" /><line x1="38.5" y1="28.5" x2="31.5" y2="27.6" />
+        </g>
       </svg>
     );
   }
