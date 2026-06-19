@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect, useRef } from "react";
 
 /* 온봇 — AI 키 없이 클릭으로 답하는 디자이너 도우미.
    프로그램 사용법·전체 기능·도메인 연결을 카테고리별 Q&A로 안내. */
@@ -328,10 +328,10 @@ const CATS: Cat[] = [
   },
 ];
 
-function DesignerAvatar({ size = 40 }: { size?: number }) {
-  // 디자이너 캐릭터: 베레모 + 둥근 안경 + 미소
+function DesignerAvatar({ size = 40, talking = false }: { size?: number; talking?: boolean }) {
+  // 디자이너 캐릭터: 베레모 + 둥근 안경 + 미소 (눈 깜빡임·말하기 애니메이션)
   return (
-    <svg width={size} height={size} viewBox="0 0 48 48" aria-hidden>
+    <svg width={size} height={size} viewBox="0 0 48 48" aria-hidden className={talking ? "onbot-av talking" : "onbot-av"}>
       <defs>
         <linearGradient id="onbot-g" x1="0" y1="0" x2="1" y2="1">
           <stop offset="0" stopColor="#7c6dff" />
@@ -350,9 +350,50 @@ function DesignerAvatar({ size = 40 }: { size?: number }) {
         <circle cx="28.5" cy="25" r="3.2" />
         <path d="M22.7 25h2.6" />
       </g>
-      {/* 미소 */}
-      <path d="M20 30.5c1.6 1.8 6.4 1.8 8 0" fill="none" stroke="#c0694a" strokeWidth="1.6" strokeLinecap="round" />
+      {/* 눈동자 (깜빡임) */}
+      <g className="onbot-eyes" fill="#2a2350">
+        <circle cx="19.5" cy="25" r="1.1" />
+        <circle cx="28.5" cy="25" r="1.1" />
+      </g>
+      {/* 볼터치 */}
+      <g fill="#ff9bd0" opacity="0.55">
+        <circle cx="15.5" cy="29" r="1.8" />
+        <circle cx="32.5" cy="29" r="1.8" />
+      </g>
+      {/* 입 (말할 땐 오므렸다 폈다) */}
+      <path className="onbot-mouth" d="M20 30.5c1.6 1.8 6.4 1.8 8 0" fill="none" stroke="#c0694a" strokeWidth="1.6" strokeLinecap="round" />
     </svg>
+  );
+}
+
+const GREETINGS = [
+  "안녕하세요! 무엇이 궁금하세요? 👇 눌러보세요.",
+  "반가워요 🎨 오늘은 뭘 도와드릴까요?",
+  "어서오세요! 쇼핑몰 만들기, 제가 도와드릴게요 ✨",
+  "또 오셨네요! 😊 궁금한 걸 눌러보세요.",
+];
+const FOOTERS = [
+  "온봇은 도움말을 안내해요 · AI 응답 아님",
+  "💡 팁: 매주 새 기능이 추가돼요!",
+  "🍀 막히면 언제든 저를 불러주세요",
+  "🎁 ‘✨ 새 기능 & 꿀팁’도 구경해보세요",
+];
+const BUBBLES = ["도와드릴까요? 🎨", "새 기능 보러올래요? ✨", "궁금한 거 있어요? 😊"];
+// 반짝이 튀는 방향 (고정값 — 하이드레이션 안전)
+const SPARK = [
+  { e: "✨", dx: -22, dy: -18 }, { e: "⭐", dx: 20, dy: -20 }, { e: "💫", dx: -26, dy: 8 },
+  { e: "✨", dx: 24, dy: 6 }, { e: "🌟", dx: -8, dy: -28 }, { e: "💖", dx: 10, dy: -26 },
+];
+
+function Sparkles() {
+  return (
+    <span className="onbot-sparks" aria-hidden>
+      {SPARK.map((s, i) => (
+        <span key={i} style={{ ["--dx" as string]: `${s.dx}px`, ["--dy" as string]: `${s.dy}px`, animationDelay: `${i * 30}ms` }}>
+          {s.e}
+        </span>
+      ))}
+    </span>
   );
 }
 
@@ -360,7 +401,46 @@ export default function OnBot() {
   const [open, setOpen] = useState(false);
   const [cat, setCat] = useState<Cat | null>(null);
   const [qa, setQa] = useState<QA | null>(null);
+  const [typing, setTyping] = useState(false);
+  const [talking, setTalking] = useState(false);
+  const [burst, setBurst] = useState(0); // 반짝이 재생용 key
+  const [round, setRound] = useState(0); // 인사말·푸터 회전
+  const [bubble, setBubble] = useState(false); // FAB 말풍선 힌트
+  const timers = useRef<ReturnType<typeof setTimeout>[]>([]);
 
+  // 처음 입장 후 잠깐 뒤 말풍선으로 "도와드릴까요?" 띄우기 (한 번)
+  useEffect(() => {
+    const t = setTimeout(() => setBubble(true), 3500);
+    const t2 = setTimeout(() => setBubble(false), 11000);
+    return () => { clearTimeout(t); clearTimeout(t2); };
+  }, []);
+
+  useEffect(() => () => { timers.current.forEach(clearTimeout); }, []);
+
+  function talk(ms = 1500) {
+    setTalking(true);
+    setBurst((b) => b + 1);
+    const t = setTimeout(() => setTalking(false), ms);
+    timers.current.push(t);
+  }
+  function openPanel() {
+    setOpen((v) => !v);
+    setBubble(false);
+    setRound((r) => r + 1);
+    if (!open) talk(1600);
+  }
+  function pickCat(c: Cat) {
+    setCat(c);
+    setQa(null);
+    talk(1200);
+  }
+  function pickQa(it: QA) {
+    setQa(it);
+    setTyping(true);
+    talk(1800);
+    const t = setTimeout(() => setTyping(false), 600);
+    timers.current.push(t);
+  }
   function reset() {
     setCat(null);
     setQa(null);
@@ -368,35 +448,54 @@ export default function OnBot() {
 
   return (
     <>
-      {/* 플로팅 버튼 */}
-      <button
-        type="button"
-        aria-label="온봇 도우미 열기"
-        onClick={() => setOpen((v) => !v)}
-        className="onbot-fab fixed bottom-5 right-5 z-[120] flex items-center gap-2 rounded-full bg-white/90 py-1.5 pl-1.5 pr-4 shadow-xl shadow-violet-500/20 ring-1 ring-black/5 backdrop-blur transition hover:-translate-y-0.5 hover:shadow-2xl dark:bg-[#191a30]/90 dark:ring-white/10"
-      >
-        <span className="relative inline-grid place-items-center">
-          <DesignerAvatar size={38} />
-          <span className="absolute -right-0.5 -top-0.5 h-3 w-3 rounded-full border-2 border-white bg-emerald-400 dark:border-[#191a30]" />
-        </span>
-        <span className="text-sm font-bold">온봇</span>
-      </button>
+      {/* 플로팅 버튼 + 말풍선 힌트 */}
+      <div className="onbot-fab fixed bottom-5 right-5 z-[120] flex flex-col items-end gap-2">
+        {bubble && !open && (
+          <button
+            type="button"
+            onClick={openPanel}
+            className="onbot-bubble max-w-[200px] rounded-2xl rounded-br-md bg-white px-3.5 py-2 text-[13px] font-semibold text-neutral-700 shadow-xl ring-1 ring-black/5 dark:bg-[#22233e] dark:text-neutral-100 dark:ring-white/10"
+          >
+            {BUBBLES[round % BUBBLES.length]}
+          </button>
+        )}
+        <button
+          type="button"
+          aria-label="온봇 도우미 열기"
+          onClick={openPanel}
+          className="onbot-fab-btn flex items-center gap-2 rounded-full bg-white/90 py-1.5 pl-1.5 pr-4 shadow-xl shadow-violet-500/20 ring-1 ring-black/5 backdrop-blur transition hover:-translate-y-0.5 hover:shadow-2xl active:scale-95 dark:bg-[#191a30]/90 dark:ring-white/10"
+        >
+          <span className="relative inline-grid place-items-center">
+            <span className={open ? "" : "onbot-idle"}>
+              <DesignerAvatar size={38} talking={talking} />
+            </span>
+            <span className="absolute -right-0.5 -top-0.5 h-3 w-3 rounded-full border-2 border-white bg-emerald-400 dark:border-[#191a30]" />
+          </span>
+          <span className="text-sm font-bold">온봇</span>
+        </button>
+      </div>
 
       {/* 패널 */}
       {open && (
-        <div className="fixed bottom-24 right-5 z-[120] flex max-h-[70vh] w-[min(360px,92vw)] flex-col overflow-hidden rounded-3xl border border-black/10 bg-white shadow-2xl dark:border-white/12 dark:bg-[#16172b]">
+        <div className="onbot-panel fixed bottom-24 right-5 z-[120] flex max-h-[72vh] w-[min(360px,92vw)] flex-col overflow-hidden rounded-3xl border border-black/10 bg-white shadow-2xl dark:border-white/12 dark:bg-[#16172b]">
           {/* 헤더 */}
-          <div className="flex items-center gap-3 bg-gradient-to-r from-violet-500 to-pink-500 p-4 text-white">
-            <DesignerAvatar size={40} />
+          <div className="relative flex items-center gap-3 overflow-hidden bg-gradient-to-r from-violet-500 to-pink-500 p-4 text-white">
+            <span className="relative inline-grid place-items-center">
+              <DesignerAvatar size={40} talking={talking} />
+              {/* 답할 때 반짝이 튐 */}
+              <span key={burst} className="pointer-events-none absolute inset-0">
+                {talking && <Sparkles />}
+              </span>
+            </span>
             <div className="flex-1">
               <div className="text-[15px] font-extrabold leading-tight">온봇</div>
-              <div className="text-[11px] text-white/80">무한분양 디자이너 도우미</div>
+              <div className="text-[11px] text-white/80">{talking ? "온봇이 신나서 말하는 중… 🎵" : "무한분양 디자이너 도우미"}</div>
             </div>
             <button
               type="button"
               aria-label="닫기"
               onClick={() => setOpen(false)}
-              className="grid h-8 w-8 place-items-center rounded-full bg-white/20 text-sm hover:bg-white/30"
+              className="grid h-8 w-8 place-items-center rounded-full bg-white/20 text-sm transition hover:bg-white/30 active:scale-90"
             >
               ✕
             </button>
@@ -405,37 +504,39 @@ export default function OnBot() {
           {/* 본문 */}
           <div className="flex-1 overflow-auto p-4 text-sm">
             {!cat ? (
-              <>
-                <p className="mb-3 text-neutral-500 dark:text-neutral-300">
-                  안녕하세요! 무엇이 궁금하세요? 👇 눌러보세요.
-                </p>
+              <div className="onbot-pop">
+                <p className="mb-3 text-neutral-500 dark:text-neutral-300">{GREETINGS[round % GREETINGS.length]}</p>
                 <div className="grid grid-cols-2 gap-2">
-                  {CATS.map((c) => (
+                  {CATS.map((c, i) => (
                     <button
                       key={c.id}
-                      onClick={() => {
-                        setCat(c);
-                        setQa(null);
-                      }}
-                      className="flex flex-col items-start gap-1 rounded-2xl border border-black/8 bg-black/[0.02] p-3 text-left transition hover:-translate-y-0.5 hover:border-violet-400/50 dark:border-white/10 dark:bg-white/[0.03]"
+                      onClick={() => pickCat(c)}
+                      style={{ animationDelay: `${i * 45}ms` }}
+                      className="onbot-card onbot-rise flex flex-col items-start gap-1 rounded-2xl border border-black/8 bg-black/[0.02] p-3 text-left transition hover:-translate-y-0.5 hover:border-violet-400/50 hover:shadow-md hover:shadow-violet-500/10 active:scale-95 dark:border-white/10 dark:bg-white/[0.03]"
                     >
-                      <span className="text-xl">{c.icon}</span>
+                      <span className="onbot-cardicon text-xl">{c.icon}</span>
                       <span className="text-[13px] font-bold">{c.label}</span>
                     </button>
                   ))}
                 </div>
-              </>
+              </div>
             ) : qa ? (
-              <>
-                <button onClick={() => setQa(null)} className="mb-3 text-xs font-semibold text-violet-500">
+              <div className="onbot-pop">
+                <button onClick={() => setQa(null)} className="mb-3 text-xs font-semibold text-violet-500 transition active:scale-95">
                   ← {cat.label}
                 </button>
                 <div className="mb-2 font-bold">{qa.q}</div>
-                <div className="leading-relaxed text-neutral-600 dark:text-neutral-300">{qa.a}</div>
-              </>
+                {typing ? (
+                  <div className="onbot-typing flex items-center gap-1.5 py-2 text-neutral-400">
+                    <span /><span /><span />
+                  </div>
+                ) : (
+                  <div className="onbot-answer leading-relaxed text-neutral-600 dark:text-neutral-300">{qa.a}</div>
+                )}
+              </div>
             ) : (
-              <>
-                <button onClick={reset} className="mb-3 text-xs font-semibold text-violet-500">
+              <div className="onbot-pop">
+                <button onClick={reset} className="mb-3 text-xs font-semibold text-violet-500 transition active:scale-95">
                   ← 처음으로
                 </button>
                 <div className="mb-2 flex items-center gap-2 font-bold">
@@ -443,26 +544,63 @@ export default function OnBot() {
                   {cat.label}
                 </div>
                 <div className="space-y-2">
-                  {cat.items.map((it) => (
+                  {cat.items.map((it, i) => (
                     <button
                       key={it.q}
-                      onClick={() => setQa(it)}
-                      className="flex w-full items-center justify-between gap-2 rounded-xl border border-black/8 bg-black/[0.02] px-3 py-2.5 text-left text-[13px] font-medium transition hover:border-violet-400/50 dark:border-white/10 dark:bg-white/[0.03]"
+                      onClick={() => pickQa(it)}
+                      style={{ animationDelay: `${i * 40}ms` }}
+                      className="onbot-q onbot-rise group flex w-full items-center justify-between gap-2 rounded-xl border border-black/8 bg-black/[0.02] px-3 py-2.5 text-left text-[13px] font-medium transition hover:border-violet-400/50 hover:bg-violet-500/5 active:scale-[.97] dark:border-white/10 dark:bg-white/[0.03]"
                     >
                       <span>{it.q}</span>
-                      <span className="text-neutral-400">›</span>
+                      <span className="text-neutral-400 transition-transform group-hover:translate-x-1 group-hover:text-violet-500">›</span>
                     </button>
                   ))}
                 </div>
-              </>
+              </div>
             )}
           </div>
 
           <div className="border-t border-black/5 px-4 py-2.5 text-center text-[11px] text-neutral-400 dark:border-white/10">
-            온봇은 도움말을 안내해요 · AI 응답 아님
+            {FOOTERS[round % FOOTERS.length]}
           </div>
         </div>
       )}
+
+      <style jsx global>{`
+        @keyframes onbot-float { 0%,100% { transform: translateY(0); } 50% { transform: translateY(-3px); } }
+        @keyframes onbot-bob { 0%,100% { transform: translateY(0) rotate(0); } 25% { transform: translateY(-2px) rotate(-4deg); } 75% { transform: translateY(-2px) rotate(4deg); } }
+        @keyframes onbot-blink { 0%,93%,100% { transform: scaleY(1); } 96% { transform: scaleY(0.1); } }
+        @keyframes onbot-talkmouth { 0%,100% { d: path("M20 30.5c1.6 1.8 6.4 1.8 8 0"); } 50% { d: path("M20 31c1.6 0.6 6.4 0.6 8 0"); } }
+        @keyframes onbot-pop { 0% { opacity: 0; transform: translateY(6px) scale(.98); } 100% { opacity: 1; transform: none; } }
+        @keyframes onbot-rise { 0% { opacity: 0; transform: translateY(8px); } 100% { opacity: 1; transform: none; } }
+        @keyframes onbot-dot { 0%,80%,100% { transform: translateY(0); opacity: .35; } 40% { transform: translateY(-5px); opacity: 1; } }
+        @keyframes onbot-spark { 0% { transform: translate(0,0) scale(0); opacity: 0; } 25% { opacity: 1; } 100% { transform: translate(var(--dx), var(--dy)) scale(1.1); opacity: 0; } }
+        @keyframes onbot-bubble-in { 0% { opacity: 0; transform: translateY(8px) scale(.9); } 60% { transform: translateY(-2px) scale(1.03); } 100% { opacity: 1; transform: none; } }
+        @keyframes onbot-wiggle { 0%,88%,100% { transform: rotate(0); } 91% { transform: rotate(-9deg); } 94% { transform: rotate(9deg); } 97% { transform: rotate(-5deg); } }
+
+        .onbot-idle { display: inline-block; animation: onbot-float 3.2s ease-in-out infinite; }
+        .onbot-fab-btn:hover .onbot-idle { animation: onbot-wiggle 0.6s ease-in-out; }
+        .onbot-av .onbot-eyes { transform-box: fill-box; transform-origin: center; animation: onbot-blink 4.2s infinite; }
+        .onbot-av.talking { animation: onbot-bob 0.5s ease-in-out infinite; transform-origin: 24px 38px; }
+        .onbot-av.talking .onbot-mouth { animation: onbot-talkmouth 0.32s ease-in-out infinite; }
+        .onbot-pop { animation: onbot-pop .28s ease-out; }
+        .onbot-rise { animation: onbot-rise .35s ease-out both; }
+        .onbot-answer { animation: onbot-pop .3s ease-out; }
+        .onbot-bubble { animation: onbot-bubble-in .35s cubic-bezier(.34,1.56,.64,1) both; cursor: pointer; }
+        .onbot-card:hover .onbot-cardicon { transform: scale(1.25) rotate(-8deg); transition: transform .2s cubic-bezier(.34,1.56,.64,1); display: inline-block; }
+        .onbot-cardicon { transition: transform .2s; display: inline-block; }
+
+        .onbot-typing span { width: 7px; height: 7px; border-radius: 999px; background: currentColor; display: inline-block; animation: onbot-dot 1.1s infinite; }
+        .onbot-typing span:nth-child(2) { animation-delay: .15s; }
+        .onbot-typing span:nth-child(3) { animation-delay: .3s; }
+
+        .onbot-sparks { position: absolute; inset: 0; display: grid; place-items: center; }
+        .onbot-sparks span { position: absolute; font-size: 13px; animation: onbot-spark .9s ease-out forwards; }
+
+        @media (prefers-reduced-motion: reduce) {
+          .onbot-idle, .onbot-av, .onbot-av.talking, .onbot-av .onbot-eyes, .onbot-pop, .onbot-rise, .onbot-answer, .onbot-bubble, .onbot-sparks span, .onbot-typing span, .onbot-av.talking .onbot-mouth { animation: none !important; }
+        }
+      `}</style>
     </>
   );
 }
