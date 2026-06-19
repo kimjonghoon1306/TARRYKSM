@@ -105,6 +105,10 @@ type Store = {
   pay_note?: string | null;
   pay_bank_on?: boolean | null;
   points_on?: boolean | null;
+  ship_on?: boolean | null;
+  ship_fee?: number | null;
+  ship_free_over?: number | null;
+  ship_extra?: number | null;
   footer_text?: string | null;
   biz_company?: string | null;
   biz_owner?: string | null;
@@ -162,7 +166,7 @@ export default function Storefront({
   const [toast, setToast] = useState("");
   // 체크아웃(주문서)
   const [checkout, setCheckout] = useState(false);
-  const [buyer, setBuyer] = useState({ name: "", phone: "", email: "", address: "", memo: "" });
+  const [buyer, setBuyer] = useState({ name: "", phone: "", email: "", address: "", memo: "", remote: false });
   const [placing, setPlacing] = useState(false);
   const [orderErr, setOrderErr] = useState("");
   const [orderDone, setOrderDone] = useState(false);
@@ -369,7 +373,14 @@ export default function Storefront({
   const pointsAvail = customer?.points ?? 0;
   const pointsMax = Math.min(pointsAvail, afterCoupon);
   const pointsUsed = pointsEnabled ? Math.max(0, Math.min(Math.trunc(Number(pointsInput) || 0), pointsMax)) : 0;
-  const payable = afterCoupon - pointsUsed;
+  // 배송비 — 켜진 몰만. 무료배송 기준은 상품 합계(total) 기준. 도서산간 체크 시 추가비.
+  const shipOn = store.ship_on === true;
+  const shipFreeOver = store.ship_free_over || 0;
+  const shipBase = shipOn ? (shipFreeOver > 0 && total >= shipFreeOver ? 0 : store.ship_fee || 0) : 0;
+  const shipExtra = shipBase > 0 && buyer.remote ? store.ship_extra || 0 : 0;
+  const shipping = shipBase + shipExtra;
+  const freeShipGap = shipOn && shipFreeOver > 0 && total > 0 && total < shipFreeOver ? shipFreeOver - total : 0;
+  const payable = afterCoupon - pointsUsed + shipping;
 
   async function applyCoupon(codeArg?: string) {
     setCouponErr(false);
@@ -1054,7 +1065,7 @@ export default function Storefront({
                   className="sf-checkout"
                   onClick={() => {
                     setCheckout(false);
-                    setBuyer({ name: "", phone: "", email: "", address: "", memo: "" });
+                    setBuyer({ name: "", phone: "", email: "", address: "", memo: "", remote: false });
                   }}
                 >
                   쇼핑 계속하기
@@ -1072,7 +1083,7 @@ export default function Storefront({
                       <b>{won(l.unit * l.qty)}</b>
                     </div>
                   ))}
-                  {(effectDiscount > 0 || pointsUsed > 0) && (
+                  {(effectDiscount > 0 || pointsUsed > 0 || shipOn) && (
                     <>
                       <div className="sf-co-line">
                         <span>상품 합계</span>
@@ -1090,12 +1101,23 @@ export default function Storefront({
                           <b>-{won(pointsUsed)}</b>
                         </div>
                       )}
+                      {shipOn && (
+                        <div className="sf-co-line">
+                          <span>배송비{shipExtra > 0 ? " (도서산간)" : ""}</span>
+                          <b>{shipping > 0 ? won(shipping) : "무료"}</b>
+                        </div>
+                      )}
                     </>
                   )}
                   <div className="sf-co-total">
-                    <span>{effectDiscount > 0 || pointsUsed > 0 ? "결제 예정" : "합계"}</span>
+                    <span>{effectDiscount > 0 || pointsUsed > 0 || shipOn ? "결제 예정" : "합계"}</span>
                     <b>{won(payable)}</b>
                   </div>
+                  {freeShipGap > 0 && (
+                    <div className="sf-co-line" style={{ color: "var(--s-accent, #7c5cff)", fontSize: 12, justifyContent: "center" }}>
+                      🚚 {won(freeShipGap)} 더 담으면 무료배송!
+                    </div>
+                  )}
                 </div>
 
                 {/* 쿠폰 */}
@@ -1204,6 +1226,18 @@ export default function Storefront({
                   onChange={(e) => setBuyer({ ...buyer, address: e.target.value })}
                   placeholder="주소를 입력하세요"
                 />
+                {shipOn && (store.ship_extra || 0) > 0 && (
+                  <label
+                    style={{ display: "flex", alignItems: "center", gap: 8, marginTop: 10, fontSize: 13, cursor: "pointer" }}
+                  >
+                    <input
+                      type="checkbox"
+                      checked={buyer.remote}
+                      onChange={(e) => setBuyer({ ...buyer, remote: e.target.checked })}
+                    />
+                    <span>제주·도서산간 지역이에요 (배송비 +{won(store.ship_extra || 0)})</span>
+                  </label>
+                )}
                 <label className="sf-co-label">요청사항 (선택)</label>
                 <textarea
                   className="sf-co-input"

@@ -240,6 +240,36 @@ export async function setStorePoints(formData: FormData) {
   redirect(`/dashboard/${id}?ptmsg=` + encodeURIComponent("적립금 설정을 저장했어요"));
 }
 
+// 배송비 설정 — 받기 여부 + 기본 배송비 + 무료배송 기준액 + 도서산간 추가비.
+export async function setStoreShipping(formData: FormData) {
+  const supabase = await createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+  if (!user) redirect("/login");
+  const id = String(formData.get("id") || "");
+  if (!id) return;
+
+  const shipOn = String(formData.get("ship_on") || "") === "1";
+  const num = (k: string) => {
+    let n = parseInt(String(formData.get(k) || "0"), 10);
+    if (!Number.isFinite(n) || n < 0) n = 0;
+    return Math.min(10_000_000, n); // 안전 상한
+  };
+
+  await supabase
+    .from("stores")
+    .update({
+      ship_on: shipOn,
+      ship_fee: num("ship_fee"),
+      ship_free_over: num("ship_free_over"),
+      ship_extra: num("ship_extra"),
+    })
+    .eq("id", id);
+  revalidatePath(`/dashboard/${id}`);
+  redirect(`/dashboard/${id}?shmsg=` + encodeURIComponent("배송비 설정을 저장했어요"));
+}
+
 // 사업자 정보 — 쇼핑몰 하단에 표시되는 법적 의무 표시 항목
 export async function setStoreBusiness(formData: FormData) {
   const supabase = await createClient();

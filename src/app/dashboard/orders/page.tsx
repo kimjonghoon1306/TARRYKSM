@@ -13,6 +13,7 @@ type Order = {
   address: string | null;
   memo: string | null;
   total: number;
+  shipping: number | null;
   status: string;
   created_at: string;
   courier: string | null;
@@ -38,7 +39,7 @@ export default async function OrdersPage() {
     const { data, error } = await supabase
       .from("orders")
       .select(
-        "id,store_id,buyer_name,buyer_phone,buyer_email,address,memo,total,status,created_at,courier,tracking_no,stores(name,slug),order_items(id,name,price,qty)"
+        "id,store_id,buyer_name,buyer_phone,buyer_email,address,memo,total,shipping,status,created_at,courier,tracking_no,stores(name,slug),order_items(id,name,price,qty)"
       )
       .order("created_at", { ascending: false });
     if (error) tableMissing = true;
@@ -114,8 +115,14 @@ export default async function OrdersPage() {
                         <span className="tabular-nums">{won(it.price * it.qty)}</span>
                       </div>
                     ))}
+                    {(o.shipping ?? 0) > 0 && (
+                      <div className="flex justify-between gap-2 text-neutral-500">
+                        <span>배송비</span>
+                        <span className="tabular-nums">{won(o.shipping ?? 0)}</span>
+                      </div>
+                    )}
                     <div className="flex justify-between gap-2 pt-1 font-bold">
-                      <span>합계</span>
+                      <span>합계{(o.shipping ?? 0) > 0 ? " (배송비 포함)" : ""}</span>
                       <span className="tabular-nums text-violet-500">{won(o.total)}</span>
                     </div>
                   </div>

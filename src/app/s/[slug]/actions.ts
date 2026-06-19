@@ -11,6 +11,7 @@ export type CheckoutBuyer = {
   email?: string;
   address?: string;
   memo?: string;
+  remote?: boolean; // 도서산간 (추가 배송비 부과)
 };
 
 // 손님 주문 접수 (비로그인 가능). 가격은 서버에서 DB값으로 재계산(클라 값 신뢰 안 함).
@@ -118,7 +119,27 @@ export async function placeOrder(
     }
   } catch { /* 비회원 주문은 그대로 */ }
 
-  const total = afterCoupon - pointsToUse;
+  const afterPoints = afterCoupon - pointsToUse;
+
+  // 배송비 — 켜진 몰만. 무료배송 기준은 상품 합계(subtotal) 기준. 도서산간이면 추가비.
+  // (배송비 컬럼 미생성 환경에선 조회 에러→shipping 0, 하위호환)
+  let shipping = 0;
+  {
+    const { data: sh } = await supabase
+      .from("stores")
+      .select("ship_on,ship_fee,ship_free_over,ship_extra")
+      .eq("id", storeId)
+      .maybeSingle();
+    const st = sh as { ship_on?: boolean; ship_fee?: number; ship_free_over?: number; ship_extra?: number } | null;
+    if (st?.ship_on) {
+      const freeOver = st.ship_free_over || 0;
+      const base = freeOver > 0 && subtotal >= freeOver ? 0 : st.ship_fee || 0;
+      shipping = base;
+      if (base > 0 && buyer.remote) shipping += st.ship_extra || 0;
+    }
+  }
+
+  const total = afterPoints + shipping;
 
   // 할인/적립금 적용 시에만 해당 컬럼 포함 (관련 SQL 미실행 환경 하위호환)
   const orderRow: Record<string, unknown> = {
@@ -136,6 +157,7 @@ export async function placeOrder(
   }
   if (custId) orderRow.customer_id = custId;
   if (pointsToUse > 0) orderRow.points_used = pointsToUse;
+  if (shipping > 0) orderRow.shipping = shipping;
 
   // id를 미리 생성해 insert (RLS상 anon은 insert 후 되읽기(select)가 막힐 수 있어 select 생략)
   const orderId = crypto.randomUUID();

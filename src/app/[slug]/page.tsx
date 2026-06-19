@@ -47,6 +47,10 @@ type Store = {
   pay_note: string | null;
   pay_bank_on: boolean | null;
   points_on: boolean | null;
+  ship_on: boolean | null;
+  ship_fee: number | null;
+  ship_free_over: number | null;
+  ship_extra: number | null;
   footer_text: string | null;
   biz_company: string | null;
   biz_owner: string | null;
@@ -75,7 +79,7 @@ export default async function PrettyStorefront({
   const [{ data: store }, cust, wishlistIdsRaw, myCouponsRaw] = await Promise.all([
     supabase
       .from("stores")
-      .select("id,name,skin,logo_url,hero_image_url,hero_title,hero_subtitle,pay_bank,pay_note,pay_bank_on,points_on,footer_text,biz_company,biz_owner,biz_number,biz_mailorder,biz_address,biz_phone,biz_email")
+      .select("id,name,skin,logo_url,hero_image_url,hero_title,hero_subtitle,pay_bank,pay_note,pay_bank_on,points_on,ship_on,ship_fee,ship_free_over,ship_extra,footer_text,biz_company,biz_owner,biz_number,biz_mailorder,biz_address,biz_phone,biz_email")
       .eq("slug", slug)
       .eq("published", true)
       .maybeSingle(),
@@ -130,6 +134,10 @@ export default async function PrettyStorefront({
           pay_note: s.pay_note,
           pay_bank_on: s.pay_bank_on,
           points_on: s.points_on,
+          ship_on: s.ship_on,
+          ship_fee: s.ship_fee,
+          ship_free_over: s.ship_free_over,
+          ship_extra: s.ship_extra,
           footer_text: s.footer_text,
           biz_company: s.biz_company,
           biz_owner: s.biz_owner,

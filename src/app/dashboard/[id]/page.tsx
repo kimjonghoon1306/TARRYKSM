@@ -2,7 +2,7 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { domainToUnicode } from "node:url";
 import { createClient } from "@/lib/supabase/server";
-import { setStoreDomain, togglePublish, setStoreSlug, setStorePayment, setStorePoints, setStoreBusiness } from "../actions";
+import { setStoreDomain, togglePublish, setStoreSlug, setStorePayment, setStorePoints, setStoreShipping, setStoreBusiness } from "../actions";
 import { PRIMARY_DOMAIN } from "@/lib/domains";
 import DomainHelp from "@/components/DomainHelp";
 import BrandingForm from "@/components/BrandingForm";
@@ -10,6 +10,7 @@ import StorePreviewButton from "@/components/StorePreviewButton";
 import { SaveButton, SavedToast } from "@/components/SaveBar";
 import PaymentMethods from "@/components/PaymentMethods";
 import PointsSettings from "@/components/PointsSettings";
+import ShippingSettings from "@/components/ShippingSettings";
 import CategoryManager from "@/components/CategoryManager";
 import { listStoreCategories } from "./categories/actions";
 import BrandingTutorial from "@/components/BrandingTutorial";
@@ -32,6 +33,10 @@ type Store = {
   pay_vbank_on: boolean | null;
   points_on: boolean | null;
   points_rate: number | null;
+  ship_on: boolean | null;
+  ship_fee: number | null;
+  ship_free_over: number | null;
+  ship_extra: number | null;
   footer_text: string | null;
   biz_company: string | null;
   biz_owner: string | null;
@@ -47,14 +52,14 @@ export default async function StoreAdmin({
   searchParams,
 }: {
   params: Promise<{ id: string }>;
-  searchParams: Promise<{ dmsg?: string; derr?: string; smsg?: string; serr?: string; brmsg?: string; pmsg?: string; ptmsg?: string }>;
+  searchParams: Promise<{ dmsg?: string; derr?: string; smsg?: string; serr?: string; brmsg?: string; pmsg?: string; ptmsg?: string; shmsg?: string }>;
 }) {
   const { id } = await params;
-  const { dmsg, derr, smsg, serr, brmsg, pmsg, ptmsg } = await searchParams;
+  const { dmsg, derr, smsg, serr, brmsg, pmsg, ptmsg, shmsg } = await searchParams;
   const supabase = await createClient();
   const { data: store } = await supabase
     .from("stores")
-    .select("id,name,skin,slug,published,custom_domain,logo_url,hero_image_url,hero_title,hero_subtitle,pay_bank,pay_note,pay_bank_on,pay_card_on,pay_vbank_on,points_on,points_rate,footer_text,biz_company,biz_owner,biz_number,biz_mailorder,biz_address,biz_phone,biz_email")
+    .select("id,name,skin,slug,published,custom_domain,logo_url,hero_image_url,hero_title,hero_subtitle,pay_bank,pay_note,pay_bank_on,pay_card_on,pay_vbank_on,points_on,points_rate,ship_on,ship_fee,ship_free_over,ship_extra,footer_text,biz_company,biz_owner,biz_number,biz_mailorder,biz_address,biz_phone,biz_email")
     .eq("id", id)
     .maybeSingle();
   if (!store) notFound();
@@ -101,7 +106,7 @@ export default async function StoreAdmin({
 
   return (
     <div className="mx-auto max-w-4xl">
-      <SavedToast message={brmsg || pmsg || ptmsg || dmsg || smsg} />
+      <SavedToast message={brmsg || pmsg || ptmsg || shmsg || dmsg || smsg} />
       <Link href="/dashboard/stores" className="text-sm text-neutral-500 hover:text-violet-500">
         ← 쇼핑몰
       </Link>
@@ -360,6 +365,27 @@ export default async function StoreAdmin({
             (아임웹·식스샵과 동일한 방식) 지금은 무통장입금으로 주문을 받을 수 있어요.
           </p>
         </div>
+      </section>
+
+      {/* 배송비 설정 */}
+      <section className={card + " mt-4"}>
+        <h2 className="mb-1 font-semibold">🚚 배송비</h2>
+        <p className="mb-4 text-xs text-neutral-500">
+          주문할 때 더해질 배송비를 정하세요. 무료배송 기준액을 넘으면 자동으로 무료가 돼요. (끄면 배송비 없이 받아요)
+        </p>
+        {shmsg && (
+          <p className="mb-3 rounded-lg bg-emerald-500/10 px-3 py-2 text-sm text-emerald-600 dark:text-emerald-400">{shmsg}</p>
+        )}
+        <form action={setStoreShipping} className="space-y-3">
+          <input type="hidden" name="id" value={s.id} />
+          <ShippingSettings
+            on={s.ship_on === true}
+            fee={s.ship_fee ?? 3000}
+            freeOver={s.ship_free_over ?? 0}
+            extra={s.ship_extra ?? 0}
+          />
+          <SaveButton label="배송비 설정 저장" />
+        </form>
       </section>
 
       {/* 적립금 설정 */}
