@@ -48,7 +48,6 @@ type Store = {
   chat_style: string | null;
   chat_greeting: string | null;
   chat_name: string | null;
-  grades_on: boolean | null;
   footer_text: string | null;
   biz_company: string | null;
   biz_owner: string | null;
@@ -71,7 +70,7 @@ export default async function StoreAdmin({
   const supabase = await createClient();
   const { data: store } = await supabase
     .from("stores")
-    .select("id,name,skin,slug,owner,published,custom_domain,logo_url,hero_image_url,hero_title,hero_subtitle,pay_bank,pay_note,pay_bank_on,pay_card_on,pay_vbank_on,points_on,points_rate,ship_on,ship_fee,ship_free_over,ship_extra,chat_on,chat_style,chat_greeting,chat_name,grades_on,footer_text,biz_company,biz_owner,biz_number,biz_mailorder,biz_address,biz_phone,biz_email")
+    .select("id,name,skin,slug,owner,published,custom_domain,logo_url,hero_image_url,hero_title,hero_subtitle,pay_bank,pay_note,pay_bank_on,pay_card_on,pay_vbank_on,points_on,points_rate,ship_on,ship_fee,ship_free_over,ship_extra,chat_on,chat_style,chat_greeting,chat_name,footer_text,biz_company,biz_owner,biz_number,biz_mailorder,biz_address,biz_phone,biz_email")
     .eq("id", id)
     .maybeSingle();
   if (!store) notFound();
@@ -105,6 +104,12 @@ export default async function StoreAdmin({
   const storeCats = await listStoreCategories(id);
   const storeFaqs = await listStoreFaqs(id);
   const storeGrades = await listStoreGrades(id);
+  // grades_on은 grades.sql 미실행 환경에서도 안 깨지게 별도 안전 조회 (컬럼 없으면 false)
+  let gradesOn = false;
+  {
+    const { data: gr } = await supabase.from("stores").select("grades_on").eq("id", id).maybeSingle();
+    gradesOn = (gr as { grades_on?: boolean } | null)?.grades_on === true;
+  }
   // 기존 상품들이 이미 쓰는 카테고리 (관리 목록 자동 채우기용)
   const { data: catRows } = await supabase.from("products").select("category").eq("store_id", id);
   const productCats = [
@@ -457,7 +462,7 @@ export default async function StoreAdmin({
         <p className="mb-4 text-xs text-neutral-500">
           단골 손님일수록 더 좋은 혜택을! 누적 구매액에 따라 등급을 나누고 등급별 할인을 줄 수 있어요.
         </p>
-        <StoreGradeManager storeId={s.id} on={s.grades_on === true} initial={storeGrades} />
+        <StoreGradeManager storeId={s.id} on={gradesOn} initial={storeGrades} />
       </section>
 
       {/* 사업자 정보 (쇼핑몰 하단 표시) */}

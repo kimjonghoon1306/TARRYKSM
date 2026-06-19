@@ -18,7 +18,7 @@ export default async function MyPage({ params }: { params: Promise<{ slug: strin
 
   // 쇼핑몰 + 손님 정보 병렬 조회 (독립 → 순차 왕복 제거)
   const [{ data: store }, cust] = await Promise.all([
-    supabase.from("stores").select("id,name,skin,grades_on").eq("slug", slug).eq("published", true).maybeSingle(),
+    supabase.from("stores").select("id,name,skin").eq("slug", slug).eq("published", true).maybeSingle(),
     getCustomer(),
   ]);
   if (!store) notFound();
@@ -59,7 +59,8 @@ export default async function MyPage({ params }: { params: Promise<{ slug: strin
   // 회원 등급 — 등급 사용 켜진 몰에서만. 누적구매액(완료 기준) 기준 현재 등급 + 다음 등급 진행도.
   let grade: { name: string; pct: number } | null = null;
   let nextGrade: { name: string; need: number } | null = null;
-  if ((store as { grades_on?: boolean }).grades_on) {
+  const { data: g0 } = await supabase.from("stores").select("grades_on").eq("id", store.id).maybeSingle();
+  if ((g0 as { grades_on?: boolean } | null)?.grades_on) {
     const { data: c2 } = await supabase.from("customers").select("total_spent").eq("id", cust.id).maybeSingle();
     const spent = (c2 as { total_spent?: number } | null)?.total_spent ?? 0;
     const { data: gradeRows } = await supabase
