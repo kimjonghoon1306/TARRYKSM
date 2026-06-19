@@ -47,7 +47,7 @@ export default async function StorefrontPage({
   if (!store) notFound();
   const s = store as Store;
 
-  const [{ data: products }, sections, reviewsByProduct, { data: faqRows }] = await Promise.all([
+  const [{ data: products }, sections, reviewsByProduct, { data: faqRows }, { data: tg }] = await Promise.all([
     supabase
       .from("products")
       .select("id,emoji,image_url,name,brand,price,compare_at,category,description,tag,stock,options,created_at")
@@ -56,9 +56,11 @@ export default async function StorefrontPage({
     fetchSections(supabase, s.id),
     fetchReviewsByProduct(supabase, s.id),
     supabase.from("store_faqs").select("id,question,answer").eq("store_id", s.id).order("position", { ascending: true }),
+    supabase.from("stores").select("qa_on,reviews_on").eq("id", s.id).maybeSingle(),
   ]);
   const items = (products ?? []) as Product[];
   const faqs = (faqRows ?? []) as { id: string; question: string; answer: string }[];
+  const toggles = (tg ?? {}) as { qa_on?: boolean | null; reviews_on?: boolean | null };
 
   return (
     <>
@@ -78,6 +80,8 @@ export default async function StorefrontPage({
           pay_bank: s.pay_bank,
           pay_note: s.pay_note,
           pay_bank_on: s.pay_bank_on,
+          qa_on: toggles.qa_on,
+          reviews_on: toggles.reviews_on,
           footer_text: s.footer_text,
           biz_company: s.biz_company,
           biz_owner: s.biz_owner,

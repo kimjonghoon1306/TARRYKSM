@@ -333,6 +333,20 @@ export async function setStoreChat(formData: FormData) {
   redirect(`/dashboard/${id}?chmsg=` + encodeURIComponent(`챗봇 설정 저장됨 (저장된 모양: ${savedStyle})`));
 }
 
+// 상품문의(Q&A)·리뷰 켜기/끄기 토글 (qa_on/reviews_on). 컬럼명 화이트리스트로만 허용.
+export async function setStoreToggle(storeId: string, key: "qa_on" | "reviews_on", on: boolean): Promise<{ ok: boolean; error?: string }> {
+  if (key !== "qa_on" && key !== "reviews_on") return { ok: false };
+  const supabase = await createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+  if (!user) return { ok: false, error: "로그인이 필요해요." };
+  const { error } = await supabase.from("stores").update({ [key]: on }).eq("id", storeId);
+  if (error) return { ok: false, error: error.message };
+  revalidatePath(`/dashboard/${storeId}`);
+  return { ok: true };
+}
+
 // 사업자 정보 — 쇼핑몰 하단에 표시되는 법적 의무 표시 항목
 export async function setStoreBusiness(formData: FormData) {
   const supabase = await createClient();

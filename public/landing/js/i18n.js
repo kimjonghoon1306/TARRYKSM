@@ -3,7 +3,7 @@
 ════════════════════════════════════════ */
 const I18N = {
   ko:{
-    new_mall:'새 쇼핑몰', new_sub:'무제한 생성',
+    new_mall:'새 쇼핑몰', new_sub:'원클릭 제작',
     cap_build:'BUILD', cap_run:'OPERATE',
     nav_studio:'스킨 스튜디오', nav_malls:'내 쇼핑몰', nav_products:'상품',
     nav_orders:'주문', nav_customers:'고객', nav_analytics:'분석', nav_settings:'설정',
@@ -27,7 +27,7 @@ const I18N = {
     toast_made:'쇼핑몰이 생성됐어요', toast_skin:'스킨 적용:', toast_saved:'저장됐어요',
   },
   en:{
-    new_mall:'New Store', new_sub:'Unlimited',
+    new_mall:'New Store', new_sub:'One-click',
     cap_build:'BUILD', cap_run:'OPERATE',
     nav_studio:'Skin Studio', nav_malls:'My Stores', nav_products:'Products',
     nav_orders:'Orders', nav_customers:'Customers', nav_analytics:'Analytics', nav_settings:'Settings',

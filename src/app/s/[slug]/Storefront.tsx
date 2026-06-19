@@ -110,6 +110,8 @@ type Store = {
   ship_fee?: number | null;
   ship_free_over?: number | null;
   ship_extra?: number | null;
+  qa_on?: boolean | null;
+  reviews_on?: boolean | null;
   footer_text?: string | null;
   biz_company?: string | null;
   biz_owner?: string | null;
@@ -967,7 +969,8 @@ export default function Storefront({
               장바구니에 담기
             </button>
 
-            {/* 리뷰 */}
+            {/* 리뷰 (켜진 몰만) */}
+            {store.reviews_on !== false && (
             <div className="sf-reviews">
               <div className="sf-rev-head">
                 <h3>구매 후기</h3>
@@ -1034,8 +1037,10 @@ export default function Storefront({
                 </button>
               </div>
             </div>
+            )}
 
-            {/* 상품 문의 (Q&A) */}
+            {/* 상품 문의 (Q&A) (켜진 몰만) */}
+            {store.qa_on !== false && (
             <div className="sf-reviews sf-qa">
               <div className="sf-rev-head">
                 <h3>상품 문의</h3>
@@ -1099,6 +1104,7 @@ export default function Storefront({
                 </button>
               </div>
             </div>
+            )}
             {/* 연관상품 — 같은 카테고리 우선 */}
             {related.length > 0 && (
               <div className="sf-related">

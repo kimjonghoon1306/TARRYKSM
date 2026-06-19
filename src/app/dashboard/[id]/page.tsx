@@ -19,6 +19,7 @@ import { listStoreFaqs } from "./faq/actions";
 import StoreGradeManager from "@/components/StoreGradeManager";
 import { listStoreGrades } from "./grades/actions";
 import LockedFeature from "@/components/LockedFeature";
+import FeatureToggle from "@/components/FeatureToggle";
 import { getMe } from "@/lib/role";
 import { canUse, requiredPlanName } from "@/lib/plans";
 import type { BotStyle } from "@/components/StoreBot";
@@ -97,8 +98,8 @@ export default async function StoreAdmin({
     listStoreCategories(id),
     listStoreFaqs(id),
     listStoreGrades(id),
-    // grades_on은 grades.sql 미실행 환경에서도 안 깨지게 별도 안전 조회 (컬럼 없으면 false)
-    supabase.from("stores").select("grades_on").eq("id", id).maybeSingle(),
+    // grades_on·qa_on·reviews_on은 SQL 미실행 환경에서도 안 깨지게 별도 안전 조회
+    supabase.from("stores").select("grades_on,qa_on,reviews_on").eq("id", id).maybeSingle(),
     supabase.from("products").select("category").eq("store_id", id),
     getMe(),
   ]);
@@ -112,7 +113,10 @@ export default async function StoreAdmin({
     image_url: string | null;
     name: string;
   }[];
-  const gradesOn = (gr as { grades_on?: boolean } | null)?.grades_on === true;
+  const grow = (gr as { grades_on?: boolean; qa_on?: boolean; reviews_on?: boolean } | null) ?? {};
+  const gradesOn = grow.grades_on === true;
+  const qaOn = grow.qa_on !== false; // 컬럼 없거나 true면 ON
+  const reviewsOn = grow.reviews_on !== false;
   // 기존 상품들이 이미 쓰는 카테고리 (관리 목록 자동 채우기용)
   const productCats = [
     ...new Set(
@@ -346,6 +350,18 @@ export default async function StoreAdmin({
           쇼핑몰 카테고리를 직접 만들고 순서·이름을 바꾸세요. 상품 등록 시 여기서 고른 카테고리로 분류됩니다.
         </p>
         <CategoryManager storeId={s.id} initial={storeCats} productCats={productCats} />
+      </section>
+
+      {/* 손님 소통 기능 켜기/끄기 (상품문의·리뷰) */}
+      <section className={card + " mt-4"}>
+        <h2 className="mb-1 font-semibold">🗣️ 손님 후기·문의</h2>
+        <p className="mb-4 text-xs text-neutral-500">
+          손님이 상품에 남기는 <b>구매 후기</b>와 <b>상품 문의</b>를 켜거나 끌 수 있어요. 끄면 손님 화면에 안 보여요.
+        </p>
+        <div className="space-y-2">
+          <FeatureToggle storeId={s.id} toggleKey="reviews_on" on={reviewsOn} label="⭐ 구매 후기 (리뷰)" desc="켜짐 — 손님이 별점 후기를 남길 수 있어요" />
+          <FeatureToggle storeId={s.id} toggleKey="qa_on" on={qaOn} label="💬 상품 문의 (Q&A)" desc="켜짐 — 손님이 상품에 질문할 수 있어요" />
+        </div>
       </section>
 
       {/* 쇼핑몰 챗봇 (FAQ) */}

@@ -95,8 +95,8 @@ export default async function PrettyStorefront({
   if (!store) notFound();
   const s = store as Store;
 
-  // store.id 확정 후 상품/섹션/리뷰/챗봇FAQ 병렬 조회
-  const [{ data: products }, sections, reviewsByProduct, { data: faqRows }] = await Promise.all([
+  // store.id 확정 후 상품/섹션/리뷰/챗봇FAQ + 토글 병렬 조회
+  const [{ data: products }, sections, reviewsByProduct, { data: faqRows }, { data: tg }] = await Promise.all([
     supabase
       .from("products")
       .select("id,emoji,image_url,name,brand,price,compare_at,category,description,tag,stock,options,created_at")
@@ -109,9 +109,12 @@ export default async function PrettyStorefront({
       .select("id,question,answer")
       .eq("store_id", s.id)
       .order("position", { ascending: true }),
+    // qa_on/reviews_on 안전 조회 (컬럼 없으면 null → 기본 ON 취급)
+    supabase.from("stores").select("qa_on,reviews_on").eq("id", s.id).maybeSingle(),
   ]);
   const items = (products ?? []) as Product[];
   const faqs = (faqRows ?? []) as { id: string; question: string; answer: string }[];
+  const toggles = (tg ?? {}) as { qa_on?: boolean | null; reviews_on?: boolean | null };
   const customer = cust && cust.store_id === s.id ? { id: cust.id, name: cust.name, email: cust.email, points: cust.points } : null;
   const wishlistIds = customer ? wishlistIdsRaw : [];
   // 결제 화면에서 쓸 수 있는 보유 쿠폰 (미사용·유효·기간내)
@@ -162,6 +165,8 @@ export default async function PrettyStorefront({
           ship_fee: s.ship_fee,
           ship_free_over: s.ship_free_over,
           ship_extra: s.ship_extra,
+          qa_on: toggles.qa_on,
+          reviews_on: toggles.reviews_on,
           footer_text: s.footer_text,
           biz_company: s.biz_company,
           biz_owner: s.biz_owner,
