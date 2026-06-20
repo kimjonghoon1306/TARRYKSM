@@ -2,6 +2,7 @@ import { createClient } from "@/lib/supabase/server";
 import { currentUser } from "@/lib/auth";
 import OrderStatusSelect from "@/components/OrderStatusSelect";
 import ShippingForm from "@/components/ShippingForm";
+import OrderCsvButton from "@/components/OrderCsvButton";
 
 type OrderItem = { id: string; name: string; price: number; qty: number };
 type Order = {
@@ -53,8 +54,13 @@ export default async function OrdersPage() {
 
   return (
     <div className="mx-auto max-w-5xl">
-      <h1 className="text-2xl font-bold sm:text-3xl">🧾 주문</h1>
-      <p className="mt-1 text-sm text-neutral-500">고객 주문을 한 곳에서 확인하고 상태를 관리하세요.</p>
+      <div className="flex flex-wrap items-center justify-between gap-3">
+        <div>
+          <h1 className="text-2xl font-bold sm:text-3xl">🧾 주문</h1>
+          <p className="mt-1 text-sm text-neutral-500">고객 주문을 한 곳에서 확인하고 상태를 관리하세요.</p>
+        </div>
+        {user && !tableMissing && <OrderCsvButton orders={orders} />}
+      </div>
 
       {!user ? (
         <div className={card + " mt-6 text-center text-sm text-neutral-500"}>
