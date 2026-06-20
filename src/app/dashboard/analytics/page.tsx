@@ -38,10 +38,10 @@ export default async function AnalyticsPage() {
   }
 
   // 주문(매출) — RLS가 내 몰 주문만 반환. 테이블 없으면 빈 배열.
-  let orders: { total: number; status: string }[] = [];
+  let orders: { total: number; status: string; created_at?: string }[] = [];
   let items: { name: string; qty: number; price: number }[] = [];
-  const { data: oData } = await supabase.from("orders").select("total,status");
-  if (oData) orders = oData as { total: number; status: string }[];
+  const { data: oData } = await supabase.from("orders").select("total,status,created_at");
+  if (oData) orders = oData as { total: number; status: string; created_at?: string }[];
   const { data: iData } = await supabase.from("order_items").select("name,qty,price");
   if (iData) items = iData as { name: string; qty: number; price: number }[];
 
@@ -53,6 +53,25 @@ export default async function AnalyticsPage() {
   const revenue = paid.reduce((s, o) => s + (o.total || 0), 0);
   const orderCount = paid.length;
   const avgOrder = orderCount ? revenue / orderCount : 0;
+
+  // 최근 14일 일별 매출 추이 (취소 제외)
+  const DAYS = 14;
+  const today = new Date();
+  const dayKeys: string[] = [];
+  for (let i = DAYS - 1; i >= 0; i--) {
+    const d = new Date(today);
+    d.setDate(today.getDate() - i);
+    dayKeys.push(`${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`);
+  }
+  const dayRevenue = new Map<string, number>(dayKeys.map((k) => [k, 0]));
+  paid.forEach((o) => {
+    if (!o.created_at) return;
+    const d = new Date(o.created_at);
+    const k = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
+    if (dayRevenue.has(k)) dayRevenue.set(k, (dayRevenue.get(k) || 0) + (o.total || 0));
+  });
+  const dailyMax = Math.max(1, ...dayKeys.map((k) => dayRevenue.get(k) || 0));
+  const last14Revenue = dayKeys.reduce((s, k) => s + (dayRevenue.get(k) || 0), 0);
 
   // 인기 상품 (실제 판매 수량)
   const sold = new Map<string, { qty: number; amt: number }>();
@@ -133,6 +152,31 @@ export default async function AnalyticsPage() {
           <div className="mt-1 text-xs text-neutral-500">전체 상품</div>
         </div>
       </div>
+
+      {/* 최근 14일 매출 추이 */}
+      <section className={card + " mt-6"}>
+        <div className="mb-4 flex flex-wrap items-baseline justify-between gap-2">
+          <h2 className="text-lg font-semibold">📊 최근 14일 매출 추이</h2>
+          <span className="text-sm text-neutral-500">합계 <b className="text-violet-500">{won(last14Revenue)}</b></span>
+        </div>
+        {last14Revenue === 0 ? (
+          <p className="text-sm text-neutral-400">최근 14일 매출이 없어요. 주문(완료/접수)이 들어오면 일별로 표시돼요.</p>
+        ) : (
+          <div className="flex items-end gap-1.5" style={{ height: 160 }}>
+            {dayKeys.map((k) => {
+              const v = dayRevenue.get(k) || 0;
+              const h = Math.round((v / dailyMax) * 130);
+              const dd = k.slice(5).replace("-", "/");
+              return (
+                <div key={k} className="flex flex-1 flex-col items-center justify-end gap-1" title={`${dd} · ${won(v)}`}>
+                  <div className="w-full rounded-t bg-gradient-to-t from-violet-500 to-pink-500" style={{ height: Math.max(2, h) }} />
+                  <span className="text-[9px] text-neutral-400">{dd.slice(-2)}</span>
+                </div>
+              );
+            })}
+          </div>
+        )}
+      </section>
 
       {/* 인기 상품 (실판매) */}
       <section className={card + " mt-6"}>
