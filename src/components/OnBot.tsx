@@ -650,7 +650,7 @@ export default function OnBot() {
             </span>
             <div className="flex-1">
               <div className="text-[15px] font-extrabold leading-tight">온봇</div>
-              <div className="text-[11px] text-white/80">{talking ? "온봇이 신나서 말하는 중… 🎵" : "무한분양 디자이너 도우미"}</div>
+              <div className="text-[11px] text-white/80">{talking ? "온봇이 신나서 말하는 중… 🎵" : "퍼스널 쇼핑몰 디자이너 도우미"}</div>
             </div>
             <button
               type="button"

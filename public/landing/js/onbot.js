@@ -101,7 +101,7 @@
       panel = document.createElement("div");
       panel.className = "ob-panel";
       panel.innerHTML =
-        '<div class="ob-head">' + av(40) + '<div><b>온봇</b><i>무한분양 디자이너 도우미</i></div><button class="ob-x" aria-label="닫기">✕</button></div>' +
+        '<div class="ob-head">' + av(40) + '<div><b>온봇</b><i>퍼스널 쇼핑몰 디자이너 도우미</i></div><button class="ob-x" aria-label="닫기">✕</button></div>' +
         '<div class="ob-body"></div>' +
         '<div class="ob-foot">온봇은 도움말을 안내해요 · AI 응답 아님</div>';
       document.body.appendChild(panel);

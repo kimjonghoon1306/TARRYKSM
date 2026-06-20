@@ -2,7 +2,7 @@ import { ImageResponse } from "next/og";
 
 export const size = { width: 1200, height: 630 };
 export const contentType = "image/png";
-export const alt = "ONJONGIL — 무한분양 · 쇼핑몰 빌더";
+export const alt = "ONJONGIL — 퍼스널 쇼핑몰 빌더";
 
 // 링크 공유(카톡·트위터·페북) 미리보기 이미지
 export default function OG() {
@@ -48,7 +48,7 @@ export default function OG() {
           <div style={{ fontSize: 72, fontWeight: 800, letterSpacing: -2 }}>ONJONGIL</div>
         </div>
         <div style={{ fontSize: 40, fontWeight: 700, opacity: 0.96 }}>
-          하나의 브랜드를, 무한히 분양하다
+          나만의 퍼스널 쇼핑몰
         </div>
         <div style={{ fontSize: 26, opacity: 0.6, marginTop: 14 }}>
           클릭 한 번으로 만드는 나만의 쇼핑몰

@@ -14,18 +14,18 @@ const geistMono = Geist_Mono({
 
 export const metadata: Metadata = {
   metadataBase: new URL("https://on.xn--zk5biyyw.com"),
-  title: "ONJONGIL — 하나의 브랜드를, 무한히 분양하다",
-  description: "클릭 한 번으로 만드는 나만의 쇼핑몰. ONJONGIL 쇼핑몰 빌더.",
+  title: "ONJONGIL — 퍼스널 쇼핑몰",
+  description: "클릭 한 번으로 만드는 나만의 퍼스널 쇼핑몰. ONJONGIL 쇼핑몰 빌더.",
   openGraph: {
-    title: "ONJONGIL — 하나의 브랜드를, 무한히 분양하다",
-    description: "클릭 한 번으로 만드는 나만의 쇼핑몰.",
+    title: "ONJONGIL — 퍼스널 쇼핑몰",
+    description: "클릭 한 번으로 만드는 나만의 퍼스널 쇼핑몰.",
     siteName: "ONJONGIL",
     type: "website",
   },
   twitter: {
     card: "summary_large_image",
-    title: "ONJONGIL — 무한분양",
-    description: "클릭 한 번으로 만드는 나만의 쇼핑몰.",
+    title: "ONJONGIL — 퍼스널 쇼핑몰",
+    description: "클릭 한 번으로 만드는 나만의 퍼스널 쇼핑몰.",
   },
 };
 
