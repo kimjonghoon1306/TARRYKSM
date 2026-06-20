@@ -1,14 +1,16 @@
 /* ════════════════════════════════════════
-   cinema.js — 시네마틱 대문 컨트롤러 (6씬 · 씬당 타이머 · 자동전환)
-   0 로고 · 1 골격 · 2 상품 · 3 360°스킨 · 4 무한분양 · 5 피날레
+   cinema.js — 시네마틱 대문 컨트롤러 (7씬 스토리 · 씬당 타이머 · 자동전환)
+   0 고민Hook · 1 브랜드공개 · 2 5분데모 · 3 스킨/증식 · 4 원클릭변환 · 5 기능 · 6 CTA
+   (Claude 디자인모드 Story 7씬을 단축 이식 + 기존 매장증식 흡수)
 ════════════════════════════════════════ */
 const CINE = [
-  { key:'logo',     d:3500 },
-  { key:'build',    d:3500 },
-  { key:'fill',     d:3500 },
-  { key:'spin',     d:3500 },
-  { key:'multiply', d:3500 },
-  { key:'finale',   d:4500 },
+  { key:'hook',      d:4000 },
+  { key:'brand',     d:4000 },
+  { key:'demo',      d:7000 },
+  { key:'skins',     d:7000 },
+  { key:'transform', d:6500 },
+  { key:'features',  d:5000 },
+  { key:'cta',       d:5000 },
 ];
 let cineIdx = 0;
 let cineTimer = null;
@@ -98,12 +100,6 @@ function cineGo(i){
   cineIdx = i;
 
   document.querySelectorAll('#cineScenes .scene').forEach((s,k)=> s.classList.toggle('on', k===i));
-
-  // 씬1~3는 공유 빌드 스테이지의 상태를 바꿈
-  const stage = document.getElementById('cineStore');
-  const state = {1:'build', 2:'fill', 3:'spin'}[i];
-  stage.className = state ? `cine-store-stage show ${state}` : 'cine-store-stage';
-
   updateCineProgress(i);
 
   const dur = CINE[i].d;
