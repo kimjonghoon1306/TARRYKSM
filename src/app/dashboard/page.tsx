@@ -1,6 +1,8 @@
 import Link from "next/link";
 import { createClient } from "@/lib/supabase/server";
 import { currentUser } from "@/lib/auth";
+import { getMe } from "@/lib/role";
+import { fetchPlanDates, planStatus } from "@/lib/subscription";
 import { SKINS } from "@/lib/skins";
 import { PRIMARY_DOMAIN } from "@/lib/domains";
 import { fetchActiveAnnouncements } from "@/lib/announcements";
@@ -47,6 +49,11 @@ export default async function Overview({
   // 플랫폼 공지 (활성만)
   const announcements = user ? await fetchActiveAnnouncements(supabase, 3) : [];
 
+  // 구독 사용기간 — 창업자에게 본문 상단에도 크게(모바일에선 사이드바 배너가 안 보여서)
+  const me = user ? await getMe() : null;
+  const sub =
+    me?.role === "founder" && user ? planStatus((await fetchPlanDates(supabase, user.id)).plan_until) : null;
+
   const card =
     "rounded-2xl border border-black/5 bg-white p-5 shadow-sm dark:border-white/10 dark:bg-white/[0.03]";
 
@@ -60,6 +67,31 @@ export default async function Overview({
     <div className="mx-auto max-w-5xl">
       <h1 className="text-2xl font-bold sm:text-3xl">대시보드</h1>
       <p className="mt-1 text-sm text-neutral-500">모든 쇼핑몰을 여기서 만들고 · 수정하고 · 관리하세요</p>
+
+      {/* 구독 사용기간 — 가장 잘 보이는 본문 상단 (창업자만, 만료/임박이면 강조) */}
+      {sub?.set && (
+        <div
+          className={
+            "mt-4 flex flex-wrap items-center gap-2 rounded-xl border px-4 py-3 text-sm " +
+            (sub.expired
+              ? "border-rose-400/50 bg-rose-500/10 text-rose-600 dark:text-rose-300"
+              : (sub.days ?? 0) <= 7
+                ? "border-amber-400/50 bg-amber-400/10 text-amber-700 dark:text-amber-300"
+                : "border-emerald-400/50 bg-emerald-500/10 text-emerald-700 dark:text-emerald-300")
+          }
+        >
+          <span className="text-lg">📅</span>
+          {sub.expired ? (
+            <span className="font-bold">
+              구독 사용 기간이 만료되었습니다 — 쇼핑몰이 잠겨 손님이 볼 수 없어요. 갱신이 필요합니다.
+            </span>
+          ) : (
+            <span className="font-semibold">
+              구독 사용 기간: <b>{sub.label}</b>까지 · {sub.days}일 남음
+            </span>
+          )}
+        </div>
+      )}
 
       {/* 플랫폼 공지 배너 */}
       {announcements.length > 0 && (

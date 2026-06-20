@@ -4,6 +4,7 @@ import { fetchSections } from "@/lib/sections";
 import { fetchReviewsByProduct } from "@/lib/reviews";
 import Storefront, { type Product } from "./Storefront";
 import StoreBot, { type BotStyle } from "@/components/StoreBot";
+import StoreLocked from "@/components/StoreLocked";
 
 type Store = {
   id: string;
@@ -46,6 +47,10 @@ export default async function StorefrontPage({
     .maybeSingle();
   if (!store) notFound();
   const s = store as Store;
+
+  // 🔒 구독 만료 시 손님 화면 잠금
+  const { data: locked } = await supabase.rpc("is_store_locked", { p_store: s.id });
+  if (locked === true) return <StoreLocked name={s.name} />;
 
   const [{ data: products }, sections, reviewsByProduct, { data: faqRows }, { data: tg }] = await Promise.all([
     supabase

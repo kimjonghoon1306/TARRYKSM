@@ -26,19 +26,40 @@ export async function setUserPlan(userId: string, plan: "free" | "basic" | "pro"
   revalidatePath("/dashboard/platform");
 }
 
-// 구독: "오늘 결제 완료" → 오늘부터 한 달 자동 계산(plan_until). 만료일도 오늘+1개월.
-export async function markPlanPaidNow(userId: string): Promise<{ ok: boolean; error?: string }> {
+// 구독: "결제 완료" → 요금제 등급(plan)을 함께 지정하고 오늘부터 한 달(plan_until) 자동 계산.
+// 등급 없이 날짜만 붙는 문제 방지 — 결제는 항상 등급+기간이 한 묶음.
+export async function markPlanPaidNow(
+  userId: string,
+  plan: "basic" | "pro" | "premium"
+): Promise<{ ok: boolean; error?: string }> {
   if (!(await assertAdmin())) return { ok: false, error: "권한이 없습니다" };
+  if (!["basic", "pro", "premium"].includes(plan)) return { ok: false, error: "요금제를 선택해 주세요." };
   const supabase = await createClient();
   const now = new Date();
   const until = new Date(now);
   until.setMonth(until.getMonth() + 1); // 한 달 뒤
   const { error } = await supabase
     .from("profiles")
-    .update({ plan_paid_at: now.toISOString(), plan_until: until.toISOString() })
+    .update({ plan, plan_paid_at: now.toISOString(), plan_until: until.toISOString() })
     .eq("id", userId);
   if (error) return { ok: false, error: "subscription-dates.sql 실행이 필요해요. (" + error.message + ")" };
   revalidatePath("/dashboard/platform");
+  revalidatePath("/dashboard/platform/" + userId);
+  revalidatePath("/dashboard", "layout");
+  return { ok: true };
+}
+
+// 구독 해지 → 무료로 전환하고 사용기간 제거(쇼핑몰 잠금 해제 위해 plan_until null).
+export async function cancelPlan(userId: string): Promise<{ ok: boolean; error?: string }> {
+  if (!(await assertAdmin())) return { ok: false, error: "권한이 없습니다" };
+  const supabase = await createClient();
+  const { error } = await supabase
+    .from("profiles")
+    .update({ plan: "free", plan_paid_at: null, plan_until: null })
+    .eq("id", userId);
+  if (error) return { ok: false, error: error.message };
+  revalidatePath("/dashboard/platform");
+  revalidatePath("/dashboard/platform/" + userId);
   revalidatePath("/dashboard", "layout");
   return { ok: true };
 }

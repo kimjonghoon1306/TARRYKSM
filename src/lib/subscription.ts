@@ -41,6 +41,9 @@ export async function fetchPlanDates(
   }
 }
 
+// 쇼핑몰 잠금 판정은 손님(anon)이 profiles를 못 읽으므로 RPC(is_store_locked, SECURITY DEFINER)로 처리.
+// → supabase/store-lock.sql, 스토어프런트 page.tsx에서 supabase.rpc("is_store_locked", { p_store }).
+
 // 여러 회원의 만료일 맵(안전 조회) — 회원관리 표 배지용
 export async function fetchPlanUntilMap(supabase: SupabaseClient): Promise<Map<string, string | null>> {
   try {

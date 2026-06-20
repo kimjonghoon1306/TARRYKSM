@@ -6,6 +6,7 @@ import { fetchReviewsByProduct } from "@/lib/reviews";
 import Storefront, { type Product } from "../s/[slug]/Storefront";
 import StoreBot, { type BotStyle } from "@/components/StoreBot";
 import StorePromo from "@/components/StorePromo";
+import StoreLocked from "@/components/StoreLocked";
 import RestockPopup from "@/components/RestockPopup";
 import { getCustomer, getWishlistIds, getMyCoupons, getMyRestock, getMyAddresses } from "./customer-actions";
 
@@ -108,6 +109,10 @@ export default async function PrettyStorefront({
   ]);
   if (!store) notFound();
   const s = store as Store;
+
+  // 🔒 구독 만료 시 손님 화면 잠금 (주인 plan_until 만료 → is_store_locked RPC)
+  const { data: locked } = await supabase.rpc("is_store_locked", { p_store: s.id });
+  if (locked === true) return <StoreLocked name={s.name} />;
 
   // store.id 확정 후 상품/섹션/리뷰/챗봇FAQ + 토글 병렬 조회
   const [{ data: products }, sections, reviewsByProduct, { data: faqRows }, { data: tg }] = await Promise.all([

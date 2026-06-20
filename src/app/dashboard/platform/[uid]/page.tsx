@@ -100,7 +100,7 @@ export default async function MemberDetail({ params }: { params: Promise<{ uid: 
       {/* 구독 사용 기간 — 창업자만(관리자는 무제한) */}
       {role === "founder" && (
         <div className="mt-6">
-          <SubscriptionControls userId={uid} until={planDates.plan_until} />
+          <SubscriptionControls userId={uid} until={planDates.plan_until} plan={profile?.plan || "free"} />
         </div>
       )}
 
