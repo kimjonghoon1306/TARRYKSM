@@ -4,13 +4,13 @@
    (Claude 디자인모드 Story 7씬을 단축 이식 + 기존 매장증식 흡수)
 ════════════════════════════════════════ */
 const CINE = [
-  { key:'hook',      d:6000 },
-  { key:'brand',     d:4500 },
-  { key:'demo',      d:7000 },
-  { key:'skins',     d:7000 },
-  { key:'transform', d:6500 },
-  { key:'features',  d:5000 },
-  { key:'cta',       d:5000 },
+  { key:'hook',      d:5500 },
+  { key:'brand',     d:4000 },
+  { key:'demo',      d:5500 },
+  { key:'skins',     d:5500 },
+  { key:'transform', d:5000 },
+  { key:'features',  d:4000 },
+  { key:'cta',       d:4000 },
 ];
 let cineIdx = 0;
 let cineTimer = null;
