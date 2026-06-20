@@ -23,7 +23,7 @@ export const PLANS: Record<Plan, PlanInfo> = {
     name: "베이직",
     price: 29000,
     maxStores: 2,
-    features: ["쇼핑몰 2개", "무료 기능 전체", "🏷️ 할인가/정가", "🎟️ 쿠폰", "💰 적립금", "🌐 커스텀 도메인", "📈 매출·분석"],
+    features: ["쇼핑몰 2개", "무료 기능 전체", "🏷️ 할인가/정가", "🎟️ 쿠폰", "💰 적립금", "🔔 재입고 알림", "🌐 커스텀 도메인", "📈 매출·분석"],
     highlight: true,
   },
   pro: {
@@ -60,7 +60,8 @@ export type Feature =
   | "domain"       // 커스텀 도메인
   | "analytics"    // 매출·분석
   | "grades"       // 회원 등급(VIP)
-  | "bulk";        // 상품 대량 등록(엑셀/CSV)
+  | "bulk"         // 상품 대량 등록(엑셀/CSV)
+  | "restock";     // 재입고 알림
 
 export const FEATURE_MIN: Record<Feature, Plan> = {
   compare_at: "basic",
@@ -70,6 +71,7 @@ export const FEATURE_MIN: Record<Feature, Plan> = {
   analytics: "basic",
   grades: "pro",
   bulk: "pro",
+  restock: "basic",
 };
 
 // 현재 plan으로 이 기능을 쓸 수 있는지 (admin은 항상 가능)

@@ -5,6 +5,7 @@ import { markRestockNotified, deleteRestock } from "@/app/dashboard/restock/acti
 
 export type DashRestock = {
   id: string;
+  product_id: string;
   contact: string;
   notified: boolean;
   created_at: string;
