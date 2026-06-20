@@ -79,7 +79,7 @@ export default async function PlatformPage() {
           href="/dashboard/platform/settlements"
           className="rounded-xl border border-black/10 px-4 py-2.5 text-sm font-semibold transition hover:border-violet-500 dark:border-white/15"
         >
-          💰 정산
+          📊 쇼핑몰 매출
         </Link>
         <Link
           href="/?studio=1"
