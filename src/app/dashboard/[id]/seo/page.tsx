@@ -25,11 +25,11 @@ export default async function SeoPage({
   const { data: store } = await supabase.from("stores").select("id,name,slug,owner").eq("id", id).maybeSingle();
   if (!store) notFound();
   const s = store as { id: string; name: string; slug: string; owner: string | null };
-  // 멀티테넌트 격리
+  // 멀티테넌트 격리 (운영자는 모든 몰 허용)
   const guard = await currentUser();
-  if (!guard || s.owner !== guard.id) notFound();
-
   const me = await getMe();
+  if (!guard || (s.owner !== guard.id && me.role !== "admin")) notFound();
+
   const canSeo = canUse("analytics", me.plan, me.role);
 
   // SEO 필드 안전 조회 (seo.sql 미실행이면 컬럼 없음)

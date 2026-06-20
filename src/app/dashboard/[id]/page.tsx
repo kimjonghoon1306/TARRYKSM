@@ -83,8 +83,12 @@ export default async function StoreAdmin({
   const s = store as Store;
 
   // ⚠️ 멀티테넌트 격리: 내 소유 몰이 아니면 접근 차단 (발행몰이면 RLS read로 타인이 URL로 열 수 있어 가드 필요)
+  // 단, 운영자(role==='admin')는 모든 몰을 관리할 수 있다(전체 관리 → 관리 대시보드).
   const guard = await currentUser();
-  if (!guard || s.owner !== guard.id) notFound();
+  const viewer = await getMe(); // React cache라 아래 Promise.all의 getMe()와 동일(추가 왕복 없음)
+  const isAdminViewer = viewer.role === "admin";
+  const notMine = !guard || s.owner !== guard.id;
+  if (!guard || (notMine && !isAdminViewer)) notFound();
 
   // store 확정 후 나머지 조회는 전부 병렬(서로 독립) — 순차 왕복 9회 → 1라운드로 단축
   const [
@@ -142,6 +146,15 @@ export default async function StoreAdmin({
 
   return (
     <div className="mx-auto max-w-4xl">
+      {/* 운영자 모드: 남의 몰을 관리 중일 때 명확히 경고 */}
+      {isAdminViewer && notMine && (
+        <div className="mb-3 flex flex-wrap items-center gap-2 rounded-xl border border-rose-400/50 bg-rose-500/10 px-4 py-2.5 text-sm font-semibold text-rose-600 dark:text-rose-300">
+          <span>👑 운영자 모드 — 다른 회원의 쇼핑몰을 관리 중입니다. 변경 시 즉시 적용돼요.</span>
+          <Link href="/dashboard/platform" className="ml-auto underline hover:no-underline">
+            전체 관리로 ↩
+          </Link>
+        </div>
+      )}
       <SavedToast message={brmsg || pmsg || ptmsg || shmsg || chmsg || dmsg || smsg} />
       {cherr && (
         <p className="mb-3 rounded-lg bg-rose-500/10 px-3 py-2 text-sm text-rose-600 dark:text-rose-400">{cherr}</p>
