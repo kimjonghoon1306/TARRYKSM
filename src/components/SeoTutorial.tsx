@@ -163,10 +163,10 @@ export default function SeoTutorial({ slug }: { slug?: string }) {
 
           {/* 우: 구글 검색결과 미리보기가 채워지는 모션 */}
           <div className="order-1 mx-auto w-full max-w-[340px] sm:order-2">
-            <div className="overflow-hidden rounded-2xl border border-black/10 bg-white shadow-lg dark:border-white/10 dark:bg-neutral-950">
-              <div className="flex items-center gap-2 border-b border-black/5 px-4 py-3 dark:border-white/10">
+            <div className="overflow-hidden rounded-2xl border-2 border-black/10 bg-white shadow-xl ring-1 ring-black/5 dark:border-white/15 dark:bg-neutral-900 dark:ring-white/10">
+              <div className="flex items-center gap-2 border-b border-black/10 bg-black/[0.02] px-4 py-3 dark:border-white/10 dark:bg-white/[0.04]">
                 <span className="text-base">🔍</span>
-                <div className="flex-1 rounded-full bg-black/[0.05] px-3 py-1.5 text-xs text-neutral-500 dark:bg-white/[0.08]">제철 과일 산지직송</div>
+                <div className="flex-1 rounded-full bg-white px-3 py-1.5 text-xs text-neutral-600 shadow-sm ring-1 ring-black/5 dark:bg-white/[0.08] dark:text-neutral-300 dark:ring-white/10">제철 과일 산지직송</div>
               </div>
               <div className="p-4">
                 <div className="text-[11px] text-neutral-500 dark:text-neutral-400">on.온종일.com › {slug || "myshop"}</div>
@@ -197,6 +197,41 @@ export default function SeoTutorial({ slug }: { slug?: string }) {
             <p className="mt-2 text-center text-[11px] text-neutral-400">
               {step === 4 ? "검색에 이렇게 노출돼요" : "검색 결과 미리보기"}
             </p>
+
+            {/* 우측 빈 공간 — 서치콘솔 등록 상세 가이드 */}
+            <div className="mt-4 space-y-3">
+              {/* 구글 */}
+              <div className="rounded-2xl border border-black/10 bg-white p-4 shadow-sm dark:border-white/10 dark:bg-white/[0.03]">
+                <div className="mb-2 flex items-center gap-2 text-sm font-bold">
+                  <span className="grid h-6 w-6 place-items-center rounded-md bg-[#4285F4] text-xs font-black text-white">G</span>
+                  구글에 등록하는 법
+                </div>
+                <ol className="space-y-1.5 text-[12.5px] leading-relaxed text-neutral-600 dark:text-neutral-300">
+                  <li><b>①</b> 위 <b>‘구글 서치콘솔 등록’</b> 버튼 클릭 → 구글 계정 로그인.</li>
+                  <li><b>②</b> <b>‘속성 추가’ → ‘URL 접두어’</b>에 <code className="rounded bg-black/[0.05] px-1 dark:bg-white/10">{`https://on.온종일.com/${slug || "myshop"}`}</code> 입력.</li>
+                  <li><b>③</b> 소유권 확인이 뜨면 <b>‘HTML 태그’</b> 방식 안내대로 진행(대부분 자동 인식).</li>
+                  <li><b>④</b> 왼쪽 메뉴 <b>‘Sitemaps(사이트맵)’</b> → 위 <b>복사한 주소</b> 붙여넣고 <b>제출</b>.</li>
+                  <li><b>⑤</b> “성공" 뜨면 끝! 며칠 내 구글 검색에 노출돼요.</li>
+                </ol>
+              </div>
+              {/* 네이버 */}
+              <div className="rounded-2xl border border-black/10 bg-white p-4 shadow-sm dark:border-white/10 dark:bg-white/[0.03]">
+                <div className="mb-2 flex items-center gap-2 text-sm font-bold">
+                  <span className="grid h-6 w-6 place-items-center rounded-md bg-[#03C75A] text-xs font-black text-white">N</span>
+                  네이버에 등록하는 법
+                </div>
+                <ol className="space-y-1.5 text-[12.5px] leading-relaxed text-neutral-600 dark:text-neutral-300">
+                  <li><b>①</b> 위 <b>‘네이버 서치어드바이저 등록’</b> 버튼 클릭 → 네이버 로그인.</li>
+                  <li><b>②</b> <b>‘웹마스터 도구’ → 사이트 등록</b>에 내 쇼핑몰 주소 입력.</li>
+                  <li><b>③</b> 소유 확인(HTML 태그/파일) 안내대로 진행.</li>
+                  <li><b>④</b> <b>‘요청 → 사이트맵 제출’</b>에 위 <b>복사한 주소</b> 붙여넣고 확인.</li>
+                  <li><b>⑤</b> 등록되면 네이버 검색에도 노출돼요.</li>
+                </ol>
+              </div>
+              <p className="rounded-xl bg-amber-50/70 px-3 py-2 text-[11.5px] leading-relaxed text-amber-700 dark:bg-amber-400/[0.08] dark:text-amber-300">
+                💡 어렵게 느껴지면 <b>사이트맵 주소(위 ‘복사’)</b>만 각 사이트의 <b>‘사이트맵 제출’</b> 칸에 붙여넣어도 절반은 끝나요. 한 번만 해두면 계속 자동이에요.
+              </p>
+            </div>
           </div>
         </div>
       )}
