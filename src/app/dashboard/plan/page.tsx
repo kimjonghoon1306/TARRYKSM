@@ -1,11 +1,11 @@
 import { createClient } from "@/lib/supabase/server";
-import { getMe } from "@/lib/role";
+import { getActor } from "@/lib/actor";
 import { PLANS, PLAN_ORDER, planOf } from "@/lib/plans";
 
 const won = (n: number) => "₩" + n.toLocaleString("ko-KR");
 
 export default async function PlanPage() {
-  const me = await getMe();
+  const me = await getActor(); // 시크릿 입장 시 그 창업자의 요금제로 보임(관리자는 그냥 들여다봄)
   const supabase = await createClient();
   let storeCount = 0;
   if (me.userId) {

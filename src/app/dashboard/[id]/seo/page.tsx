@@ -3,6 +3,7 @@ import { notFound } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { currentUser } from "@/lib/auth";
 import { getMe } from "@/lib/role";
+import { getActor } from "@/lib/actor";
 import { canUse, requiredPlanName } from "@/lib/plans";
 import { setStoreSeo } from "../../actions";
 import { SaveButton, SavedToast } from "@/components/SaveBar";
@@ -27,10 +28,11 @@ export default async function SeoPage({
   const s = store as { id: string; name: string; slug: string; owner: string | null };
   // 멀티테넌트 격리 (운영자는 모든 몰 허용)
   const guard = await currentUser();
-  const me = await getMe();
+  const me = await getMe(); // 가드(진짜 관리자 권한)
   if (!guard || (s.owner !== guard.id && me.role !== "admin")) notFound();
 
-  const canSeo = canUse("analytics", me.plan, me.role);
+  const actor = await getActor(); // 잠금 표시는 보는 대상(창업자) 기준
+  const canSeo = canUse("analytics", actor.plan, actor.role);
 
   // SEO 필드 안전 조회 (seo.sql 미실행이면 컬럼 없음)
   let seo: { seo_title?: string | null; seo_desc?: string | null; seo_keywords?: string | null; seo_noindex?: boolean | null } = {};

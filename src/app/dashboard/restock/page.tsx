@@ -1,6 +1,5 @@
 import { createClient } from "@/lib/supabase/server";
-import { currentUser } from "@/lib/auth";
-import { getMe } from "@/lib/role";
+import { getActor } from "@/lib/actor";
 import { canUse, requiredPlanName } from "@/lib/plans";
 import { type DashRestock } from "@/components/RestockItem";
 import RestockGroup from "@/components/RestockGroup";
@@ -10,8 +9,8 @@ export const dynamic = "force-dynamic";
 
 export default async function RestockPage() {
   const supabase = await createClient();
-  const user = await currentUser();
-  const me = await getMe();
+  const me = await getActor();
+  const user = me.userId ? { id: me.userId } : null;
   const allowed = canUse("restock", me.plan, me.role);
 
   let rows: DashRestock[] = [];

@@ -6,7 +6,7 @@ import { listStoreCategories } from "../../categories/actions";
 import OptionsEditor from "@/components/OptionsEditor";
 import ProductImagePicker from "@/components/ProductImagePicker";
 import PriceInput from "@/components/PriceInput";
-import { getMe } from "@/lib/role";
+import { getActor } from "@/lib/actor";
 import { canUse, requiredPlanName } from "@/lib/plans";
 
 type Product = {
@@ -45,7 +45,7 @@ export default async function EditProduct({
     .maybeSingle();
   if (!data) notFound();
   const p = data as Product;
-  const me = await getMe();
+  const me = await getActor();
   const canCompareAt = canUse("compare_at", me.plan, me.role);
 
   // 몰에서 만든 카테고리(있으면) + 현재 상품 카테고리 보존

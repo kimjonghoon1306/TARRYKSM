@@ -4,7 +4,7 @@ import { createClient } from "@/lib/supabase/server";
 import CouponManager, { type Coupon } from "@/components/CouponManager";
 import AutoCouponSettings from "@/components/AutoCouponSettings";
 import LockedFeature from "@/components/LockedFeature";
-import { getMe } from "@/lib/role";
+import { getActor } from "@/lib/actor";
 import { canUse, requiredPlanName } from "@/lib/plans";
 
 export default async function CouponsPage({ params }: { params: Promise<{ id: string }> }) {
@@ -14,7 +14,7 @@ export default async function CouponsPage({ params }: { params: Promise<{ id: st
   const { data: store } = await supabase.from("stores").select("id,name").eq("id", id).maybeSingle();
   if (!store) notFound();
 
-  const me = await getMe();
+  const me = await getActor();
   const allowed = canUse("coupon", me.plan, me.role);
 
   let coupons: Coupon[] = [];

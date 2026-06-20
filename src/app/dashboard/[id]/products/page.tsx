@@ -5,7 +5,7 @@ import { deleteProduct } from "./actions";
 import ProductForm from "@/components/ProductForm";
 import BulkUpload from "@/components/BulkUpload";
 import { listStoreCategories } from "../categories/actions";
-import { getMe } from "@/lib/role";
+import { getActor } from "@/lib/actor";
 import { canUse, requiredPlanName } from "@/lib/plans";
 
 type Store = { id: string; name: string; slug: string; skin: string };
@@ -48,7 +48,7 @@ export default async function ProductsAdmin({
   const items = (products ?? []) as Product[];
 
   const storeCats = (await listStoreCategories(id)).map((c) => c.name);
-  const me = await getMe();
+  const me = await getActor();
   const canCompareAt = canUse("compare_at", me.plan, me.role);
   const canBulk = canUse("bulk", me.plan, me.role);
 
