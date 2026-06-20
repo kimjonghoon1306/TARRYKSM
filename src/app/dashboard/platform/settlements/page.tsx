@@ -6,6 +6,8 @@ import { PRIMARY_DOMAIN } from "@/lib/domains";
 
 // 플랫폼은 결제 대금을 대신 받지 않음(각 창업자 PG로 직접 입금) → 수수료/정산 개념 없음.
 // 이 탭은 쇼핑몰별 실시간 매출 현황을 보여준다.
+// 확정 매출 = 결제 확인(처리중) 이상만 집계. 신규(미확정)·취소/환불은 실시간 제외.
+const CONFIRMED = new Set(["처리중", "배송중", "완료"]);
 const won = (n: number) => "₩" + Math.round(n).toLocaleString("ko-KR");
 
 type Store = { id: string; name: string; slug: string; owner: string | null };
@@ -55,8 +57,8 @@ export default async function StoreRevenuePage() {
     const row = byStore.get(o.store_id);
     if (!row) continue;
     row.orders += 1;
-    if (o.status === "신규") row.newOrders += 1;
-    if (o.status !== "취소") row.gmv += o.total || 0;
+    if (o.status === "신규") row.newOrders += 1; // 미확정(결제 대기)
+    if (CONFIRMED.has(o.status)) row.gmv += o.total || 0; // 확정 매출만
   }
 
   const rows = Array.from(byStore.values()).sort((a, b) => b.gmv - a.gmv);
@@ -78,13 +80,13 @@ export default async function StoreRevenuePage() {
         </span>
       </div>
       <p className="mt-1 text-sm text-neutral-500">
-        쇼핑몰별 실시간 매출 현황입니다. (취소 주문 제외)
+        쇼핑몰별 실시간 확정 매출입니다. 결제 확인(처리중) 이상만 집계하고, 신규(미확정)·취소/환불은 제외합니다.
       </p>
 
       {/* 합계 */}
       <div className="mt-6 grid grid-cols-3 gap-3">
         <div className={card}>
-          <div className="text-xs text-neutral-500">총 거래액</div>
+          <div className="text-xs text-neutral-500">총 확정 매출</div>
           <div className="mt-1 text-xl font-bold text-violet-500 sm:text-2xl">{won(totalGmv)}</div>
         </div>
         <div className={card}>
@@ -111,8 +113,8 @@ export default async function StoreRevenuePage() {
                 <th className="px-4 py-3 font-semibold">쇼핑몰</th>
                 <th className="px-4 py-3 font-semibold">창업자</th>
                 <th className="px-4 py-3 text-right font-semibold">주문</th>
-                <th className="px-4 py-3 text-right font-semibold">신규</th>
-                <th className="px-4 py-3 text-right font-semibold">매출</th>
+                <th className="px-4 py-3 text-right font-semibold">대기</th>
+                <th className="px-4 py-3 text-right font-semibold">확정 매출</th>
               </tr>
             </thead>
             <tbody>

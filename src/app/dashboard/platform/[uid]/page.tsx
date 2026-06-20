@@ -4,6 +4,8 @@ import { createClient } from "@/lib/supabase/server";
 import { getMe } from "@/lib/role";
 import { PRIMARY_DOMAIN } from "@/lib/domains";
 import { planOf } from "@/lib/plans";
+import { fetchPlanDates } from "@/lib/subscription";
+import SubscriptionControls from "@/components/SubscriptionControls";
 
 const won = (n: number) => "₩" + n.toLocaleString("ko-KR");
 function fmt(d: string) {
@@ -43,6 +45,7 @@ export default async function MemberDetail({ params }: { params: Promise<{ uid: 
 
   const role = profile?.role === "admin" ? "admin" : "founder";
   const plan = planOf(role, profile?.plan || "free");
+  const planDates = await fetchPlanDates(supabase, uid);
 
   const card =
     "rounded-2xl border border-black/5 bg-white p-5 shadow-sm dark:border-white/10 dark:bg-white/[0.03]";
@@ -93,6 +96,13 @@ export default async function MemberDetail({ params }: { params: Promise<{ uid: 
           <div className="mt-1 text-2xl font-bold text-violet-500">{won(gmv)}</div>
         </div>
       </div>
+
+      {/* 구독 사용 기간 — 창업자만(관리자는 무제한) */}
+      {role === "founder" && (
+        <div className="mt-6">
+          <SubscriptionControls userId={uid} until={planDates.plan_until} />
+        </div>
+      )}
 
       {/* 몰 목록 */}
       <h2 className="mb-3 mt-8 text-lg font-semibold">쇼핑몰 ({stores.length})</h2>

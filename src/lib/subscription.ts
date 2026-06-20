@@ -1,0 +1,53 @@
+// 구독(사용 기간) 헬퍼 — profiles.plan_paid_at / plan_until
+// plan_until 컬럼이 없을 수 있어(subscription-dates.sql 미실행) 조회는 전부 안전 폴백.
+import type { SupabaseClient } from "@supabase/supabase-js";
+
+export function fmtDate(d: string | Date): string {
+  const t = typeof d === "string" ? new Date(d) : d;
+  return `${t.getFullYear()}.${String(t.getMonth() + 1).padStart(2, "0")}.${String(t.getDate()).padStart(2, "0")}`;
+}
+
+export type PlanStatus = {
+  set: boolean; // 만료일이 지정돼 있는지
+  until: string | null;
+  label: string; // 만료일 표기 or "미설정"
+  days: number | null; // 남은 일수(음수=만료 지남)
+  expired: boolean;
+};
+
+export function planStatus(until?: string | null): PlanStatus {
+  if (!until) return { set: false, until: null, label: "미설정", days: null, expired: false };
+  const end = new Date(until);
+  const now = new Date();
+  const days = Math.ceil((end.getTime() - now.getTime()) / 86400000);
+  return { set: true, until, label: fmtDate(end), days, expired: days < 0 };
+}
+
+// 한 회원의 구독 정보(안전 조회)
+export async function fetchPlanDates(
+  supabase: SupabaseClient,
+  userId: string
+): Promise<{ plan_paid_at: string | null; plan_until: string | null }> {
+  try {
+    const { data, error } = await supabase
+      .from("profiles")
+      .select("plan_paid_at,plan_until")
+      .eq("id", userId)
+      .maybeSingle();
+    if (error || !data) return { plan_paid_at: null, plan_until: null };
+    return data as { plan_paid_at: string | null; plan_until: string | null };
+  } catch {
+    return { plan_paid_at: null, plan_until: null };
+  }
+}
+
+// 여러 회원의 만료일 맵(안전 조회) — 회원관리 표 배지용
+export async function fetchPlanUntilMap(supabase: SupabaseClient): Promise<Map<string, string | null>> {
+  try {
+    const { data, error } = await supabase.from("profiles").select("id,plan_until");
+    if (error || !data) return new Map();
+    return new Map((data as { id: string; plan_until: string | null }[]).map((r) => [r.id, r.plan_until]));
+  } catch {
+    return new Map();
+  }
+}

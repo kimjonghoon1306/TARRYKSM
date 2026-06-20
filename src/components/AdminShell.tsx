@@ -5,6 +5,7 @@ import { usePathname, useRouter } from "next/navigation";
 import { useRef, useState } from "react";
 import ThemeToggle from "./ThemeToggle";
 import { signout } from "@/app/auth/actions";
+import { planStatus } from "@/lib/subscription";
 
 type Role = "admin" | "founder";
 
@@ -27,13 +28,16 @@ export default function AdminShell({
   email,
   role = "founder",
   unread = 0,
+  planUntil = null,
   children,
 }: {
   email: string | null;
   role?: Role;
   unread?: number;
+  planUntil?: string | null;
   children: React.ReactNode;
 }) {
+  const sub = planStatus(planUntil);
   const path = usePathname();
   const router = useRouter();
   const [open, setOpen] = useState(false);
@@ -90,6 +94,37 @@ export default function AdminShell({
       >
         {isAdmin ? "👑 플랫폼 관리자" : "🏪 창업자"}
       </div>
+
+      {/* 구독 사용 기간 — 창업자에게 가장 잘 보이게(만료일/남은일) */}
+      {!isAdmin && sub.set && (
+        <div
+          className={
+            "mt-3 rounded-xl border px-3 py-2 " +
+            (sub.expired
+              ? "border-rose-400/40 bg-rose-500/10"
+              : (sub.days ?? 0) <= 7
+                ? "border-amber-400/40 bg-amber-400/10"
+                : "border-emerald-400/40 bg-emerald-500/10")
+          }
+        >
+          <div className="text-[11px] font-semibold text-neutral-500">📅 이용 기간</div>
+          <div
+            className={
+              "text-sm font-bold " +
+              (sub.expired
+                ? "text-rose-600 dark:text-rose-300"
+                : (sub.days ?? 0) <= 7
+                  ? "text-amber-600 dark:text-amber-300"
+                  : "text-emerald-600 dark:text-emerald-300")
+            }
+          >
+            {sub.expired ? "사용 기간 만료" : `${sub.label}까지`}
+          </div>
+          <div className="text-[11px] text-neutral-500">
+            {sub.expired ? "연장 문의가 필요해요" : `${sub.days}일 남음`}
+          </div>
+        </div>
+      )}
 
       <Link
         href="/?studio=1"

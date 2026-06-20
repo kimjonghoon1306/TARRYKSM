@@ -4,6 +4,7 @@ import { createClient } from "@/lib/supabase/server";
 import { getMe } from "@/lib/role";
 import { PRIMARY_DOMAIN } from "@/lib/domains";
 import { RoleToggle, PlanToggle, StoreAdminControls, DeleteUserButton } from "@/components/PlatformControls";
+import { fetchPlanUntilMap, planStatus } from "@/lib/subscription";
 
 type Store = {
   id: string;
@@ -38,6 +39,7 @@ export default async function PlatformPage() {
   const stores = (storesData ?? []) as Store[];
   const profiles = (profilesData ?? []) as Profile[];
   const orders = (ordersData ?? []) as { store_id: string; total: number; status: string }[];
+  const planUntilMap = await fetchPlanUntilMap(supabase); // 구독 만료일(안전 조회)
 
   const admins = profiles.filter((p) => p.role === "admin").length;
   const founders = profiles.length - admins;
@@ -81,14 +83,6 @@ export default async function PlatformPage() {
         >
           📊 쇼핑몰 매출
         </Link>
-        <Link
-          href="/?studio=1"
-          target="_blank"
-          rel="noopener"
-          className="rounded-xl bg-gradient-to-r from-violet-500 to-pink-500 px-4 py-2.5 text-sm font-semibold text-white shadow-sm transition hover:brightness-105"
-        >
-          🎨 회원 스튜디오 열기 ↗
-        </Link>
       </div>
 
       {/* 지표 */}
@@ -128,6 +122,7 @@ export default async function PlatformPage() {
               <tr className="border-b border-black/5 text-left text-xs text-neutral-500 dark:border-white/10">
                 <th className="px-4 py-3 font-semibold">이메일</th>
                 <th className="px-4 py-3 text-right font-semibold">쇼핑몰</th>
+                <th className="px-4 py-3 text-right font-semibold">이용 만료</th>
                 <th className="px-4 py-3 text-right font-semibold">요금제</th>
                 <th className="px-4 py-3 text-right font-semibold">역할</th>
                 <th className="px-4 py-3 text-right font-semibold">관리</th>
@@ -144,6 +139,31 @@ export default async function PlatformPage() {
                       </Link>
                     </td>
                     <td className="px-4 py-3 text-right tabular-nums text-neutral-500">{storesByOwner.get(p.id) || 0}</td>
+                    <td className="px-4 py-3 text-right">
+                      {p.role === "admin" ? (
+                        <span className="text-xs font-semibold text-violet-500">무제한</span>
+                      ) : (
+                        (() => {
+                          const st = planStatus(planUntilMap.get(p.id));
+                          if (!st.set) return <span className="text-xs text-neutral-400">미설정</span>;
+                          return (
+                            <span
+                              className={
+                                "inline-block rounded-full px-2 py-0.5 text-[11px] font-bold " +
+                                (st.expired
+                                  ? "bg-rose-500/15 text-rose-600 dark:text-rose-300"
+                                  : (st.days ?? 0) <= 7
+                                    ? "bg-amber-500/15 text-amber-600 dark:text-amber-300"
+                                    : "bg-emerald-500/15 text-emerald-600 dark:text-emerald-300")
+                              }
+                            >
+                              {st.label}
+                              {st.expired ? " (만료)" : ` (D-${st.days})`}
+                            </span>
+                          );
+                        })()
+                      )}
+                    </td>
                     <td className="px-4 py-3 text-right">
                       <PlanToggle userId={p.id} plan={p.plan || "free"} />
                     </td>
