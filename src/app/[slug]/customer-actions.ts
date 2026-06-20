@@ -131,6 +131,34 @@ export async function getMyRestock(): Promise<MyRestock[]> {
   return (data as MyRestock[] | null) ?? [];
 }
 
+// 배송지 주소록 (마이페이지·체크아웃). addresses.sql 미실행이면 빈 배열/무시.
+export type Address = { id: string; label: string | null; recipient: string; phone: string; address: string; memo: string | null; is_default: boolean };
+export async function getMyAddresses(): Promise<Address[]> {
+  const t = (await cookies()).get(COOKIE)?.value;
+  if (!t) return [];
+  const supabase = await createClient();
+  const { data } = await supabase.rpc("my_addresses", { p_token: t });
+  return (data as Address[] | null) ?? [];
+}
+export async function addAddress(input: { label?: string; recipient: string; phone: string; address: string; memo?: string; isDefault?: boolean }): Promise<{ ok: boolean; error?: string }> {
+  const t = (await cookies()).get(COOKIE)?.value;
+  if (!t) return { ok: false, error: "로그인이 필요해요." };
+  if (!input.recipient?.trim() || !input.address?.trim()) return { ok: false, error: "받는 사람과 주소를 입력해 주세요." };
+  const supabase = await createClient();
+  const { data, error } = await supabase.rpc("add_address", {
+    p_token: t, p_label: input.label || "", p_recipient: input.recipient, p_phone: input.phone || "", p_address: input.address, p_memo: input.memo || "", p_default: !!input.isDefault,
+  });
+  if (error || data !== true) return { ok: false, error: "주소 저장에 실패했어요." };
+  return { ok: true };
+}
+export async function deleteAddress(id: string): Promise<{ ok: boolean }> {
+  const t = (await cookies()).get(COOKIE)?.value;
+  if (!t) return { ok: false };
+  const supabase = await createClient();
+  await supabase.rpc("delete_address", { p_token: t, p_id: id });
+  return { ok: true };
+}
+
 // 찜한 상품 전체정보 (마이페이지)
 export type WishItem = { id: string; name: string; price: number; image_url: string | null; emoji: string | null; category: string | null };
 export async function getWishlistProducts(): Promise<WishItem[]> {

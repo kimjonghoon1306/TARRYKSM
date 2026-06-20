@@ -7,7 +7,7 @@ import Storefront, { type Product } from "../s/[slug]/Storefront";
 import StoreBot, { type BotStyle } from "@/components/StoreBot";
 import StorePromo from "@/components/StorePromo";
 import RestockPopup from "@/components/RestockPopup";
-import { getCustomer, getWishlistIds, getMyCoupons, getMyRestock } from "./customer-actions";
+import { getCustomer, getWishlistIds, getMyCoupons, getMyRestock, getMyAddresses } from "./customer-actions";
 
 // 각 쇼핑몰 링크 공유 시: 가게 이름·로고(파비콘)·배너(미리보기 이미지)
 export async function generateMetadata({
@@ -160,11 +160,13 @@ export default async function PrettyStorefront({
 
   // 입고 완료(notified) 재입고 알림 — 로그인 손님에게 팝업으로 (restock2.sql 미실행이면 빈 배열)
   let restockReady: { id: string; name: string }[] = [];
+  let myAddresses: { id: string; label: string | null; recipient: string; phone: string; address: string; memo: string | null; is_default: boolean }[] = [];
   if (customer) {
     try {
       const mr = await getMyRestock();
       restockReady = mr.filter((r) => r.notified).map((r) => ({ id: r.product_id, name: r.product_name || "상품" }));
     } catch { /* 무시 */ }
+    try { myAddresses = await getMyAddresses(); } catch { /* 무시 */ }
   }
 
   return (
@@ -186,6 +188,7 @@ export default async function PrettyStorefront({
         myCoupons={myCoupons}
         openAuth={openAuth}
         memberGrade={memberGrade}
+        addresses={myAddresses}
         store={{
           id: s.id,
           name: s.name,

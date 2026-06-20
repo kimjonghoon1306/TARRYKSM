@@ -151,6 +151,7 @@ export default function Storefront({
   myCoupons,
   openAuth,
   memberGrade,
+  addresses,
 }: {
   store: Store;
   products: Product[];
@@ -162,6 +163,7 @@ export default function Storefront({
   myCoupons?: { code: string; kind: string; value: number; min_order: number }[];
   openAuth?: "login" | "signup";
   memberGrade?: { name: string; pct: number } | null;
+  addresses?: { id: string; label: string | null; recipient: string; phone: string; address: string; memo: string | null; is_default: boolean }[];
 }) {
   const [cart, setCart] = useState<Record<string, CartLine>>({});
   // 비로그인 손님이 마이페이지 등에서 넘어오면 로그인/회원가입 시트를 자동으로 연다
@@ -1446,6 +1448,20 @@ export default function Storefront({
                   inputMode="email"
                 />
                 <label className="sf-co-label">배송 주소 (선택)</label>
+                {addresses && addresses.length > 0 && (
+                  <div className="sf-addr-chips">
+                    {addresses.map((a) => (
+                      <button
+                        key={a.id}
+                        type="button"
+                        className="sf-addr-chip"
+                        onClick={() => setBuyer({ ...buyer, name: a.recipient || buyer.name, phone: a.phone || buyer.phone, address: a.address, memo: a.memo || buyer.memo })}
+                      >
+                        📍 {a.label || a.recipient}{a.is_default ? " · 기본" : ""}
+                      </button>
+                    ))}
+                  </div>
+                )}
                 <input
                   className="sf-co-input"
                   value={buyer.address}

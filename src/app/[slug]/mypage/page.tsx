@@ -1,7 +1,8 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
-import { getCustomer, getWishlistProducts, getMyCoupons, getMyRestock } from "../customer-actions";
+import { getCustomer, getWishlistProducts, getMyCoupons, getMyRestock, getMyAddresses } from "../customer-actions";
+import AddressBook from "@/components/AddressBook";
 import CustomerLogoutButton from "@/components/CustomerLogoutButton";
 import { trackingUrl } from "@/lib/tracking";
 
@@ -45,11 +46,12 @@ export default async function MyPage({ params }: { params: Promise<{ slug: strin
   }
 
   // 주문내역 + 찜한 상품 + 쿠폰함 + 재입고 신청 병렬 조회
-  const [{ data: orders }, wish, coupons, restock] = await Promise.all([
+  const [{ data: orders }, wish, coupons, restock, addresses] = await Promise.all([
     supabase.from("orders").select("id,total,status,created_at,courier,tracking_no").eq("customer_id", cust.id).order("created_at", { ascending: false }),
     getWishlistProducts(),
     getMyCoupons(),
     getMyRestock(),
+    getMyAddresses(),
   ]);
   const list = orders ?? [];
   const usableCoupons = coupons.filter((c) => !c.used && c.active && (!c.expires_at || new Date(c.expires_at) > new Date()));
@@ -254,6 +256,10 @@ export default async function MyPage({ params }: { params: Promise<{ slug: strin
             ))}
           </div>
         )}
+
+        {/* 배송지 주소록 */}
+        <h2 style={{ fontSize: 16, fontWeight: 800, margin: "34px 4px 14px" }}>📍 배송지 주소록</h2>
+        <AddressBook initial={addresses} />
       </div>
     </main>
   );
