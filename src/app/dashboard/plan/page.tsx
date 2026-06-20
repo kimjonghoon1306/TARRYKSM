@@ -24,8 +24,14 @@ export default async function PlanPage() {
     <div className="mx-auto max-w-5xl">
       <h1 className="text-2xl font-bold sm:text-3xl">요금제</h1>
       <p className="mt-1 text-sm text-neutral-500">
-        현재 플랜: <b className="text-violet-500">{current.name}</b> · 쇼핑몰 {storeCount}
-        {current.maxStores === Infinity ? "" : ` / ${current.maxStores}`}개 사용 중
+        {me.userId ? (
+          <>
+            현재 플랜: <b className="text-violet-500">{current.name}</b> · 쇼핑몰 {storeCount}
+            {current.maxStores === Infinity ? "" : ` / ${current.maxStores}`}개 사용 중
+          </>
+        ) : (
+          "무료로 시작해 필요할 때 업그레이드하세요."
+        )}
       </p>
 
       <div className="mt-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
