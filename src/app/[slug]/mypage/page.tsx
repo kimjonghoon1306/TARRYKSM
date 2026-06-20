@@ -80,7 +80,7 @@ export default async function MyPage({ params }: { params: Promise<{ slug: strin
   }
 
   return (
-    <main style={{ minHeight: "100vh", background: "linear-gradient(180deg,#eef0f7 0%,#f7f8fb 360px)", padding: "0 0 80px", color: "#1a1a1a" }}>
+    <main style={{ minHeight: "100vh", background: "linear-gradient(180deg,#eef0f7 0%,#f7f8fb 360px)", padding: "0 0 120px", color: "#1a1a1a" }}>
       <header style={{ display: "flex", alignItems: "center", gap: 12, padding: "16px 24px", background: "rgba(255,255,255,.8)", backdropFilter: "blur(12px)", position: "sticky", top: 0, zIndex: 10, borderBottom: "1px solid rgba(0,0,0,.05)" }}>
         <Link href={`/${slug}`} style={{ fontSize: 14, color: "#555", textDecoration: "none", fontWeight: 600 }}>← {store.name}</Link>
         <b style={{ position: "absolute", left: "50%", transform: "translateX(-50%)", fontSize: 16, color: "#1a1a1a" }}>마이페이지</b>

@@ -234,7 +234,8 @@ export default function AdminShell({
       </div>
 
       {/* 콘텐츠 */}
-      <main className="px-4 py-6 sm:px-6 lg:ml-64 lg:px-10 lg:py-10">{children}</main>
+      {/* pb 넉넉히 — 우하단 온봇이 페이지 맨 아래 내용을 가리지 않게 (특히 모바일) */}
+      <main className="px-4 py-6 pb-28 sm:px-6 lg:ml-64 lg:px-10 lg:py-10 lg:pb-28">{children}</main>
     </div>
   );
 }
