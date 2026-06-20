@@ -16,7 +16,7 @@ const I18N = {
     au_login:'🔑 로그인', au_signup:'＋ 회원가입',
     // 스튜디오 뷰
     st_eyebrow:'SKIN STUDIO', st_title:'한 번의 클릭으로 <em>브랜드 전체</em>를 바꾸다',
-    st_desc:'색·서체·라운드·무드까지 통째로 갈아입는 14가지 스킨. 같은 상품도 완전히 다른 매장이 됩니다.',
+    st_desc:'색·서체·라운드·무드까지 통째로 갈아입는 28가지 스킨. 같은 상품도 완전히 다른 매장이 됩니다.',
     st_apply:'이 스킨 적용', st_applied:'적용됨', st_gallery:'스킨 갤러리', st_gallery_sub:'카드를 누르면 위 미리보기가 바뀝니다',
     st_use:'이 스킨으로 쇼핑몰 만들기',
     ml_title:'내 쇼핑몰', ml_sub:'운영 중인 매장을 한눈에',

@@ -37,7 +37,7 @@ export default async function StoresPage() {
         <div>
           <div className="font-semibold">＋ 새 쇼핑몰 만들기</div>
           <div className="text-sm text-neutral-500">
-            스튜디오에서 14가지 스킨을 미리보며 고르고 만드세요
+            스튜디오에서 28가지 스킨을 미리보며 고르고 만드세요
           </div>
         </div>
         <span className="ml-auto text-violet-500">→</span>
