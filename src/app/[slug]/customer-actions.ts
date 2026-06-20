@@ -121,6 +121,16 @@ export async function getWishlistIds(): Promise<string[]> {
   return (data as { product_id: string }[] | null)?.map((r) => r.product_id) ?? [];
 }
 
+// 내가 신청한 재입고 알림 목록 (마이페이지). restock2.sql 미실행이면 빈 배열.
+export type MyRestock = { id: string; product_id: string; product_name: string | null; notified: boolean; created_at: string };
+export async function getMyRestock(): Promise<MyRestock[]> {
+  const t = (await cookies()).get(COOKIE)?.value;
+  if (!t) return [];
+  const supabase = await createClient();
+  const { data } = await supabase.rpc("my_restock_requests", { p_token: t });
+  return (data as MyRestock[] | null) ?? [];
+}
+
 // 찜한 상품 전체정보 (마이페이지)
 export type WishItem = { id: string; name: string; price: number; image_url: string | null; emoji: string | null; category: string | null };
 export async function getWishlistProducts(): Promise<WishItem[]> {

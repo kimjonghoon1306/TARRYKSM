@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
-import { getCustomer, getWishlistProducts, getMyCoupons } from "../customer-actions";
+import { getCustomer, getWishlistProducts, getMyCoupons, getMyRestock } from "../customer-actions";
 import CustomerLogoutButton from "@/components/CustomerLogoutButton";
 import { trackingUrl } from "@/lib/tracking";
 
@@ -44,11 +44,12 @@ export default async function MyPage({ params }: { params: Promise<{ slug: strin
     );
   }
 
-  // 주문내역 + 찜한 상품 + 쿠폰함 병렬 조회
-  const [{ data: orders }, wish, coupons] = await Promise.all([
+  // 주문내역 + 찜한 상품 + 쿠폰함 + 재입고 신청 병렬 조회
+  const [{ data: orders }, wish, coupons, restock] = await Promise.all([
     supabase.from("orders").select("id,total,status,created_at,courier,tracking_no").eq("customer_id", cust.id).order("created_at", { ascending: false }),
     getWishlistProducts(),
     getMyCoupons(),
+    getMyRestock(),
   ]);
   const list = orders ?? [];
   const usableCoupons = coupons.filter((c) => !c.used && c.active && (!c.expires_at || new Date(c.expires_at) > new Date()));
@@ -199,6 +200,26 @@ export default async function MyPage({ params }: { params: Promise<{ slug: strin
               </Link>
             ))}
           </div>
+        )}
+
+        {/* 재입고 알림 신청 */}
+        {restock.length > 0 && (
+          <>
+            <h2 style={{ fontSize: 16, fontWeight: 800, margin: "34px 4px 14px" }}>🔔 재입고 알림 신청</h2>
+            <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
+              {restock.map((r) => (
+                <div key={r.id} style={{ background: "#fff", borderRadius: 16, padding: "16px 20px", display: "flex", alignItems: "center", justifyContent: "space-between", gap: 10, boxShadow: "0 8px 24px -20px rgba(0,0,0,.3)" }}>
+                  <div>
+                    <div style={{ fontWeight: 700, fontSize: 14.5 }}>{r.product_name || "상품"}</div>
+                    <div style={{ fontSize: 12, color: "#6b7280", marginTop: 3 }}>{fmt(r.created_at)} 신청</div>
+                  </div>
+                  <span style={{ fontSize: 12, fontWeight: 700, padding: "6px 14px", borderRadius: 999, background: r.notified ? "#dcfce7" : "#fef3c7", color: r.notified ? "#16a34a" : "#b45309" }}>
+                    {r.notified ? "재입고 연락됨" : "알림 대기중"}
+                  </span>
+                </div>
+              ))}
+            </div>
+          </>
         )}
 
         {/* 주문 내역 */}
