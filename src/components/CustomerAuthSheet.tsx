@@ -26,6 +26,7 @@ export default function CustomerAuthSheet({
   const [err, setErr] = useState("");
   const [busy, setBusy] = useState(false);
   const [isDesktop, setIsDesktop] = useState(false);
+  const [agree, setAgree] = useState(false); // 약관·개인정보 수집 동의 (회원가입 필수)
 
   useEffect(() => {
     const mq = window.matchMedia("(min-width: 641px)");
@@ -38,6 +39,7 @@ export default function CustomerAuthSheet({
 
   async function submit() {
     setErr("");
+    if (tab === "signup" && !agree) { setErr("이용약관·개인정보 수집에 동의해 주세요."); return; }
     setBusy(true);
     try {
       const res =
@@ -128,6 +130,16 @@ export default function CustomerAuthSheet({
             <input style={inputStyle} inputMode="tel" placeholder="010-0000-0000" value={phone} onChange={(e) => setPhone(e.target.value)}
               onFocus={(e) => (e.target.style.borderColor = C.brand)} onBlur={(e) => (e.target.style.borderColor = "transparent")} />
           </div>
+        )}
+
+        {tab === "signup" && (
+          <label style={{ display: "flex", alignItems: "flex-start", gap: 8, margin: "4px 2px 12px", fontSize: 12.5, lineHeight: 1.5, color: "#555", cursor: "pointer" }}>
+            <input type="checkbox" checked={agree} onChange={(e) => setAgree(e.target.checked)} style={{ marginTop: 2, flexShrink: 0, accentColor: C.brand }} />
+            <span>
+              <a href={`/${slug}/terms`} target="_blank" rel="noopener noreferrer" style={{ color: C.brand, fontWeight: 700 }}>이용약관</a> 및{" "}
+              <a href={`/${slug}/privacy`} target="_blank" rel="noopener noreferrer" style={{ color: C.brand, fontWeight: 700 }}>개인정보 수집·이용</a>에 동의합니다. (필수)
+            </span>
+          </label>
         )}
 
         {err && <div style={{ color: "#e11d48", fontSize: 13, fontWeight: 600, margin: "2px 2px 10px" }}>{err}</div>}

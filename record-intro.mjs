@@ -8,7 +8,7 @@ import path from "node:path";
 const URL = process.env.REC_URL || "https://on.xn--zk5biyyw.com/?v=" + Date.now(); // 캐시 회피
 const OUT_DIR = path.join(os.homedir(), "Desktop");
 const W = 1920, H = 1080;
-const DURATION_MS = 42000; // 7씬 ≈ 38.5초 + 여유
+const DURATION_MS = 35500; // 7씬 ~33.5초 + 여유
 
 const tmp = fs.mkdtempSync(path.join(os.tmpdir(), "introrec-"));
 

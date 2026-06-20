@@ -47,6 +47,10 @@ export async function login(formData: FormData) {
 }
 
 export async function signup(formData: FormData) {
+  // 약관·개인정보 동의 필수 (UI required + 서버 2차 검증)
+  if (String(formData.get("agree") || "") !== "1") {
+    redirect("/signup?error=" + encodeURIComponent("이용약관·개인정보 수집에 동의해 주세요."));
+  }
   const supabase = await createClient();
   const email = String(formData.get("email") || "");
   const password = String(formData.get("password") || "");
