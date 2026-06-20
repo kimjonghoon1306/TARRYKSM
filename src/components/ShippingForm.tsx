@@ -2,6 +2,7 @@
 
 import { useState, useTransition } from "react";
 import { setShipping } from "@/app/dashboard/orders/actions";
+import { trackingUrl } from "@/lib/tracking";
 
 const COURIERS = ["CJ대한통운", "우체국택배", "한진택배", "롯데택배", "로젠택배", "직접배송", "기타"];
 
@@ -49,6 +50,16 @@ export default function ShippingForm({
       >
         {pending ? "저장중…" : saved ? "저장됨 ✓" : "송장 저장"}
       </button>
+      {trackingUrl(c, t) && (
+        <a
+          href={trackingUrl(c, t) as string}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="rounded-lg border border-violet-400/50 px-3 py-1.5 text-xs font-bold text-violet-600 transition hover:bg-violet-500/10 dark:text-violet-300"
+        >
+          🔍 배송 조회 ↗
+        </a>
+      )}
     </div>
   );
 }

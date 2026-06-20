@@ -169,13 +169,13 @@ export default function SeoTutorial({ slug }: { slug?: string }) {
                 <div className="flex-1 rounded-full bg-black/[0.05] px-3 py-1.5 text-xs text-neutral-500 dark:bg-white/[0.08]">제철 과일 산지직송</div>
               </div>
               <div className="p-4">
-                <div className="text-[11px] text-neutral-400">on.온종일.com › {slug || "myshop"}</div>
+                <div className="text-[11px] text-neutral-500 dark:text-neutral-400">on.온종일.com › {slug || "myshop"}</div>
                 {/* 제목 */}
-                <div className={"mt-1 text-[17px] font-medium leading-snug " + (show(1) ? "tut-pop in text-[#1a0dab] dark:text-[#8ab4f8]" : "text-neutral-300")}>
+                <div className={"mt-1 text-[17px] font-semibold leading-snug " + (show(1) ? "tut-pop in text-[#1a0dab] dark:text-[#8ab4f8]" : "text-neutral-500 dark:text-neutral-500")}>
                   {show(1) ? "온종일팜 — 산지직송 제철 과일" : "쇼핑몰 제목이 여기에"}
                 </div>
                 {/* 설명 */}
-                <div className={"mt-1.5 text-[13px] leading-relaxed " + (show(2) ? "tut-pop in text-neutral-600 dark:text-neutral-300" : "text-neutral-300 dark:text-neutral-600")}>
+                <div className={"mt-1.5 text-[13px] leading-relaxed " + (show(2) ? "tut-pop in text-neutral-700 dark:text-neutral-300" : "text-neutral-500 dark:text-neutral-500")}>
                   {show(2) ? "산지에서 오늘 수확한 과일·채소를 합리적인 가격에 만나보세요. 신선함을 그대로 배송합니다." : "쇼핑몰 설명이 여기에 표시돼요"}
                 </div>
                 {/* 키워드 칩 */}

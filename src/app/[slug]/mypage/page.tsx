@@ -3,6 +3,7 @@ import { notFound } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { getCustomer, getWishlistProducts, getMyCoupons } from "../customer-actions";
 import CustomerLogoutButton from "@/components/CustomerLogoutButton";
+import { trackingUrl } from "@/lib/tracking";
 
 export const dynamic = "force-dynamic";
 
@@ -45,7 +46,7 @@ export default async function MyPage({ params }: { params: Promise<{ slug: strin
 
   // 주문내역 + 찜한 상품 + 쿠폰함 병렬 조회
   const [{ data: orders }, wish, coupons] = await Promise.all([
-    supabase.from("orders").select("id,total,status,created_at").eq("customer_id", cust.id).order("created_at", { ascending: false }),
+    supabase.from("orders").select("id,total,status,created_at,courier,tracking_no").eq("customer_id", cust.id).order("created_at", { ascending: false }),
     getWishlistProducts(),
     getMyCoupons(),
   ]);
@@ -212,14 +213,22 @@ export default async function MyPage({ params }: { params: Promise<{ slug: strin
         ) : (
           <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
             {list.map((o) => (
-              <div key={o.id} style={{ background: "#fff", borderRadius: 16, padding: "18px 20px", display: "flex", alignItems: "center", justifyContent: "space-between", boxShadow: "0 8px 24px -20px rgba(0,0,0,.3)" }}>
+              <div key={o.id} style={{ background: "#fff", borderRadius: 16, padding: "18px 20px", display: "flex", alignItems: "center", justifyContent: "space-between", gap: 10, boxShadow: "0 8px 24px -20px rgba(0,0,0,.3)" }}>
                 <div>
                   <div style={{ fontWeight: 800, fontSize: 15 }}>{won(o.total)}</div>
                   <div style={{ fontSize: 12, color: "#6b7280", marginTop: 3 }}>{fmt(o.created_at)}</div>
                 </div>
-                <span style={{ fontSize: 12, fontWeight: 700, padding: "6px 14px", borderRadius: 999, background: o.status === "취소" ? "#fee2e2" : "#eef6ff", color: o.status === "취소" ? "#e11d48" : "#2563eb" }}>
-                  {o.status}
-                </span>
+                <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+                  {trackingUrl(o.courier, o.tracking_no) && (
+                    <a href={trackingUrl(o.courier, o.tracking_no) as string} target="_blank" rel="noopener noreferrer"
+                      style={{ fontSize: 12, fontWeight: 700, padding: "6px 12px", borderRadius: 999, background: "#f3f0ff", color: "#7c3aed", textDecoration: "none" }}>
+                      🚚 배송조회
+                    </a>
+                  )}
+                  <span style={{ fontSize: 12, fontWeight: 700, padding: "6px 14px", borderRadius: 999, background: o.status === "취소" ? "#fee2e2" : "#eef6ff", color: o.status === "취소" ? "#e11d48" : "#2563eb" }}>
+                    {o.status}
+                  </span>
+                </div>
               </div>
             ))}
           </div>
