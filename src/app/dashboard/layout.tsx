@@ -1,5 +1,6 @@
 import Link from "next/link";
 import AdminShell from "@/components/AdminShell";
+import ThemeToggle from "@/components/ThemeToggle";
 import OnBot from "@/components/OnBot";
 import { getMe } from "@/lib/role";
 import { createClient } from "@/lib/supabase/server";
@@ -29,6 +30,7 @@ export default async function DashboardLayout({
               <span className="text-base font-semibold tracking-tight">ONJONGIL</span>
             </Link>
             <div className="flex items-center gap-2 text-sm">
+              <ThemeToggle />
               <Link
                 href="/login"
                 className="rounded-lg border border-black/10 px-3.5 py-1.5 font-semibold hover:border-violet-500 dark:border-white/15"
