@@ -22,7 +22,9 @@ export default async function StorePreview({ params }: { params: Promise<{ id: s
     .eq("id", id)
     .maybeSingle();
   if (!store) notFound();
-  const s = store as Record<string, string | null> & { published?: boolean };
+  const s = store as Record<string, string | null> & { published?: boolean; owner?: string | null };
+  // 멀티테넌트 격리: 내 소유 몰만 미리보기 (발행몰 공개 RLS로 타인 몰 열람 방지)
+  if (s.owner !== user.id) notFound();
 
   const { data: products } = await supabase
     .from("products")

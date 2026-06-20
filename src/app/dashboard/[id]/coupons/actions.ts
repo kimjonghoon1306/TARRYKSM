@@ -2,6 +2,7 @@
 
 import { revalidatePath } from "next/cache";
 import { createClient } from "@/lib/supabase/server";
+import { ownsStore } from "@/lib/auth";
 
 export type CouponInput = {
   code: string;
@@ -26,6 +27,7 @@ export async function setAutoCoupons(storeId: string, welcome: string | null, re
 
 // 쿠폰 발급 (RLS: 몰 소유자/관리자만)
 export async function addCoupon(storeId: string, input: CouponInput) {
+  if (!(await ownsStore(storeId))) return { ok: false, error: "권한이 없어요." };
   const code = (input.code || "").trim().toUpperCase();
   if (!code) return { ok: false, error: "쿠폰 코드를 입력해 주세요." };
   if (!/^[A-Z0-9_-]{2,30}$/.test(code))
@@ -54,16 +56,19 @@ export async function addCoupon(storeId: string, input: CouponInput) {
 }
 
 export async function toggleCoupon(storeId: string, id: string, active: boolean) {
+  if (!(await ownsStore(storeId))) return { ok: false, error: "권한이 없어요." };
   const supabase = await createClient();
-  const { error } = await supabase.from("coupons").update({ active }).eq("id", id);
+  // store_id까지 일치해야 변경 (2차 방어)
+  const { error } = await supabase.from("coupons").update({ active }).eq("id", id).eq("store_id", storeId);
   if (error) return { ok: false, error: "변경에 실패했어요." };
   revalidatePath(`/dashboard/${storeId}/coupons`);
   return { ok: true };
 }
 
 export async function deleteCoupon(storeId: string, id: string) {
+  if (!(await ownsStore(storeId))) return { ok: false, error: "권한이 없어요." };
   const supabase = await createClient();
-  const { error } = await supabase.from("coupons").delete().eq("id", id);
+  const { error } = await supabase.from("coupons").delete().eq("id", id).eq("store_id", storeId);
   if (error) return { ok: false, error: "삭제에 실패했어요." };
   revalidatePath(`/dashboard/${storeId}/coupons`);
   return { ok: true };

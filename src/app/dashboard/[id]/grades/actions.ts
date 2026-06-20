@@ -2,6 +2,7 @@
 
 import { revalidatePath } from "next/cache";
 import { createClient } from "@/lib/supabase/server";
+import { ownsStore } from "@/lib/auth";
 
 export type StoreGrade = { id: string; name: string; min_spent: number; discount_pct: number; position: number };
 
@@ -22,6 +23,7 @@ export async function listStoreGrades(storeId: string): Promise<StoreGrade[]> {
 
 // 등급 사용 ON/OFF
 export async function setGradesOn(storeId: string, on: boolean): Promise<{ ok: boolean; error?: string }> {
+  if (!(await ownsStore(storeId))) return { ok: false, error: "권한이 없어요." };
   const supabase = await createClient();
   const { error } = await supabase.from("stores").update({ grades_on: on }).eq("id", storeId);
   if (error) return { ok: false, error: error.message };
@@ -30,6 +32,7 @@ export async function setGradesOn(storeId: string, on: boolean): Promise<{ ok: b
 }
 
 export async function addGrade(storeId: string, name: string, minSpent: number, discountPct: number): Promise<{ ok: boolean; error?: string }> {
+  if (!(await ownsStore(storeId))) return { ok: false, error: "권한이 없어요." };
   const n = (name || "").trim();
   if (!n) return { ok: false, error: "등급 이름을 입력해 주세요." };
   const ms = Math.max(0, Math.trunc(minSpent || 0));
@@ -42,6 +45,7 @@ export async function addGrade(storeId: string, name: string, minSpent: number, 
 }
 
 export async function updateGrade(storeId: string, id: string, name: string, minSpent: number, discountPct: number): Promise<{ ok: boolean; error?: string }> {
+  if (!(await ownsStore(storeId))) return { ok: false, error: "권한이 없어요." };
   const n = (name || "").trim();
   if (!n) return { ok: false, error: "등급 이름을 입력해 주세요." };
   const ms = Math.max(0, Math.trunc(minSpent || 0));
@@ -54,6 +58,7 @@ export async function updateGrade(storeId: string, id: string, name: string, min
 }
 
 export async function deleteGrade(storeId: string, id: string): Promise<{ ok: boolean }> {
+  if (!(await ownsStore(storeId))) return { ok: false };
   const supabase = await createClient();
   await supabase.from("store_grades").delete().eq("id", id).eq("store_id", storeId);
   rv(storeId);
@@ -62,6 +67,7 @@ export async function deleteGrade(storeId: string, id: string): Promise<{ ok: bo
 
 // 기본 등급 4단계 채우기 (이미 있으면 건너뜀)
 export async function seedDefaultGrades(storeId: string): Promise<{ ok: boolean; list?: StoreGrade[]; error?: string }> {
+  if (!(await ownsStore(storeId))) return { ok: false, error: "권한이 없어요." };
   const supabase = await createClient();
   const existing = await listStoreGrades(storeId);
   if (existing.length > 0) return { ok: true, list: existing };

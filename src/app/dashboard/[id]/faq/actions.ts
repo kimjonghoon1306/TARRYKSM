@@ -3,11 +3,13 @@
 import { revalidatePath } from "next/cache";
 import { createClient } from "@/lib/supabase/server";
 import { DEFAULT_FAQS } from "@/lib/defaultFaqs";
+import { ownsStore } from "@/lib/auth";
 
 export type StoreFaq = { id: string; question: string; answer: string; position: number };
 
 // 기본 질문 세트를 이 몰에 채우기 (이미 있는 질문은 건너뜀). 새 몰 생성 시 + 버튼에서 사용.
 export async function seedDefaultFaqs(storeId: string): Promise<{ ok: boolean; list?: StoreFaq[]; error?: string }> {
+  if (!(await ownsStore(storeId))) return { ok: false, error: "권한이 없어요." };
   const supabase = await createClient();
   const existing = await listStoreFaqs(storeId);
   const have = new Set(existing.map((f) => f.question.trim()));
@@ -38,6 +40,7 @@ export async function listStoreFaqs(storeId: string): Promise<StoreFaq[]> {
 }
 
 export async function addFaq(storeId: string, question: string, answer: string): Promise<{ ok: boolean; error?: string }> {
+  if (!(await ownsStore(storeId))) return { ok: false, error: "권한이 없어요." };
   const q = (question || "").trim();
   const a = (answer || "").trim();
   if (!q) return { ok: false, error: "질문을 입력해 주세요." };
@@ -55,6 +58,7 @@ export async function addFaq(storeId: string, question: string, answer: string):
 }
 
 export async function updateFaq(storeId: string, id: string, question: string, answer: string): Promise<{ ok: boolean; error?: string }> {
+  if (!(await ownsStore(storeId))) return { ok: false, error: "권한이 없어요." };
   const q = (question || "").trim();
   const a = (answer || "").trim();
   if (!q) return { ok: false, error: "질문을 입력해 주세요." };
@@ -67,6 +71,7 @@ export async function updateFaq(storeId: string, id: string, question: string, a
 }
 
 export async function deleteFaq(storeId: string, id: string): Promise<{ ok: boolean }> {
+  if (!(await ownsStore(storeId))) return { ok: false };
   const supabase = await createClient();
   await supabase.from("store_faqs").delete().eq("id", id).eq("store_id", storeId);
   rv(storeId);
@@ -75,6 +80,7 @@ export async function deleteFaq(storeId: string, id: string): Promise<{ ok: bool
 
 // 순서 이동 (이웃과 position 교환)
 export async function moveFaq(storeId: string, id: string, dir: -1 | 1): Promise<{ ok: boolean }> {
+  if (!(await ownsStore(storeId))) return { ok: false };
   const supabase = await createClient();
   const list = await listStoreFaqs(storeId);
   const idx = list.findIndex((c) => c.id === id);

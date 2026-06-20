@@ -2,6 +2,7 @@
 
 import { revalidatePath } from "next/cache";
 import { createClient } from "@/lib/supabase/server";
+import { ownsStore } from "@/lib/auth";
 
 export type StoreCat = { id: string; name: string; position: number };
 
@@ -22,6 +23,7 @@ function rv(storeId: string) {
 }
 
 export async function addStoreCategory(storeId: string, name: string): Promise<{ ok: boolean; error?: string }> {
+  if (!(await ownsStore(storeId))) return { ok: false, error: "권한이 없어요." };
   const n = (name || "").trim();
   if (!n) return { ok: false, error: "카테고리 이름을 입력해 주세요." };
   if (n.length > 20) return { ok: false, error: "카테고리 이름이 너무 길어요(20자 이내)." };
@@ -37,6 +39,7 @@ export async function addStoreCategory(storeId: string, name: string): Promise<{
 }
 
 export async function renameStoreCategory(storeId: string, id: string, name: string): Promise<{ ok: boolean; error?: string }> {
+  if (!(await ownsStore(storeId))) return { ok: false, error: "권한이 없어요." };
   const n = (name || "").trim();
   if (!n) return { ok: false, error: "이름을 입력해 주세요." };
   const supabase = await createClient();
@@ -54,6 +57,7 @@ export async function renameStoreCategory(storeId: string, id: string, name: str
 }
 
 export async function deleteStoreCategory(storeId: string, id: string): Promise<{ ok: boolean }> {
+  if (!(await ownsStore(storeId))) return { ok: false };
   const supabase = await createClient();
   const { data: row } = await supabase.from("store_categories").select("name").eq("id", id).eq("store_id", storeId).maybeSingle();
   const name = (row as { name?: string } | null)?.name;
@@ -107,6 +111,7 @@ export async function seedCategoriesFromProducts(storeId: string): Promise<Store
 
 // 순서 이동 (이웃과 position 교환)
 export async function moveStoreCategory(storeId: string, id: string, dir: -1 | 1): Promise<{ ok: boolean }> {
+  if (!(await ownsStore(storeId))) return { ok: false };
   const supabase = await createClient();
   const list = await listStoreCategories(storeId);
   const idx = list.findIndex((c) => c.id === id);
