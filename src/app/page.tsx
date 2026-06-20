@@ -26,9 +26,6 @@ export default function Home() {
           내 쇼핑몰
         </Link>
       </div>
-      <Link href="/pricing" className="mt-6 text-sm text-neutral-400 hover:text-violet-400">
-        💎 요금제 보기
-      </Link>
     </main>
   );
 }

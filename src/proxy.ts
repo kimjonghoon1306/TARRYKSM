@@ -72,8 +72,10 @@ export async function proxy(request: NextRequest) {
     data: { user },
   } = await supabase.auth.getUser();
 
-  // 관리자 컨트롤타워(/dashboard)는 로그인 필요
-  if (p.startsWith("/dashboard") && !user) {
+  // 관리자 컨트롤타워(/dashboard)는 로그인 필요.
+  // 단, 요금제(/dashboard/plan)는 비로그인도 둘러볼 수 있게 예외 처리.
+  const publicDash = p === "/dashboard/plan";
+  if (p.startsWith("/dashboard") && !publicDash && !user) {
     const redirectRes = NextResponse.redirect(new URL("/login", request.url));
     response.cookies.getAll().forEach((c) => redirectRes.cookies.set(c));
     return redirectRes;
