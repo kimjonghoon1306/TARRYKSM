@@ -2,7 +2,7 @@
 
 import { useEffect, useMemo, useRef, useState } from "react";
 import type { Section } from "@/lib/sections";
-import { placeOrder, submitReview, checkCoupon, listQuestions, askQuestion, type ProductQuestion } from "./actions";
+import { placeOrder, submitReview, checkCoupon, listQuestions, askQuestion, requestRestock, type ProductQuestion } from "./actions";
 import { toggleWishlist } from "@/app/[slug]/customer-actions";
 import CustomerAuthSheet from "@/components/CustomerAuthSheet";
 import "./storefront.css";
@@ -207,6 +207,11 @@ export default function Storefront({
   const [qaBusy, setQaBusy] = useState(false);
   const [qaErr, setQaErr] = useState("");
   const [qaDone, setQaDone] = useState(false);
+  // 재입고 알림 — 품절 상품 상세
+  const [restockContact, setRestockContact] = useState("");
+  const [restockBusy, setRestockBusy] = useState(false);
+  const [restockDone, setRestockDone] = useState(false);
+  const [restockErr, setRestockErr] = useState("");
   // 찜(위시리스트) — 로그인 손님만. 서버에서 받은 찜 id로 초기화, 낙관적 토글.
   const [favs, setFavs] = useState<Set<string>>(() => new Set(wishlistIds || []));
 
@@ -340,7 +345,23 @@ export default function Storefront({
     setQaSecret(false);
     setQaErr("");
     setQaDone(false);
+    // 재입고 알림 초기화
+    setRestockContact(customer?.email || "");
+    setRestockBusy(false);
+    setRestockDone(false);
+    setRestockErr("");
     listQuestions(p.id).then(setQuestions).catch(() => {});
+  }
+
+  async function postRestock() {
+    setRestockErr("");
+    if (!detail) return;
+    if (!restockContact.trim()) return setRestockErr("연락받을 이메일이나 전화번호를 입력해 주세요.");
+    setRestockBusy(true);
+    const res = await requestRestock({ storeId: store.id, productId: detail.id, contact: restockContact });
+    setRestockBusy(false);
+    if (!res.ok) return setRestockErr(res.error || "신청에 실패했어요.");
+    setRestockDone(true);
   }
 
   async function postQuestion() {
@@ -1005,6 +1026,31 @@ export default function Storefront({
             >
               {dComboSoldOut ? "품절" : "장바구니에 담기"}
             </button>
+
+            {/* 재입고 알림 — 상품 품절 또는 조합 품절일 때 */}
+            {(detail.stock === 0 || dComboSoldOut) && (
+              <div className="sf-restock">
+                {restockDone ? (
+                  <div className="sf-restock-done">🔔 재입고되면 알려드릴게요!</div>
+                ) : (
+                  <>
+                    <div className="sf-restock-title">🔔 품절됐어요 — 재입고 알림 받기</div>
+                    <div className="sf-restock-row">
+                      <input
+                        className="sf-co-input"
+                        value={restockContact}
+                        onChange={(e) => setRestockContact(e.target.value)}
+                        placeholder="이메일 또는 전화번호"
+                      />
+                      <button className="sf-restock-btn" onClick={postRestock} disabled={restockBusy}>
+                        {restockBusy ? "신청 중…" : "알림 신청"}
+                      </button>
+                    </div>
+                    {restockErr && <div className="sf-rev-err">{restockErr}</div>}
+                  </>
+                )}
+              </div>
+            )}
 
             {/* 리뷰 (켜진 몰만) */}
             {store.reviews_on !== false && (

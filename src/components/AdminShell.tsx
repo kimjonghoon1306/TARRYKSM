@@ -16,6 +16,7 @@ const NAV = [
   { href: "/dashboard/customers", label: "고객", icon: "👤" },
   { href: "/dashboard/reviews", label: "리뷰", icon: "⭐" },
   { href: "/dashboard/qa", label: "문의", icon: "💬" },
+  { href: "/dashboard/restock", label: "재입고", icon: "🔔" },
   { href: "/dashboard/notifications", label: "알림", icon: "🔔" },
   { href: "/dashboard/analytics", label: "분석", icon: "📈" },
   { href: "/dashboard/plan", label: "요금제", icon: "💎" },

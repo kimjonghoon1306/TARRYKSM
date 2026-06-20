@@ -320,6 +320,26 @@ export async function askQuestion(input: {
   return { ok: true };
 }
 
+// 재입고 알림 신청 (품절 상품) — 발행몰이면 비로그인도 연락처로 신청 가능. RPC 없으면 무시.
+export async function requestRestock(input: {
+  storeId: string;
+  productId: string;
+  contact: string;
+}): Promise<{ ok: boolean; error?: string }> {
+  const contact = (input.contact || "").trim();
+  if (!contact) return { ok: false, error: "연락받을 이메일이나 전화번호를 입력해 주세요." };
+  const supabase = await createClient();
+  const token = (await cookies()).get("cust_session")?.value || null;
+  const { data, error } = await supabase.rpc("request_restock", {
+    p_store: input.storeId,
+    p_product: input.productId,
+    p_contact: contact,
+    p_token: token,
+  });
+  if (error || data !== true) return { ok: false, error: "신청에 실패했어요. 잠시 후 다시 시도해 주세요." };
+  return { ok: true };
+}
+
 // 체크아웃 쿠폰 검증 (코드+소계 → 할인액). coupons 테이블/RPC 없으면 무시(할인 0).
 export async function checkCoupon(
   storeId: string,
