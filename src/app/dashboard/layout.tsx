@@ -3,12 +3,13 @@ import AdminShell from "@/components/AdminShell";
 import ThemeToggle from "@/components/ThemeToggle";
 import OnBot from "@/components/OnBot";
 import FounderPopup from "@/components/FounderPopup";
+import SubscriptionExpiredGate from "@/components/SubscriptionExpiredGate";
 import { getMe } from "@/lib/role";
 import { getActor } from "@/lib/actor";
 import { createClient } from "@/lib/supabase/server";
 import { fetchNotifications } from "@/lib/notifications";
 import { fetchPopupAnnouncements } from "@/lib/announcements";
-import { fetchPlanDates } from "@/lib/subscription";
+import { fetchPlanDates, isExpired } from "@/lib/subscription";
 
 // 대시보드는 계정별 데이터 → 절대 캐시 금지(다른 계정 화면이 남아 보이는 것 방지)
 export const dynamic = "force-dynamic";
@@ -65,6 +66,12 @@ export default async function DashboardLayout({
   // 구독 사용 만료일 — 보는 대상이 창업자일 때 그 사람 기준
   const planUntil =
     actor.role === "founder" && actor.userId ? (await fetchPlanDates(supabase, actor.userId)).plan_until : null;
+
+  // 🔒 유료 구독 만료 → 대시보드 전체 잠금(기능 사용 불가, 갱신 안내만). 무료는 해당 없음.
+  if (actor.role === "founder" && isExpired(actor.plan, planUntil)) {
+    return <SubscriptionExpiredGate email={actor.email} impersonating={actor.impersonating} />;
+  }
+
   return (
     <>
       <AdminShell

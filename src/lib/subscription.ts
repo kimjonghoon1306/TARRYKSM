@@ -15,6 +15,14 @@ export type PlanStatus = {
   expired: boolean;
 };
 
+// 만료 여부 — 유료(basic/pro/premium)인데 사용기간이 지났으면 true.
+// 무료는 기간 개념이 없어 만료되지 않음. (아임웹식: 한번 유료면 무료로 못 돌아감 → 만료=잠김)
+export function isExpired(plan: string, until?: string | null): boolean {
+  if (!["basic", "pro", "premium"].includes(plan)) return false;
+  if (!until) return false;
+  return new Date(until).getTime() < Date.now();
+}
+
 export function planStatus(until?: string | null): PlanStatus {
   if (!until) return { set: false, until: null, label: "미설정", days: null, expired: false };
   const end = new Date(until);

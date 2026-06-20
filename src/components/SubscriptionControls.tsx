@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { markPlanPaidNow, adjustPlanDays, cancelPlan } from "@/app/dashboard/platform/actions";
+import { markPlanPaidNow, adjustPlanDays } from "@/app/dashboard/platform/actions";
 import { planStatus } from "@/lib/subscription";
 
 const PLAN_LABEL: Record<string, string> = { basic: "베이직", pro: "프로", premium: "프리미엄" };
@@ -26,15 +26,6 @@ export default function SubscriptionControls({
     setErr("");
     setBusy(true);
     const res = await markPlanPaidNow(userId, p);
-    setBusy(false);
-    if (!res.ok) return setErr(res.error || "처리 실패");
-    location.reload();
-  }
-  async function cancel() {
-    if (!confirm("구독을 해지할까요? 무료로 전환되고 사용기간이 제거됩니다.")) return;
-    setErr("");
-    setBusy(true);
-    const res = await cancelPlan(userId);
     setBusy(false);
     if (!res.ok) return setErr(res.error || "처리 실패");
     location.reload();
@@ -100,7 +91,7 @@ export default function SubscriptionControls({
         </div>
       </div>
 
-      {/* 날짜 조정·해지는 유료(기간 있는) 회원만 — 무료는 날짜 개념이 없음 */}
+      {/* 날짜 조정은 유료(기간 있는) 회원만 — 무료는 날짜 개념이 없음 */}
       {isPaid && (
         <div className="mt-3 flex flex-wrap items-center gap-2">
           <span className="text-[11px] font-semibold text-neutral-500">날짜 조정:</span>
@@ -108,8 +99,12 @@ export default function SubscriptionControls({
           <button onClick={() => adjust(30)} disabled={busy} className={pill}>+30일</button>
           <button onClick={() => adjust(-7)} disabled={busy} className={pill}>-7일</button>
           <button onClick={() => adjust(-30)} disabled={busy} className={pill}>-30일</button>
-          <button onClick={cancel} disabled={busy} className="ml-auto rounded-lg border border-rose-300 px-3 py-1.5 text-xs font-semibold text-rose-500 transition hover:bg-rose-50 disabled:opacity-50 dark:border-rose-500/40 dark:hover:bg-rose-500/10">구독 해지(무료)</button>
         </div>
+      )}
+      {isPaid && (
+        <p className="mt-2 text-[11px] text-neutral-400">
+          ※ 한번 유료 결제한 회원은 무료로 되돌릴 수 없어요. 갱신하거나 등급을 낮춰서 결제할 수 있습니다.
+        </p>
       )}
       {err && <div className="mt-2 text-xs text-rose-500">{err}</div>}
     </div>

@@ -49,21 +49,6 @@ export async function markPlanPaidNow(
   return { ok: true };
 }
 
-// 구독 해지 → 무료로 전환하고 사용기간 제거(쇼핑몰 잠금 해제 위해 plan_until null).
-export async function cancelPlan(userId: string): Promise<{ ok: boolean; error?: string }> {
-  if (!(await assertAdmin())) return { ok: false, error: "권한이 없습니다" };
-  const supabase = await createClient();
-  const { error } = await supabase
-    .from("profiles")
-    .update({ plan: "free", plan_paid_at: null, plan_until: null })
-    .eq("id", userId);
-  if (error) return { ok: false, error: error.message };
-  revalidatePath("/dashboard/platform");
-  revalidatePath("/dashboard/platform/" + userId);
-  revalidatePath("/dashboard", "layout");
-  return { ok: true };
-}
-
 // 구독: 사용 만료일을 days 만큼 더하거나(+) 뺀다(-). 유료 회원만 — 무료는 기간 개념 없음.
 export async function adjustPlanDays(userId: string, days: number): Promise<{ ok: boolean; error?: string }> {
   if (!(await assertAdmin())) return { ok: false, error: "권한이 없습니다" };
