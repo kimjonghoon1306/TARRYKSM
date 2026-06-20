@@ -179,9 +179,10 @@
 
 /* ════ 7씬 스토리 ════ */
 /* 0 고민 Hook */
-.sc-hook .hook-1{font-family:var(--font-display);font-weight:900;font-size:clamp(64px,14vw,210px);letter-spacing:-.035em;line-height:.95}
+.sc-hook .hook-1{font-family:var(--font-display);font-weight:900;font-size:clamp(64px,14vw,210px);letter-spacing:-.035em;line-height:.95;text-shadow:0 0 80px var(--glow)}
 .sc-hook .hook-2{font-weight:300;font-size:clamp(26px,5vw,68px);letter-spacing:.06em;color:var(--txt-1);margin-top:6px}
 .sc-hook .hook-3{font-weight:300;font-size:clamp(18px,3.4vw,44px);letter-spacing:.12em;color:var(--sub);margin-top:14px}
+.sc-hook .hook-3 em{font-style:normal;font-weight:600;background:linear-gradient(120deg,var(--brand),var(--brand-2));-webkit-background-clip:text;background-clip:text;color:transparent}
 .sc-hook.on .hook-1{animation:fadeUp2 .7s .1s both}
 .sc-hook.on .hook-2{animation:fadeUp2 .7s .5s both}
 .sc-hook.on .hook-3{animation:fadeUp2 .7s 1s both}
