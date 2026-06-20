@@ -28,3 +28,16 @@ export async function ownsStore(storeId: string): Promise<boolean> {
     .maybeSingle();
   return !!data;
 }
+
+// 특정 테이블의 행(id)이 내 소유 몰에 속하는지 — store_id 컬럼 가진 테이블용(orders·reviews·product_questions·restock_requests).
+export async function ownsRow(table: string, id: string): Promise<boolean> {
+  if (!id) return false;
+  const supabase = await createClient();
+  const { data: { user } } = await supabase.auth.getUser();
+  if (!user) return false;
+  const { data } = await supabase.from(table).select("store_id").eq("id", id).maybeSingle();
+  const storeId = (data as { store_id?: string } | null)?.store_id;
+  if (!storeId) return false;
+  const { data: s } = await supabase.from("stores").select("id").eq("id", storeId).eq("owner", user.id).maybeSingle();
+  return !!s;
+}

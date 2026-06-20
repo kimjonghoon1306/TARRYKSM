@@ -2,9 +2,11 @@
 
 import { revalidatePath } from "next/cache";
 import { createClient } from "@/lib/supabase/server";
+import { ownsRow } from "@/lib/auth";
 
-// 문의 답변 저장/수정 (RLS: 몰 소유자/관리자만)
+// 문의 답변 저장/수정 (RLS + owner 2차 검증)
 export async function answerQuestion(questionId: string, answer: string) {
+  if (!(await ownsRow("product_questions", questionId))) return { ok: false, error: "권한이 없어요." };
   const supabase = await createClient();
   const text = (answer || "").trim().slice(0, 1000);
   const { error } = await supabase
@@ -18,6 +20,7 @@ export async function answerQuestion(questionId: string, answer: string) {
 
 // 문의 삭제 (RLS: 몰 소유자/관리자만)
 export async function deleteQuestion(questionId: string) {
+  if (!(await ownsRow("product_questions", questionId))) return { ok: false, error: "권한이 없어요." };
   const supabase = await createClient();
   const { error } = await supabase.from("product_questions").delete().eq("id", questionId);
   if (error) return { ok: false, error: "삭제에 실패했어요." };

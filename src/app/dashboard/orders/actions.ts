@@ -2,12 +2,14 @@
 
 import { revalidatePath } from "next/cache";
 import { createClient } from "@/lib/supabase/server";
+import { ownsRow } from "@/lib/auth";
 
 const STATUSES = ["신규", "처리중", "배송중", "완료", "취소"];
 
-// 주문 상태 변경 (RLS가 소유자/관리자만 허용)
+// 주문 상태 변경 (RLS + owner 2차 검증)
 export async function updateOrderStatus(orderId: string, status: string) {
   if (!STATUSES.includes(status)) return;
+  if (!(await ownsRow("orders", orderId))) return;
   const supabase = await createClient();
   await supabase.from("orders").update({ status }).eq("id", orderId);
   // 적립금 동기화: '완료'면 적립, 완료에서 벗어나면 회수 (멱등, points.sql 미실행 환경이면 무시)
@@ -20,6 +22,7 @@ export async function updateOrderStatus(orderId: string, status: string) {
 
 // 송장 등록 — 택배사+운송장번호 저장. 입력하면 상태를 '배송중'으로 자동 전환.
 export async function setShipping(orderId: string, courier: string, trackingNo: string) {
+  if (!(await ownsRow("orders", orderId))) return;
   const supabase = await createClient();
   const c = courier.trim();
   const t = trackingNo.trim();
