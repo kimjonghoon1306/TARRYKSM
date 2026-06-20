@@ -3,6 +3,7 @@
 import crypto from "crypto";
 import { cookies } from "next/headers";
 import { createClient } from "@/lib/supabase/server";
+import { createAdminClient } from "@/lib/supabase/admin";
 
 // 소비자(쇼핑몰 손님) 회원 인증. 쇼핑몰별 독립.
 // 비번은 PBKDF2로 해시(salt:hash). 세션 토큰은 httpOnly 쿠키(cust_session).
@@ -18,6 +19,30 @@ function verifyPw(password: string, stored: string): boolean {
   const [salt] = stored.split(":");
   if (!salt) return false;
   return hashPw(password, salt) === stored;
+}
+
+// 🔒 저장된 비번 해시를 "서버 안에서만" 조회 — 해시를 절대 클라이언트(anon)로 내보내지 않음.
+// service_role 키가 있으면 RLS 우회로 customers 직접 조회(권장),
+// 키 미설정 환경에서만 기존 RPC로 폴백(배포엔 키가 있어 항상 service 경로).
+async function getCustomerHash(
+  storeId: string,
+  email: string
+): Promise<{ id: string; password_hash: string } | null> {
+  const admin = createAdminClient();
+  if (admin) {
+    const { data } = await admin
+      .from("customers")
+      .select("id,password_hash")
+      .eq("store_id", storeId)
+      .eq("email", email)
+      .maybeSingle();
+    return (data as { id: string; password_hash: string } | null) ?? null;
+  }
+  const supabase = await createClient();
+  const { data } = await supabase.rpc("customer_get_hash", { p_store: storeId, p_email: email });
+  return data && (data as { id: string; password_hash: string }[]).length
+    ? (data as { id: string; password_hash: string }[])[0]
+    : null;
 }
 
 type Res = { ok: boolean; error?: string };
@@ -63,11 +88,9 @@ export async function customerLogin(
 ): Promise<Res> {
   const email = input.email.trim().toLowerCase();
   const supabase = await createClient();
-  // 저장된 해시를 받아 서버에서 같은 salt로 재해시해 비교 (비번 평문은 DB에 안 감)
-  const { data, error } = await supabase.rpc("customer_get_hash", { p_store: storeId, p_email: email });
-  if (error || !data || !data.length) return { ok: false, error: "이메일 또는 비밀번호가 올바르지 않아요." };
-  const row = data[0] as { id: string; password_hash: string };
-  if (!verifyPw(input.password, row.password_hash)) {
+  // 🔒 저장된 해시를 서버 안에서만 조회해 같은 salt로 재해시 비교(해시는 클라이언트로 안 나감)
+  const row = await getCustomerHash(storeId, email);
+  if (!row || !verifyPw(input.password, row.password_hash)) {
     return { ok: false, error: "이메일 또는 비밀번호가 올바르지 않아요." };
   }
   const { data: token } = await supabase.rpc("customer_new_session", { p_id: row.id });
@@ -206,9 +229,8 @@ export async function customerChangePassword(input: { current: string; next: str
   const cust = await getCustomer();
   if (!cust) return { ok: false, error: "로그인이 필요해요." };
   const supabase = await createClient();
-  // 현재 비번 검증 (저장 해시를 받아 같은 salt로 재해시 비교)
-  const { data: hd } = await supabase.rpc("customer_get_hash", { p_store: cust.store_id, p_email: cust.email });
-  const row = hd && hd.length ? (hd[0] as { password_hash: string }) : null;
+  // 현재 비번 검증 — 저장 해시를 서버 안에서만 조회해 비교
+  const row = await getCustomerHash(cust.store_id, cust.email);
   if (!row || !verifyPw(input.current, row.password_hash)) {
     return { ok: false, error: "현재 비밀번호가 올바르지 않아요." };
   }
