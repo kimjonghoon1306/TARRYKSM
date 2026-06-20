@@ -2,9 +2,11 @@ import Link from "next/link";
 import AdminShell from "@/components/AdminShell";
 import ThemeToggle from "@/components/ThemeToggle";
 import OnBot from "@/components/OnBot";
+import FounderPopup from "@/components/FounderPopup";
 import { getMe } from "@/lib/role";
 import { createClient } from "@/lib/supabase/server";
 import { fetchNotifications } from "@/lib/notifications";
+import { fetchPopupAnnouncements } from "@/lib/announcements";
 
 // 대시보드는 계정별 데이터 → 절대 캐시 금지(다른 계정 화면이 남아 보이는 것 방지)
 export const dynamic = "force-dynamic";
@@ -53,6 +55,8 @@ export default async function DashboardLayout({
 
   const supabase = await createClient();
   const { unread } = await fetchNotifications(supabase, 30);
+  // 운영자가 띄운 팝업 공지 — 창업자(founder)에게만 모달로(운영자 본인은 발신자라 제외)
+  const popups = me.role === "founder" ? await fetchPopupAnnouncements(supabase, 3) : [];
   return (
     <>
       <AdminShell email={me.email} role={me.role} unread={unread}>
@@ -60,6 +64,9 @@ export default async function DashboardLayout({
       </AdminShell>
       {/* 창업자 전용 도우미 — 손님 쇼핑몰(/[slug])엔 뜨지 않도록 대시보드에만 둠 */}
       <OnBot />
+      {popups.length > 0 && (
+        <FounderPopup items={popups.map((a) => ({ id: a.id, title: a.title, body: a.body }))} />
+      )}
     </>
   );
 }

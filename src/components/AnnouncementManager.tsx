@@ -18,6 +18,7 @@ export default function AnnouncementManager({ items }: { items: Announcement[] }
   const [title, setTitle] = useState("");
   const [body, setBody] = useState("");
   const [pinned, setPinned] = useState(false);
+  const [popup, setPopup] = useState(false);
   const [busy, setBusy] = useState(false);
   const [err, setErr] = useState("");
 
@@ -30,12 +31,12 @@ export default function AnnouncementManager({ items }: { items: Announcement[] }
     setErr("");
     if (!title.trim()) return setErr("제목을 입력해 주세요.");
     setBusy(true);
-    const res = await addAnnouncement({ title, body, pinned });
+    const res = await addAnnouncement({ title, body, pinned, popup });
     setBusy(false);
     if (!res.ok) return setErr(res.error || "등록에 실패했어요.");
     location.reload();
   }
-  async function toggle(a: Announcement, field: "active" | "pinned") {
+  async function toggle(a: Announcement, field: "active" | "pinned" | "popup") {
     const next = !a[field];
     setList((l) => l.map((x) => (x.id === a.id ? { ...x, [field]: next } : x)));
     await toggleAnnouncement(a.id, field, next);
@@ -68,6 +69,10 @@ export default function AnnouncementManager({ items }: { items: Announcement[] }
           <label className="flex items-center gap-2 text-sm text-neutral-600 dark:text-neutral-300">
             <input type="checkbox" checked={pinned} onChange={(e) => setPinned(e.target.checked)} />
             📌 상단 고정
+          </label>
+          <label className="flex items-center gap-2 text-sm text-neutral-600 dark:text-neutral-300">
+            <input type="checkbox" checked={popup} onChange={(e) => setPopup(e.target.checked)} />
+            💬 팝업으로 띄우기 <span className="text-xs text-neutral-400">(창업자 화면에 모달로 표시)</span>
           </label>
           {err && <div className="text-sm text-rose-500">{err}</div>}
           <button
@@ -112,6 +117,12 @@ export default function AnnouncementManager({ items }: { items: Announcement[] }
                   </button>
                   <button onClick={() => toggle(a, "pinned")} className="text-neutral-500 hover:text-amber-500">
                     {a.pinned ? "고정 해제" : "상단 고정"}
+                  </button>
+                  <button
+                    onClick={() => toggle(a, "popup")}
+                    className={"font-semibold " + (a.popup ? "text-violet-500" : "text-neutral-400 hover:text-violet-500")}
+                  >
+                    {a.popup ? "💬 팝업 ON" : "팝업으로"}
                   </button>
                   <button onClick={() => remove(a)} className="text-neutral-400 hover:text-rose-500">
                     삭제
