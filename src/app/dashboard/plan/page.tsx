@@ -16,6 +16,7 @@ export default async function PlanPage() {
     storeCount = count ?? 0;
   }
   const current = planOf(me.role, me.plan);
+  const isAdmin = me.role === "admin"; // 운영자는 요금제 무관 무제한 — 특정 플랜에 묶이지 않음
 
   const card =
     "rounded-2xl border border-black/5 bg-white p-6 shadow-sm dark:border-white/10 dark:bg-white/[0.03]";
@@ -24,13 +25,17 @@ export default async function PlanPage() {
     <div className="mx-auto max-w-5xl">
       <h1 className="text-2xl font-bold sm:text-3xl">요금제</h1>
       <p className="mt-1 text-sm text-neutral-500">
-        {me.userId ? (
+        {!me.userId ? (
+          "무료로 시작해 필요할 때 업그레이드하세요."
+        ) : isAdmin ? (
+          <>
+            현재 플랜: <b className="text-violet-500">무제한</b> · 운영자는 모든 기능·쇼핑몰 무제한
+          </>
+        ) : (
           <>
             현재 플랜: <b className="text-violet-500">{current.name}</b> · 쇼핑몰 {storeCount}
             {current.maxStores === Infinity ? "" : ` / ${current.maxStores}`}개 사용 중
           </>
-        ) : (
-          "무료로 시작해 필요할 때 업그레이드하세요."
         )}
       </p>
 
@@ -66,7 +71,11 @@ export default async function PlanPage() {
                 ))}
               </ul>
               <div className="mt-5">
-                {isCurrent ? (
+                {isAdmin ? (
+                  <div className="rounded-xl bg-violet-500/10 py-2.5 text-center text-sm font-semibold text-violet-600 dark:text-violet-300">
+                    ♾️ 무제한 이용
+                  </div>
+                ) : isCurrent ? (
                   <div className="rounded-xl bg-black/5 py-2.5 text-center text-sm font-semibold text-neutral-500 dark:bg-white/10">
                     현재 플랜
                   </div>

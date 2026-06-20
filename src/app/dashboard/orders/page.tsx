@@ -36,15 +36,21 @@ export default async function OrdersPage() {
   let orders: Order[] = [];
   let tableMissing = false;
   if (user) {
-    // RLS가 내 몰의 주문만 돌려줌
-    const { data, error } = await supabase
-      .from("orders")
-      .select(
-        "id,store_id,buyer_name,buyer_phone,buyer_email,address,memo,total,shipping,status,created_at,courier,tracking_no,stores(name,slug),order_items(id,name,price,qty)"
-      )
-      .order("created_at", { ascending: false });
-    if (error) tableMissing = true;
-    else orders = (data ?? []) as unknown as Order[];
+    // ⚠️ 내 소유 몰(store_id)로 한정. 관리자는 orders RLS가 전체를 주므로 본인 주문관리엔 내 몰만.
+    // (전 회원 주문은 /dashboard/platform에서 관리)
+    const { data: myStores } = await supabase.from("stores").select("id").eq("owner", user.id);
+    const storeIds = (myStores ?? []).map((s) => s.id);
+    if (storeIds.length) {
+      const { data, error } = await supabase
+        .from("orders")
+        .select(
+          "id,store_id,buyer_name,buyer_phone,buyer_email,address,memo,total,shipping,status,created_at,courier,tracking_no,stores(name,slug),order_items(id,name,price,qty)"
+        )
+        .in("store_id", storeIds)
+        .order("created_at", { ascending: false });
+      if (error) tableMissing = true;
+      else orders = (data ?? []) as unknown as Order[];
+    }
   }
 
   const card =

@@ -32,10 +32,11 @@ export default async function Overview({
     productCount = count ?? 0;
   }
 
-  // 매출·주문 요약 (RLS가 내 몰 주문만 반환, 테이블 없으면 빈 배열)
+  // 매출·주문 요약 — ⚠️ 반드시 내 소유 몰(store_id)로 한정.
+  // (관리자는 orders RLS가 is_admin()으로 전체를 반환하므로, 본인 대시보드엔 내 몰만. 전 회원 집계는 /dashboard/platform)
   let orders: { total: number; status: string }[] = [];
-  if (user) {
-    const { data } = await supabase.from("orders").select("total,status");
+  if (user && storeIds.length) {
+    const { data } = await supabase.from("orders").select("total,status").in("store_id", storeIds);
     if (data) orders = data as { total: number; status: string }[];
   }
   const paidOrders = orders.filter((o) => o.status !== "취소");

@@ -33,10 +33,16 @@ export default async function CustomersPage() {
   let customers: Customer[] = [];
   let tableMissing = false;
   if (user) {
-    const { data, error } = await supabase
-      .from("orders")
-      .select("buyer_name,buyer_phone,buyer_email,total,status,created_at")
-      .order("created_at", { ascending: false });
+    // ⚠️ 내 소유 몰(store_id)로 한정. 관리자는 orders RLS가 전체를 주므로 본인 고객목록엔 내 몰 손님만.
+    const { data: myStores } = await supabase.from("stores").select("id").eq("owner", user.id);
+    const storeIds = (myStores ?? []).map((s) => s.id);
+    const { data, error } = storeIds.length
+      ? await supabase
+          .from("orders")
+          .select("buyer_name,buyer_phone,buyer_email,total,status,created_at")
+          .in("store_id", storeIds)
+          .order("created_at", { ascending: false })
+      : { data: [], error: null };
     if (error) tableMissing = true;
     else {
       // 연락처 기준으로 고객 묶기

@@ -37,13 +37,25 @@ export default async function AnalyticsPage() {
     products = (data ?? []) as { price: number; category: string | null }[];
   }
 
-  // 주문(매출) — RLS가 내 몰 주문만 반환. 테이블 없으면 빈 배열.
-  let orders: { total: number; status: string; created_at?: string }[] = [];
+  // 주문(매출) — ⚠️ 내 소유 몰(store_id)로 한정. 관리자는 RLS가 전체를 주므로 본인 분석엔 내 몰만.
+  let orders: { id: string; total: number; status: string; created_at?: string }[] = [];
   let items: { name: string; qty: number; price: number }[] = [];
-  const { data: oData } = await supabase.from("orders").select("total,status,created_at");
-  if (oData) orders = oData as { total: number; status: string; created_at?: string }[];
-  const { data: iData } = await supabase.from("order_items").select("name,qty,price");
-  if (iData) items = iData as { name: string; qty: number; price: number }[];
+  if (storeIds.length) {
+    const { data: oData } = await supabase
+      .from("orders")
+      .select("id,total,status,created_at")
+      .in("store_id", storeIds);
+    if (oData) orders = oData as { id: string; total: number; status: string; created_at?: string }[];
+    const orderIds = orders.map((o) => o.id);
+    if (orderIds.length) {
+      // order_items엔 store_id가 없어 내 주문 id로 한정.
+      const { data: iData } = await supabase
+        .from("order_items")
+        .select("name,qty,price")
+        .in("order_id", orderIds);
+      if (iData) items = iData as { name: string; qty: number; price: number }[];
+    }
+  }
 
   const storeCount = (stores ?? []).length;
   const productCount = products.length;
