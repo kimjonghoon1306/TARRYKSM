@@ -1,7 +1,7 @@
 import { createClient } from "@/lib/supabase/server";
 import { SKIN_BY_ID } from "@/lib/skins";
 import LockedFeature from "@/components/LockedFeature";
-import { getMe } from "@/lib/role";
+import { getActor } from "@/lib/actor";
 import { canUse, requiredPlanName } from "@/lib/plans";
 
 const won = (n: number) => "₩" + Math.round(n).toLocaleString("ko-KR");
@@ -9,7 +9,7 @@ const won = (n: number) => "₩" + Math.round(n).toLocaleString("ko-KR");
 export default async function AnalyticsPage() {
   const supabase = await createClient();
 
-  const me = await getMe();
+  const me = await getActor(); // 시크릿 입장 시 그 창업자 기준(요금제 게이팅·데이터 범위)
   if (!canUse("analytics", me.plan, me.role)) {
     return (
       <div className="mx-auto max-w-3xl">

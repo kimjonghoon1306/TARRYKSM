@@ -1,5 +1,5 @@
 import { createClient } from "@/lib/supabase/server";
-import { currentUser } from "@/lib/auth";
+import { getActor } from "@/lib/actor";
 import { listMyCustomers } from "./actions";
 import MemberPoints from "@/components/MemberPoints";
 
@@ -28,7 +28,8 @@ function fmt(d: string) {
 
 export default async function CustomersPage() {
   const supabase = await createClient();
-  const user = await currentUser();
+  const actor = await getActor();
+  const user = actor.userId ? { id: actor.userId } : null;
 
   let customers: Customer[] = [];
   let tableMissing = false;

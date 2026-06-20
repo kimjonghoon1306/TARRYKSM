@@ -1,5 +1,5 @@
 import { createClient } from "@/lib/supabase/server";
-import { currentUser } from "@/lib/auth";
+import { getActor } from "@/lib/actor";
 import OrderStatusSelect from "@/components/OrderStatusSelect";
 import ShippingForm from "@/components/ShippingForm";
 import OrderCsvButton from "@/components/OrderCsvButton";
@@ -31,7 +31,8 @@ function fmt(d: string) {
 
 export default async function OrdersPage() {
   const supabase = await createClient();
-  const user = await currentUser();
+  const actor = await getActor();
+  const user = actor.userId ? { id: actor.userId } : null;
 
   let orders: Order[] = [];
   let tableMissing = false;

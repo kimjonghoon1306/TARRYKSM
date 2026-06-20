@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { createClient } from "@/lib/supabase/server";
-import { currentUser } from "@/lib/auth";
+import { getActor } from "@/lib/actor";
 import { deleteStore } from "../actions";
 import { PRIMARY_DOMAIN } from "@/lib/domains";
 
@@ -8,8 +8,9 @@ type Store = { id: string; name: string; skin: string; slug: string };
 
 export default async function StoresPage() {
   const supabase = await createClient();
-  const user = await currentUser();
-  // ⚠️ 멀티테넌트 격리: 내 소유 몰만
+  const actor = await getActor();
+  const user = actor.userId ? { id: actor.userId } : null;
+  // ⚠️ 멀티테넌트 격리: 보는 대상(시크릿 입장 시 그 창업자) 몰만
   const { data: stores } = user
     ? await supabase.from("stores").select("id,name,skin,slug").eq("owner", user.id).order("created_at", { ascending: false })
     : { data: [] };

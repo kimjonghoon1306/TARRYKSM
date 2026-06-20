@@ -5,11 +5,13 @@ import { usePathname, useRouter } from "next/navigation";
 import { useRef, useState } from "react";
 import ThemeToggle from "./ThemeToggle";
 import { signout } from "@/app/auth/actions";
+import { exitImpersonation } from "@/app/dashboard/impersonate-actions";
 import { planStatus } from "@/lib/subscription";
+import { canUse, type Feature } from "@/lib/plans";
 
 type Role = "admin" | "founder";
 
-const NAV = [
+const NAV: { href: string; label: string; icon: string; feature?: Feature }[] = [
   { href: "/dashboard", label: "대시보드", icon: "📊" },
   { href: "/dashboard/stores", label: "쇼핑몰", icon: "🏬" },
   { href: "/dashboard/products", label: "상품", icon: "📦" },
@@ -17,9 +19,9 @@ const NAV = [
   { href: "/dashboard/customers", label: "고객", icon: "👤" },
   { href: "/dashboard/reviews", label: "리뷰", icon: "⭐" },
   { href: "/dashboard/qa", label: "문의", icon: "💬" },
-  { href: "/dashboard/restock", label: "재입고", icon: "🔔" },
+  { href: "/dashboard/restock", label: "재입고", icon: "🔔", feature: "restock" },
   { href: "/dashboard/notifications", label: "알림", icon: "🔔" },
-  { href: "/dashboard/analytics", label: "분석", icon: "📈" },
+  { href: "/dashboard/analytics", label: "분석", icon: "📈", feature: "analytics" },
   { href: "/dashboard/plan", label: "요금제", icon: "💎" },
   { href: "/dashboard/settings", label: "계정 설정", icon: "⚙️" },
 ];
@@ -27,14 +29,20 @@ const NAV = [
 export default function AdminShell({
   email,
   role = "founder",
+  plan = "free",
   unread = 0,
   planUntil = null,
+  impersonating = false,
+  realEmail = null,
   children,
 }: {
   email: string | null;
   role?: Role;
+  plan?: string;
   unread?: number;
   planUntil?: string | null;
+  impersonating?: boolean;
+  realEmail?: string | null;
   children: React.ReactNode;
 }) {
   const sub = planStatus(planUntil);
@@ -42,6 +50,8 @@ export default function AdminShell({
   const router = useRouter();
   const [open, setOpen] = useState(false);
   const isAdmin = role === "admin";
+  // 요금제로 사이드바 메뉴 게이팅 — 무료면 무료 기능 메뉴만 보인다(운영자 본인=admin은 전체).
+  const nav = NAV.filter((n) => !n.feature || canUse(n.feature, plan, role));
 
   // 🔒 비밀 입구: 로고를 빠르게 5번 탭 → 관리자(없으면 관리자 로그인). 단일 클릭은 평소대로 대시보드.
   const tapRef = useRef<{ n: number; t: number; timer: ReturnType<typeof setTimeout> | null }>({ n: 0, t: 0, timer: null });
@@ -66,6 +76,18 @@ export default function AdminShell({
 
   const Side = (
     <>
+      {/* 시크릿 입장(임퍼서네이션) 표시 — 운영자가 창업자 화면을 그대로 보는 중 */}
+      {impersonating && (
+        <div className="mb-3 rounded-xl border border-violet-400/50 bg-violet-500/10 px-3 py-2.5">
+          <div className="text-[11px] font-bold text-violet-600 dark:text-violet-300">👑 운영자 시크릿 보기</div>
+          <div className="mt-0.5 truncate text-[11px] text-neutral-500">{email || "창업자"} 님으로 보는 중</div>
+          <form action={exitImpersonation}>
+            <button className="mt-2 w-full rounded-lg bg-violet-500 py-1.5 text-[11px] font-bold text-white transition hover:brightness-105">
+              ← 운영자로 나가기
+            </button>
+          </form>
+        </div>
+      )}
       <button
         type="button"
         onClick={onLogoTap}
@@ -135,7 +157,7 @@ export default function AdminShell({
 
       <nav className="mt-5 flex flex-col gap-1">
         <span className="px-2 pb-1 text-[10px] font-bold tracking-widest text-neutral-400">관리</span>
-        {NAV.map((n) => {
+        {nav.map((n) => {
           const active =
             n.href === "/dashboard" ? path === n.href : path.startsWith(n.href);
           return (

@@ -1,7 +1,6 @@
 import Link from "next/link";
 import { createClient } from "@/lib/supabase/server";
-import { currentUser } from "@/lib/auth";
-import { getMe } from "@/lib/role";
+import { getActor } from "@/lib/actor";
 import { fetchPlanDates, planStatus } from "@/lib/subscription";
 import { SKINS } from "@/lib/skins";
 import { PRIMARY_DOMAIN } from "@/lib/domains";
@@ -17,8 +16,10 @@ export default async function Overview({
 }) {
   const { smsg, serr } = await searchParams;
   const supabase = await createClient();
-  const user = await currentUser();
-  // ⚠️ 멀티테넌트 격리: 반드시 내 소유(owner) 몰만 조회 (발행몰 공개 RLS로 타인 몰 새는 것 방지)
+  // 보는 대상(운영자 시크릿 입장 중이면 그 창업자). 일반 창업자는 본인.
+  const actor = await getActor();
+  const user = actor.userId ? { id: actor.userId } : null;
+  // ⚠️ 멀티테넌트 격리: 반드시 보는 대상(owner) 몰만 조회 (발행몰 공개 RLS로 타인 몰 새는 것 방지)
   const { data: stores } = user
     ? await supabase.from("stores").select("id,name,skin,slug").eq("owner", user.id).order("created_at", { ascending: false })
     : { data: [] };
@@ -50,9 +51,10 @@ export default async function Overview({
   const announcements = user ? await fetchActiveAnnouncements(supabase, 3) : [];
 
   // 구독 사용기간 — 창업자에게 본문 상단에도 크게(모바일에선 사이드바 배너가 안 보여서)
-  const me = user ? await getMe() : null;
   const sub =
-    me?.role === "founder" && user ? planStatus((await fetchPlanDates(supabase, user.id)).plan_until) : null;
+    actor.role === "founder" && actor.userId
+      ? planStatus((await fetchPlanDates(supabase, actor.userId)).plan_until)
+      : null;
 
   const card =
     "rounded-2xl border border-black/5 bg-white p-5 shadow-sm dark:border-white/10 dark:bg-white/[0.03]";

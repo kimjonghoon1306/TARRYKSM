@@ -4,6 +4,7 @@ import ThemeToggle from "@/components/ThemeToggle";
 import OnBot from "@/components/OnBot";
 import FounderPopup from "@/components/FounderPopup";
 import { getMe } from "@/lib/role";
+import { getActor } from "@/lib/actor";
 import { createClient } from "@/lib/supabase/server";
 import { fetchNotifications } from "@/lib/notifications";
 import { fetchPopupAnnouncements } from "@/lib/announcements";
@@ -54,16 +55,27 @@ export default async function DashboardLayout({
     );
   }
 
+  // 보는 대상(운영자가 창업자로 시크릿 입장 중이면 그 창업자) — 사이드바·요금제·기능은 이 기준.
+  const actor = await getActor();
+
   const supabase = await createClient();
   const { unread } = await fetchNotifications(supabase, 30);
-  // 운영자가 띄운 팝업 공지 — 창업자(founder)에게만 모달로(운영자 본인은 발신자라 제외)
-  const popups = me.role === "founder" ? await fetchPopupAnnouncements(supabase, 3) : [];
-  // 구독 사용 만료일 — 창업자에게만 표시(운영자는 무제한)
+  // 운영자가 띄운 팝업 공지 — 진짜 창업자에게만(임퍼서네이션 중엔 방해되니 제외)
+  const popups = !actor.impersonating && actor.role === "founder" ? await fetchPopupAnnouncements(supabase, 3) : [];
+  // 구독 사용 만료일 — 보는 대상이 창업자일 때 그 사람 기준
   const planUntil =
-    me.role === "founder" && me.userId ? (await fetchPlanDates(supabase, me.userId)).plan_until : null;
+    actor.role === "founder" && actor.userId ? (await fetchPlanDates(supabase, actor.userId)).plan_until : null;
   return (
     <>
-      <AdminShell email={me.email} role={me.role} unread={unread} planUntil={planUntil}>
+      <AdminShell
+        email={actor.email}
+        role={actor.role}
+        plan={actor.plan}
+        unread={unread}
+        planUntil={planUntil}
+        impersonating={actor.impersonating}
+        realEmail={actor.realEmail}
+      >
         {children}
       </AdminShell>
       {/* 창업자 전용 도우미 — 손님 쇼핑몰(/[slug])엔 뜨지 않도록 대시보드에만 둠 */}

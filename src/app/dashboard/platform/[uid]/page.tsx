@@ -6,6 +6,7 @@ import { PRIMARY_DOMAIN } from "@/lib/domains";
 import { planOf } from "@/lib/plans";
 import { fetchPlanDates } from "@/lib/subscription";
 import SubscriptionControls from "@/components/SubscriptionControls";
+import { enterAsFounder } from "@/app/dashboard/impersonate-actions";
 
 const won = (n: number) => "₩" + n.toLocaleString("ko-KR");
 function fmt(d: string) {
@@ -133,12 +134,11 @@ export default async function MemberDetail({ params }: { params: Promise<{ uid: 
                     {PRIMARY_DOMAIN}/{s.slug} · 주문 {ordersByStore.get(s.id) || 0} · {fmt(s.created_at)}
                   </div>
                 </div>
-                <Link
-                  href={`/dashboard/${s.id}`}
-                  className="flex-none rounded-lg bg-gradient-to-r from-violet-500 to-pink-500 px-3 py-1.5 text-xs font-semibold text-white transition hover:brightness-105"
-                >
-                  관리 대시보드 ↗
-                </Link>
+                <form action={enterAsFounder.bind(null, uid, `/dashboard/${s.id}`)} className="flex-none">
+                  <button className="rounded-lg bg-gradient-to-r from-violet-500 to-pink-500 px-3 py-1.5 text-xs font-semibold text-white transition hover:brightness-105">
+                    🕵️ 시크릿 입장(관리)
+                  </button>
+                </form>
                 <Link
                   href={`/${s.slug}`}
                   target="_blank"

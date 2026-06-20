@@ -22,6 +22,7 @@ import LockedFeature from "@/components/LockedFeature";
 import FeatureToggle from "@/components/FeatureToggle";
 import PromoSettings from "@/components/PromoSettings";
 import { getMe } from "@/lib/role";
+import { getActor } from "@/lib/actor";
 import { currentUser } from "@/lib/auth";
 import { canUse, requiredPlanName } from "@/lib/plans";
 import type { BotStyle } from "@/components/StoreBot";
@@ -111,7 +112,7 @@ export default async function StoreAdmin({
     // grades_on·qa_on·reviews_on·프로모는 SQL 미실행 환경에서도 안 깨지게 별도 안전 조회
     supabase.from("stores").select("grades_on,qa_on,reviews_on,bar_on,bar_text,bar_link,bar_bg,bar_fg,popup_on,popup_title,popup_body,popup_image,popup_btn_text,popup_btn_link,seo_title,seo_desc,seo_keywords,seo_noindex").eq("id", id).maybeSingle(),
     supabase.from("products").select("category").eq("store_id", id),
-    getMe(),
+    getActor(), // 요금제 잠금은 보는 대상(시크릿 입장 시 그 창업자) 기준
   ]);
   // 요금제별 기능 잠금
   const canDomain = canUse("domain", me.plan, me.role);

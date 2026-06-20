@@ -64,19 +64,22 @@ export async function cancelPlan(userId: string): Promise<{ ok: boolean; error?:
   return { ok: true };
 }
 
-// 구독: 사용 만료일을 days 만큼 더하거나(+) 뺀다(-). 기준일 없으면 오늘부터.
+// 구독: 사용 만료일을 days 만큼 더하거나(+) 뺀다(-). 유료 회원만 — 무료는 기간 개념 없음.
 export async function adjustPlanDays(userId: string, days: number): Promise<{ ok: boolean; error?: string }> {
   if (!(await assertAdmin())) return { ok: false, error: "권한이 없습니다" };
   const supabase = await createClient();
   const { data, error: readErr } = await supabase
     .from("profiles")
-    .select("plan_until")
+    .select("plan,plan_until")
     .eq("id", userId)
     .maybeSingle();
   if (readErr) return { ok: false, error: "subscription-dates.sql 실행이 필요해요." };
-  const base = (data as { plan_until?: string | null } | null)?.plan_until
-    ? new Date((data as { plan_until: string }).plan_until)
-    : new Date();
+  const row = data as { plan?: string | null; plan_until?: string | null } | null;
+  // 무료 회원은 사용 기간이 없음 → 날짜 조정 불가(먼저 결제 완료로 유료 전환).
+  if (!row || !["basic", "pro", "premium"].includes(row.plan || "free")) {
+    return { ok: false, error: "무료 회원은 사용 기간이 없어요. 먼저 결제 완료(유료 등급)를 해주세요." };
+  }
+  const base = row.plan_until ? new Date(row.plan_until) : new Date();
   base.setDate(base.getDate() + days);
   const { error } = await supabase
     .from("profiles")

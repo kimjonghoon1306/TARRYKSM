@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { createClient } from "@/lib/supabase/server";
-import { currentUser } from "@/lib/auth";
+import { getActor } from "@/lib/actor";
 
 type Row = {
   id: string;
@@ -18,9 +18,10 @@ const won = (n: number) => "₩" + n.toLocaleString("ko-KR");
 
 export default async function AllProductsPage() {
   const supabase = await createClient();
-  const user = await currentUser();
+  const actor = await getActor();
+  const user = actor.userId ? { id: actor.userId } : null;
 
-  // ⚠️ 멀티테넌트 격리: 내 소유 몰만
+  // ⚠️ 멀티테넌트 격리: 보는 대상(시크릿 입장 시 그 창업자) 몰만
   const { data: stores } = user
     ? await supabase.from("stores").select("id,name").eq("owner", user.id)
     : { data: [] };
