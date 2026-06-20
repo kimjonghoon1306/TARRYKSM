@@ -6,12 +6,15 @@ export default function LegalView({
   storeName,
   title,
   sections,
+  backHref,
 }: {
   slug: string;
   storeName: string;
   title: string;
   sections: { h: string; body: string }[];
+  backHref?: string;
 }) {
+  const back = backHref || `/${slug}`;
   return (
     <main style={{ minHeight: "100vh", background: "#f7f8fb", color: "#1a1a1a", padding: "0 0 80px" }}>
       <header
@@ -21,7 +24,7 @@ export default function LegalView({
           position: "sticky", top: 0, zIndex: 10, borderBottom: "1px solid rgba(0,0,0,.06)",
         }}
       >
-        <Link href={`/${slug}`} style={{ fontSize: 14, color: "#555", textDecoration: "none", fontWeight: 600 }}>← {storeName}</Link>
+        <Link href={back} style={{ fontSize: 14, color: "#555", textDecoration: "none", fontWeight: 600 }}>← {storeName}</Link>
         <b style={{ position: "absolute", left: "50%", transform: "translateX(-50%)", fontSize: 16 }}>{title}</b>
       </header>
 

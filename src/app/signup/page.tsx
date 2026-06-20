@@ -66,7 +66,7 @@ export default async function SignupPage({
         <label className="flex items-start gap-2 text-xs leading-relaxed text-neutral-500 dark:text-neutral-400">
           <input type="checkbox" name="agree" required value="1" className="mt-0.5 shrink-0 accent-violet-500" />
           <span>
-            <b className="text-neutral-700 dark:text-neutral-200">ONJONGIL 이용약관</b> 및 <b className="text-neutral-700 dark:text-neutral-200">개인정보 수집·이용</b>에 동의합니다. (필수)
+            <Link href="/terms" target="_blank" className="font-semibold text-violet-500 hover:text-violet-400 underline">ONJONGIL 이용약관</Link> 및 <Link href="/privacy" target="_blank" className="font-semibold text-violet-500 hover:text-violet-400 underline">개인정보 수집·이용</Link>에 동의합니다. (필수)
           </span>
         </label>
         <button className="mt-1 w-full rounded-xl bg-gradient-to-r from-violet-500 to-pink-500 py-3 text-sm font-semibold text-white shadow-lg shadow-violet-500/25 transition hover:brightness-105 active:scale-[.99]">
