@@ -22,15 +22,17 @@ export async function proxy(request: NextRequest) {
   }
   const isPlatformHost = !!matchedRoot || host.endsWith(".vercel.app") || host === "localhost";
 
-  // 1) 기본 서브도메인 → 스토어프런트 (인증 불필요)
+  const storePath = (slug: string) => `/${slug}${p === "/" ? "" : p}`;
+
+  // 1) 기본 서브도메인 → 스토어프런트/마이페이지 등 공개 몰 경로 (인증 불필요)
   if (subdomain) {
-    return NextResponse.rewrite(new URL(`/s/${subdomain}${p}`, request.url));
+    return NextResponse.rewrite(new URL(storePath(subdomain), request.url));
   }
   // 2) 커스텀 도메인 → 연결된 쇼핑몰 (인증 불필요)
   if (!isPlatformHost) {
     const slug = await resolveCustomDomain(host);
     return slug
-      ? NextResponse.rewrite(new URL(`/s/${slug}${p}`, request.url))
+      ? NextResponse.rewrite(new URL(storePath(slug), request.url))
       : NextResponse.next({ request });
   }
 

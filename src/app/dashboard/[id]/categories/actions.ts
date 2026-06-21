@@ -72,6 +72,7 @@ export async function deleteStoreCategory(storeId: string, id: string): Promise<
 
 // 주어진 이름들을 관리 목록에 추가 (없던 것만). 서버 페이지가 뽑은 기존 상품 카테고리를 받아 시딩.
 export async function seedStoreCategories(storeId: string, names: string[]): Promise<StoreCat[]> {
+  if (!(await ownsStore(storeId))) return [];
   const clean = [...new Set((names || []).map((n) => (n || "").trim()).filter((n) => n && n !== "전체" && n !== "ALL"))];
   if (!clean.length) return listStoreCategories(storeId);
   const supabase = await createClient();
@@ -88,6 +89,7 @@ export async function seedStoreCategories(storeId: string, names: string[]): Pro
 
 // 기존 상품들이 이미 쓰던 카테고리를 관리 목록으로 자동 동기화 (없던 것만 추가)
 export async function seedCategoriesFromProducts(storeId: string): Promise<StoreCat[]> {
+  if (!(await ownsStore(storeId))) return [];
   const supabase = await createClient();
   const { data: prods } = await supabase.from("products").select("category").eq("store_id", storeId);
   const used = [

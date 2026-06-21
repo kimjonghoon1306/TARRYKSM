@@ -4,6 +4,7 @@ import { revalidatePath } from "next/cache";
 import { createClient } from "@/lib/supabase/server";
 import { getMe } from "@/lib/role";
 import { canUse } from "@/lib/plans";
+import { ownsStore } from "@/lib/auth";
 
 // 옵션 JSON 파싱·검증 ([{name, choices:[{label, add}]}])
 function parseOptions(raw: FormDataEntryValue | null): unknown[] {
@@ -50,12 +51,7 @@ function parseCompareAt(raw: FormDataEntryValue | null, price: number): number |
 // 소유 확인: 이 store가 현재 유저 것인지 (RLS가 막지만 UX용 선검사)
 async function assertOwner(storeId: string) {
   const supabase = await createClient();
-  const { data } = await supabase
-    .from("stores")
-    .select("id")
-    .eq("id", storeId)
-    .maybeSingle();
-  return { supabase, ok: !!data };
+  return { supabase, ok: await ownsStore(storeId) };
 }
 
 // 이미지 파일을 Storage(product-images)에 올리고 공개 URL 반환. 파일 없으면 null.

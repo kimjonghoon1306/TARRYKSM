@@ -11,6 +11,7 @@ import { getMe } from "@/lib/role";
 import { planOf } from "@/lib/plans";
 import { sampleRowsForStore, heroForStore, sampleSectionsForStore } from "@/lib/sampleData";
 import { DEFAULT_FAQS } from "@/lib/defaultFaqs";
+import { ownsStore } from "@/lib/auth";
 
 export async function createStore(formData: FormData) {
   const supabase = await createClient();
@@ -132,6 +133,7 @@ export async function deleteStore(formData: FormData) {
   const supabase = await createClient();
   const id = String(formData.get("id") || "");
   if (!id) return;
+  if (!(await ownsStore(id))) return;
   await supabase.from("stores").delete().eq("id", id);
   revalidatePath("/dashboard", "layout");
 }
@@ -147,6 +149,7 @@ export async function setStoreSlug(formData: FormData) {
 
   const back = (msg: string) =>
     redirect(`${ret}?serr=` + encodeURIComponent(msg));
+  if (!(await ownsStore(id))) back("권한이 없어요");
 
   if (!slug || !/^[a-z0-9][a-z0-9-]{1,29}$/.test(slug)) {
     back("주소는 영문 소문자·숫자·하이픈 2~30자로 입력하세요 (예: myshop)");
@@ -179,6 +182,7 @@ export async function setStoreBranding(formData: FormData) {
   if (!user) redirect("/login");
   const id = String(formData.get("id") || "");
   if (!id) return;
+  if (!(await ownsStore(id))) redirect(`/dashboard?serr=` + encodeURIComponent("권한이 없어요"));
 
   const logoUrl = String(formData.get("logo_url") || "").trim() || null;
   const heroUrl = String(formData.get("hero_url") || "").trim() || null;
@@ -204,8 +208,9 @@ export async function setStoreBranding(formData: FormData) {
 export async function setStoreSkin(formData: FormData) {
   const supabase = await createClient();
   const id = String(formData.get("id") || "");
-  let skin = String(formData.get("skin") || "");
+  const skin = String(formData.get("skin") || "");
   if (!id || !SKIN_IDS.includes(skin)) return;
+  if (!(await ownsStore(id))) return;
   await supabase.from("stores").update({ skin }).eq("id", id);
   revalidatePath(`/dashboard/${id}`);
   revalidatePath(`/dashboard/${id}/design`);
@@ -218,6 +223,7 @@ export async function togglePublish(formData: FormData) {
   const id = String(formData.get("id") || "");
   const next = String(formData.get("publish") || "") === "1";
   if (!id) return;
+  if (!(await ownsStore(id))) return;
   await supabase.from("stores").update({ published: next }).eq("id", id);
   revalidatePath(`/dashboard/${id}`);
 }
@@ -231,6 +237,7 @@ export async function setStorePayment(formData: FormData) {
   if (!user) redirect("/login");
   const id = String(formData.get("id") || "");
   if (!id) return;
+  if (!(await ownsStore(id))) redirect(`/dashboard?serr=` + encodeURIComponent("권한이 없어요"));
 
   const payBank = String(formData.get("pay_bank") || "").trim() || null;
   const payNote = String(formData.get("pay_note") || "").trim() || null;
@@ -255,6 +262,7 @@ export async function setStorePoints(formData: FormData) {
   if (!user) redirect("/login");
   const id = String(formData.get("id") || "");
   if (!id) return;
+  if (!(await ownsStore(id))) redirect(`/dashboard?serr=` + encodeURIComponent("권한이 없어요"));
 
   const pointsOn = String(formData.get("points_on") || "") === "1";
   let rate = parseInt(String(formData.get("points_rate") || "0"), 10);
@@ -278,6 +286,7 @@ export async function setStoreShipping(formData: FormData) {
   if (!user) redirect("/login");
   const id = String(formData.get("id") || "");
   if (!id) return;
+  if (!(await ownsStore(id))) redirect(`/dashboard?serr=` + encodeURIComponent("권한이 없어요"));
 
   const shipOn = String(formData.get("ship_on") || "") === "1";
   const num = (k: string) => {
@@ -308,6 +317,7 @@ export async function setStoreChat(formData: FormData) {
   if (!user) redirect("/login");
   const id = String(formData.get("id") || "");
   if (!id) return;
+  if (!(await ownsStore(id))) redirect(`/dashboard?serr=` + encodeURIComponent("권한이 없어요"));
 
   const chatOn = String(formData.get("chat_on") || "") === "1";
   const styleRaw = String(formData.get("chat_style") || "designer");
@@ -341,6 +351,7 @@ export async function setStoreToggle(storeId: string, key: "qa_on" | "reviews_on
     data: { user },
   } = await supabase.auth.getUser();
   if (!user) return { ok: false, error: "로그인이 필요해요." };
+  if (!(await ownsStore(storeId))) return { ok: false, error: "권한이 없어요." };
   const { error } = await supabase.from("stores").update({ [key]: on }).eq("id", storeId);
   if (error) return { ok: false, error: error.message };
   revalidatePath(`/dashboard/${storeId}`);
@@ -356,6 +367,7 @@ export async function setStorePromo(formData: FormData) {
   if (!user) redirect("/login");
   const id = String(formData.get("id") || "");
   if (!id) return;
+  if (!(await ownsStore(id))) redirect(`/dashboard?serr=` + encodeURIComponent("권한이 없어요"));
 
   const t = (k: string, max = 500) => String(formData.get(k) || "").trim().slice(0, max) || null;
   const { error } = await supabase
@@ -388,6 +400,7 @@ export async function setStoreSeo(formData: FormData) {
   if (!user) redirect("/login");
   const id = String(formData.get("id") || "");
   if (!id) return;
+  if (!(await ownsStore(id))) redirect(`/dashboard?serr=` + encodeURIComponent("권한이 없어요"));
 
   const t = (k: string, max = 200) => String(formData.get(k) || "").trim().slice(0, max) || null;
   const { error } = await supabase
@@ -413,6 +426,7 @@ export async function setStoreBusiness(formData: FormData) {
   if (!user) redirect("/login");
   const id = String(formData.get("id") || "");
   if (!id) return;
+  if (!(await ownsStore(id))) redirect(`/dashboard?serr=` + encodeURIComponent("권한이 없어요"));
 
   const f = (k: string) => String(formData.get(k) || "").trim() || null;
   await supabase
@@ -436,6 +450,7 @@ export async function setStoreDomain(formData: FormData) {
   const supabase = await createClient();
   const id = String(formData.get("id") || "");
   if (!id) return;
+  if (!(await ownsStore(id))) redirect(`/dashboard?serr=` + encodeURIComponent("권한이 없어요"));
 
   const raw = String(formData.get("custom_domain") || "")
     .trim()

@@ -15,6 +15,7 @@ export type CouponInput = {
 
 // 자동 발급 쿠폰 설정 (가입축하·재구매). null이면 해당 자동발급 끔. (RLS: 몰 소유자/관리자만)
 export async function setAutoCoupons(storeId: string, welcome: string | null, repurchase: string | null): Promise<{ ok: boolean; error?: string }> {
+  if (!(await ownsStore(storeId))) return { ok: false, error: "권한이 없어요." };
   const supabase = await createClient();
   const { error } = await supabase
     .from("stores")

@@ -4,12 +4,12 @@ import { revalidatePath } from "next/cache";
 import { createClient } from "@/lib/supabase/server";
 import { SECTION_META, fetchSections, type Section, type SectionConfig, type SectionType } from "@/lib/sections";
 import { sampleSectionsForStore } from "@/lib/sampleData";
+import { ownsStore } from "@/lib/auth";
 
 // 소유 확인 (RLS가 최종 방어, UX용 선검사)
 async function assertOwner(storeId: string) {
   const supabase = await createClient();
-  const { data } = await supabase.from("stores").select("id").eq("id", storeId).maybeSingle();
-  return { supabase, ok: !!data };
+  return { supabase, ok: await ownsStore(storeId) };
 }
 
 // 섹션이 비어 있으면 기본 대문 틀(신상·배너·베스트·전체)을 생성해 반환. 이미 있으면 그대로.

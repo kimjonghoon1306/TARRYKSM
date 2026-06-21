@@ -29,6 +29,33 @@ export async function placeOrder(
 
   const supabase = await createClient();
 
+  const token = (await cookies()).get("cust_session")?.value || null;
+  const { data: atomicOrder, error: atomicErr } = await supabase.rpc("checkout_place_order_atomic", {
+    p_store_id: storeId,
+    p_buyer: buyer,
+    p_items: items,
+    p_coupon_code: couponCode || null,
+    p_use_points: Math.max(0, Math.trunc(Number(usePoints) || 0)),
+    p_token: token,
+  });
+  if (!atomicErr) {
+    const r = atomicOrder as { ok?: boolean; error?: string; orderId?: string } | null;
+    return r?.ok
+      ? { ok: true, orderId: r.orderId }
+      : { ok: false, error: r?.error || "주문 접수에 실패했어요. 잠시 후 다시 시도해 주세요." };
+  }
+  const missingAtomic =
+    atomicErr.code === "42883" ||
+    /checkout_place_order_atomic|function .* does not exist/i.test(atomicErr.message || "");
+  if (!missingAtomic) {
+    return {
+      ok: false,
+      error: /재고|품절|남았어요/.test(atomicErr.message || "")
+        ? atomicErr.message
+        : "주문 접수에 실패했어요. 잠시 후 다시 시도해 주세요.",
+    };
+  }
+
   // 발행된 몰인지 + 상품 가격 조회 (재계산)
   const ids = items.map((i) => i.product_id);
   const { data: prods } = await supabase
@@ -115,7 +142,6 @@ export async function placeOrder(
   // 회원 식별 (적립금·등급 공용)
   let custId: string | null = null;
   let custPoints = 0;
-  const token = (await cookies()).get("cust_session")?.value;
   try {
     const { getCustomer } = await import("@/app/[slug]/customer-actions");
     const cust = await getCustomer();
