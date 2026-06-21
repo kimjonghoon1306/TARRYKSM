@@ -15,7 +15,7 @@ function skinCardHTML(s){
       <div class="sk-mini" data-skin="${s.id}">${buildMini(s.id)}</div>
       <div class="sk-meta">
         <span class="skm-em">${skinThumb(s.id) ? `<img class="skm-em-img" src="${skinThumb(s.id)}" alt="">` : s.emoji}</span>
-        <span class="sk-meta-t"><b>${s.name}</b><i>${s.vibe}</i></span>
+        <span class="sk-meta-t"><b>${s.name}</b><i>${tx(s.vibe)}</i></span>
       </div>
     </div>`;
 }
@@ -25,7 +25,7 @@ function renderStudio(){
   const groups = SKIN_GROUPS.map(g=>{
     const cards = g.ids.map(id=>SKIN_BY_ID[id]).filter(Boolean).map(skinCardHTML).join('');
     return `<div class="skin-group">
-      <h4 class="skin-group-h">${g.label}<span>${g.ids.length}</span></h4>
+      <h4 class="skin-group-h">${tx(g.label)}<span>${g.ids.length}</span></h4>
       <div class="skin-gallery">${cards}</div>
     </div>`;
   }).join('');
@@ -83,7 +83,7 @@ function updatePsBar(){
   const s = SKIN_BY_ID[activeSkin];
   const n = document.getElementById('psName'); const v = document.getElementById('psVibe');
   if(n) n.textContent = `${s.emoji} ${s.name}`;
-  if(v) v.textContent = s.vibe;
+  if(v) v.textContent = tx(s.vibe);
 }
 
 function setDevice(mode){
@@ -118,7 +118,7 @@ function renderMalls(){
         <div class="sk-mini" data-skin="${m.skin}">${buildMini(m.skin)}</div>
         <div class="mc-foot">
           <span class="skm-em">${skinThumb(s.id) ? `<img class="skm-em-img" src="${skinThumb(s.id)}" alt="">` : s.emoji}</span>
-          <span class="mc-info"><b>${m.name}</b><i>${s.name} · ${s.vibe}</i></span>
+          <span class="mc-info"><b>${m.name}</b><i>${s.name} · ${tx(s.vibe)}</i></span>
           <span class="mc-edit">${T('ml_edit')} ↗</span>
         </div>
       </div>`;
@@ -156,7 +156,7 @@ function renderEditorSkins(){
   document.getElementById('edSkinList').innerHTML = SKINS.map(s=>`
     <button class="ed-skin ${s.id===m.skin?'on':''}" onclick="editorSetSkin('${s.id}')">
       <span class="es-sw" data-skin="${s.id}" style="background:var(--s-brand)"></span>
-      <span class="es-meta"><b>${s.emoji} ${s.name}</b><i>${s.vibe}</i></span>
+      <span class="es-meta"><b>${s.emoji} ${s.name}</b><i>${tx(s.vibe)}</i></span>
     </button>`).join('');
 }
 function renderEditorPreview(){

@@ -61,7 +61,7 @@ function productCard(p,i,st){
     </div>
     <div class="pc-body">
       <div class="pc-brand">${p.b}</div>
-      <div class="pc-name">${p.n}</div>
+      <div class="pc-name">${tx(p.n)}</div>
       <div class="pc-rating"><span class="pc-stars">${stars(p.r)}</span><span>${p.r} <i>(${p.rc})</i></span></div>
       <div class="pc-bottom">
         <span class="pc-price">${won(p.p)}</span>
@@ -74,18 +74,18 @@ function productCard(p,i,st){
 function gridHTML(st){
   const items = visibleProducts(st);
   if(!items.length){
-    return `<div class="st-empty-grid"><span>🫥</span><b>검색 결과가 없어요</b><i>다른 키워드나 카테고리로 찾아보세요</i></div>`;
+    return `<div class="st-empty-grid"><span>🫥</span><b>${tx('검색 결과가 없어요')}</b><i>${tx('다른 키워드나 카테고리로 찾아보세요')}</i></div>`;
   }
   return items.map(({p,i})=>productCard(p,i,st)).join('');
 }
 
 function railHTML(st){
-  return st.cats.map(c=>`<span class="rail-chip ${c===st.cat?'on':''}" data-act="filter" data-cat="${c}">${c}</span>`).join('');
+  return st.cats.map(c=>`<span class="rail-chip ${c===st.cat?'on':''}" data-act="filter" data-cat="${c}">${tx(c)}</span>`).join('');
 }
 
 const SORTS = [['reco','추천'],['low','낮은가격'],['high','높은가격'],['new','신상'],['rating','별점순']];
 function sortHTML(st){
-  return SORTS.map(([k,l])=>`<button class="sh-sort-b ${k===st.sort?'on':''}" data-act="sort" data-sort="${k}">${l}</button>`).join('');
+  return SORTS.map(([k,l])=>`<button class="sh-sort-b ${k===st.sort?'on':''}" data-act="sort" data-sort="${k}">${tx(l)}</button>`).join('');
 }
 
 function cartHTML(st){
@@ -153,7 +153,7 @@ function detailHTML(i,st){
       <p>${rv.t}</p></div>`).join('');
   const related = relatedProducts(st,i).map(({p:rp,j})=>`<button class="dp-rel" data-act="open" data-i="${j}">
       ${rp.img ? `<img class="dp-rel-img" src="${rp.img}" alt="">` : `<span class="dp-rel-em">${rp.e}</span>`}
-      <b>${rp.n}</b>
+      <b>${tx(rp.n)}</b>
       <span class="dp-rel-p">${won(rp.p)}</span></button>`).join('');
   return `<button class="dp-x" data-act="close">✕</button>
     <div class="dp-scroll">
@@ -162,21 +162,21 @@ function detailHTML(i,st){
         ${p.img ? `<img class="dp-img" src="${p.img}" alt="${p.n}">` : `<span class="dp-emoji">${p.e}</span>`}
       </div>
       <div class="dp-body">
-        <div class="pc-brand">${p.b} · ${p.cat}</div>
-        <h3 class="dp-name">${p.n}</h3>
-        <div class="dp-rating"><span class="pc-stars">${stars(p.r)}</span><b>${p.r}</b><span>리뷰 ${p.rc}개</span></div>
-        <div class="dp-price">${won(unit)}${addSum?` <small>(옵션 +${won(addSum)})</small>`:''}</div>
-        <p class="dp-desc">${p.d || ''}</p>
+        <div class="pc-brand">${p.b} · ${tx(p.cat)}</div>
+        <h3 class="dp-name">${tx(p.n)}</h3>
+        <div class="dp-rating"><span class="pc-stars">${stars(p.r)}</span><b>${p.r}</b><span>${tx('리뷰')} ${p.rc}</span></div>
+        <div class="dp-price">${won(unit)}${addSum?` <small>(${tx('옵션')} +${won(addSum)})</small>`:''}</div>
+        <p class="dp-desc">${tx(p.d) || ''}</p>
         ${optHTML?`<div class="dp-opts">${optHTML}</div>`:''}
         <ul class="dp-meta">
-          <li><span>배송</span><b>5만원 이상 무료배송</b></li>
-          <li><span>혜택</span><b>첫 구매 5% 적립</b></li>
+          <li><span>${tx('배송')}</span><b>${tx('5만원 이상 무료배송')}</b></li>
+          <li><span>${tx('혜택')}</span><b>${tx('첫 구매 5% 적립')}</b></li>
         </ul>
 
-        <div class="dp-sec-t">리뷰 <i>${p.rc}</i></div>
+        <div class="dp-sec-t">${tx('리뷰')} <i>${p.rc}</i></div>
         ${reviewHTML}
 
-        <div class="dp-sec-t">함께 보면 좋은 상품</div>
+        <div class="dp-sec-t">${tx('함께 보면 좋은 상품')}</div>
         <div class="dp-related">${related}</div>
       </div>
     </div>
@@ -185,7 +185,7 @@ function detailHTML(i,st){
       <div class="dp-qty">
         <button data-act="dq-dec">−</button><em>${qty}</em><button data-act="dq-inc">＋</button>
       </div>
-      <button class="dp-add" data-act="add-close" data-i="${i}">담기 · ${won(unit*qty)}</button>
+      <button class="dp-add" data-act="add-close" data-i="${i}">${tx('담기')} · ${won(unit*qty)}</button>
     </div>`;
 }
 
@@ -200,25 +200,25 @@ function buildStore(st){
   return `<div class="store" data-skin="${s.id}">
     <div class="st-bar">
       <div class="stb-logo">${brand}</div>
-      <nav class="stb-nav"><a data-act="scroll-shelf">신상</a><a data-act="scroll-shelf">베스트</a><a data-act="scroll-shelf">카테고리</a><a data-act="scroll-shelf">이벤트</a></nav>
+      <nav class="stb-nav"><a data-act="scroll-shelf">${tx('신상')}</a><a data-act="scroll-shelf">${tx('베스트')}</a><a data-act="scroll-shelf">${tx('카테고리')}</a><a data-act="scroll-shelf">${tx('이벤트')}</a></nav>
       <div class="stb-actions">
         <button class="stb-ico" data-act="toggle-search">🔍</button>
-        <button class="stb-login" data-act="demo-auth">로그인</button>
+        <button class="stb-login" data-act="demo-auth">${tx('로그인')}</button>
         <button class="stb-cart" data-act="open-cart">🛒 <b class="stb-cnt">${cartCount(st)}</b></button>
       </div>
     </div>
 
     <div class="st-hero">
-      <span class="sth-badge">${s.badge}</span>
-      <h1 class="sth-title">${s.heroTitle}</h1>
-      <p class="sth-sub">${s.heroSub}</p>
-      <button class="sth-cta" data-act="scroll-shelf">${s.cta} →</button>
+      <span class="sth-badge">${tx(s.badge)}</span>
+      <h1 class="sth-title">${tx(s.heroTitle)}</h1>
+      <p class="sth-sub">${tx(s.heroSub)}</p>
+      <button class="sth-cta" data-act="scroll-shelf">${tx(s.cta)} →</button>
       ${heroImg ? `<img class="sth-photo" src="${heroImg}" alt="">` : `<div class="sth-art">${s.emoji}</div>`}
     </div>
 
     <div class="st-searchbar">
       <span>🔍</span>
-      <input type="text" data-act="search-input" placeholder="상품 검색" value="${st.q}">
+      <input type="text" data-act="search-input" placeholder="${tx('상품 검색')}" value="${st.q}">
       <button class="ssb-x" data-act="toggle-search">✕</button>
     </div>
 
@@ -229,20 +229,20 @@ function buildStore(st){
     </div>
 
     <div class="st-shelf">
-      <div class="sh-head"><h3 class="sh-title">이번 주 셀렉션</h3><a data-act="reset">전체보기 →</a></div>
+      <div class="sh-head"><h3 class="sh-title">${tx('이번 주 셀렉션')}</h3><a data-act="reset">${tx('전체보기')} →</a></div>
       <div class="sh-sort">${sortHTML(st)}</div>
       <div class="sh-grid">${gridHTML(st)}</div>
     </div>
 
     <div class="st-promo">
       <b>FREE SHIPPING</b>
-      <span>5만원 이상 구매 시 무료배송 · 오늘의 단 하나의 큐레이션</span>
+      <span>${tx('5만원 이상 구매 시 무료배송 · 오늘의 단 하나의 큐레이션')}</span>
     </div>
 
     <div class="st-foot">
       <div class="stf-logo">${brand}</div>
-      <div class="stf-links"><a>회사소개</a><a>이용약관</a><a>고객센터</a><a>인스타그램</a></div>
-      <div class="stf-copy">© ${brand} · 온종일로 만든 쇼핑몰</div>
+      <div class="stf-links"><a>${tx('회사소개')}</a><a>${tx('이용약관')}</a><a>${tx('고객센터')}</a><a>${tx('인스타그램')}</a></div>
+      <div class="stf-copy">© ${brand} · ${tx('온종일로 만든 쇼핑몰')}</div>
     </div>
 
     <!-- 오버레이: 스크림 · 장바구니 드로어 · 상품상세 -->
@@ -277,8 +277,8 @@ function onStoreClick(e){
   const a = e.target.closest('[data-act]'); if(!a) return;
   const i = a.dataset.i != null ? +a.dataset.i : null;
   switch(a.dataset.act){
-    case 'add':        e.stopPropagation(); addToCart(st,i,1); bumpCart(st); storeToast(st,`🛒 <b>${st.products[i].n}</b> 담았어요`); break;
-    case 'add-close':  addToCart(st,i,st.dqty); closeOverlay(st); bumpCart(st); storeToast(st,`🛒 <b>${st.products[i].n}</b> ${st.dqty}개 담았어요`); break;
+    case 'add':        e.stopPropagation(); addToCart(st,i,1); bumpCart(st); storeToast(st,`🛒 <b>${tx(st.products[i].n)}</b> ${tx('담았어요')}`); break;
+    case 'add-close':  addToCart(st,i,st.dqty); closeOverlay(st); bumpCart(st); storeToast(st,`🛒 <b>${tx(st.products[i].n)}</b> ${st.dqty} ${tx('개 담았어요')}`); break;
     case 'open':       openDetail(st,i); break;
     case 'fav':        e.stopPropagation(); toggleFav(st,i); break;
     case 'filter':     st.cat = a.dataset.cat; refreshGrid(st); break;
