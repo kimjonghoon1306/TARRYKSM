@@ -72,6 +72,27 @@ export async function proxy(request: NextRequest) {
     data: { user },
   } = await supabase.auth.getUser();
 
+  // ── 1시간 비활성 자동 로그아웃 ──
+  // 인증 쿠키는 세션 쿠키(브라우저/탭을 닫으면 삭제)라 "페이지를 끄면 로그아웃"은 자동.
+  // 플랫폼 안에서 탭을 오가는 동안엔 매 요청마다 'la'(마지막 활동 시각)를 갱신해 로그인 유지.
+  // 다만 마지막 활동 후 1시간이 지나면 강제 로그아웃한다.
+  const IDLE_MS = 60 * 60 * 1000; // 1시간
+  if (user) {
+    const la = parseInt(request.cookies.get("la")?.value || "0", 10);
+    if (la && Date.now() - la > IDLE_MS) {
+      // 1시간 이상 아무 활동 없음 → 인증·활동 쿠키 모두 만료시키고 로그인으로
+      const timeoutRes = NextResponse.redirect(new URL("/login?timeout=1", request.url));
+      request.cookies.getAll().forEach((c) => {
+        if (c.name.startsWith("sb-") || c.name === "la") {
+          timeoutRes.cookies.set(c.name, "", { maxAge: 0, path: "/" });
+        }
+      });
+      return timeoutRes;
+    }
+    // 활동 시각 갱신(세션 쿠키 — 브라우저를 닫으면 함께 삭제됨)
+    response.cookies.set("la", String(Date.now()), { path: "/", sameSite: "lax", httpOnly: true });
+  }
+
   // 관리자 컨트롤타워(/dashboard)는 로그인 필요.
   // 단, 요금제(/dashboard/plan)는 비로그인도 둘러볼 수 있게 예외 처리.
   const publicDash = p === "/dashboard/plan";
