@@ -438,4 +438,87 @@ export const DICT: Record<string, string> = {
   "전체 신청": "Total Requests",
   "🔔 알림": "🔔 Notifications",
   "새 주문·리뷰가 들어오면 여기에서 바로 확인하세요.": "Check new orders and reviews here as they arrive.",
+
+  // ── 카테고리 / 옵션 ──
+  "＋ 추가": "＋ Add",
+  "아래로": "Down",
+  "위로": "Up",
+  "기존 상품 카테고리를 불러오는 중…": "Loading existing categories…",
+  "꺼짐 — 상품 단위 재고 사용": "Off — stock by product",
+  "켜짐 — 조합마다 재고 입력": "On — stock per combination",
+  "선택지 삭제": "Delete choice",
+  "0이면 품절": "0 = sold out",
+  "조합마다 재고를 정하세요. ": "Set stock per combination. ",
+
+  // ── 브랜딩 (BrandingForm) ──
+  "로그인이 필요해요": "Login required",
+  "상단·하단 꾸미기 저장": "Save Header/Footer",
+  "엄선한 상품을 한 곳에. 지금 둘러보세요.": "Curated products in one place. Browse now.",
+  "업로드 실패: ": "Upload failed: ",
+  "업로드 중…": "Uploading…",
+  "대문 문구": "Homepage Tagline",
+  "대문 배너 이미지": "Homepage Banner Image",
+  "대문 제목": "Homepage Title",
+  "둘러보기": "Browse",
+  "로고 (없으면 상호명 표시)": "Logo (shows business name if none)",
+
+  // ── 도메인 연결 (DomainHelp) ──
+  "🌐 내 도메인 연결하는 법": "🌐 How to Connect Your Domain",
+  "📌 예시 ①: shop.mybrand.com 처럼 앞에 글자가 붙는 경우": "📌 Example 1: a subdomain like shop.mybrand.com",
+  "📌 예시 ②: mybrand.com 처럼 그냥 도메인인 경우": "📌 Example 2: a bare domain like mybrand.com",
+  "DNS 레코드 1줄 추가": "Add 1 DNS record",
+  "도메인을 산 사이트에 로그인": "Log in where you bought the domain",
+  "왼쪽 칸에 내 도메인 적고 저장": "Enter your domain on the left and save",
+  "아래 표대로 한 줄을 추가하고 저장하세요.": "Add one row as in the table below and save.",
+  "자동으로 처리": "Handled automatically",
+  "몇 분~몇 시간": "A few minutes to a few hours",
+
+  // ── 챗봇 (BotStylePicker) ──
+  "꺼짐 — 챗봇 숨김": "Off — chatbot hidden",
+  "켜짐 — 손님 화면 오른쪽 아래에 떠요": "On — shows at bottom-right for customers",
+  "챗봇 모양 (스킨 분위기에 맞게 골라보세요)": "Chatbot Style (match your skin's vibe)",
+  "챗봇 이름 (선택)": "Chatbot Name (optional)",
+  "첫 인사말 (선택)": "Greeting (optional)",
+  "비우면 기본 인사말이 나와요. 아래에서 질문/답을 추가해야 챗봇이 표시됩니다.": "Leave blank for the default greeting. Add Q&As below to show the chatbot.",
+
+  // ── FAQ (StoreFaqManager) ──
+  "기본 질문 채우기 실패": "Failed to fill default questions",
+  "이 질문을 삭제할까요?": "Delete this question?",
+  "새 질문/답 추가": "Add New Q&A",
+
+  // ── 구독 제어 (SubscriptionControls) ──
+  "📅 구독 사용 기간": "📅 Subscription Period",
+  "💳 베이직 결제완료": "💳 Basic Paid",
+  "💳 프로 결제완료": "💳 Pro Paid",
+  "💳 프리미엄 결제완료": "💳 Premium Paid",
+  "결제 완료 처리 (등급 + 오늘부터 1개월)": "Mark as paid (grade + 1 month from today)",
+  "요금제 변경 / 연장 (오늘부터 1개월)": "Change / extend plan (1 month from today)",
+  "만료됨": "Expired",
+  "프로": "Pro",
+  "프리미엄": "Premium",
+  "날짜 조정:": "Adjust date:",
+  "-30일": "-30d",
+  "-7일": "-7d",
+  "+30일": "+30d",
+  "+7일": "+7d",
+
+  // ── 플랫폼 제어 (PlatformControls) ──
+  "🟢 공개": "🟢 Public",
+  "✓ 저장됨": "✓ Saved",
+  "강제 비공개로 전환": "Force to Private",
+  "공개로 전환": "Switch to Public",
+  "삭제 실패": "Delete failed",
+  "삭제 중…": "Deleting…",
+  "삭제(회수)": "Delete (revoke)",
+  "이 회원을 플랫폼 관리자로 올릴까요? 전체 권한을 갖게 됩니다.": "Promote this member to platform admin? They'll get full access.",
+  "저장 중…": "Saving…",
+  "회원 삭제": "Delete Member",
+  "관리자": "Admin",
+  "삭제됨": "Deleted",
+
+  // ── 무료 이미지 (ProductImagePicker) ──
+  "🖼 무료 이미지 라이브러리": "🖼 Free Image Library",
+  "✓ 업로드한 사진이 적용됐어요": "✓ Your uploaded photo is applied",
+  "상품 사진이 없어도 무료 이미지 라이브러리(66종)에서 골라 바로 쓸 수 있어요.": "No product photo? Pick from the free image library (66) and use it instantly.",
+  "탭하면 바로 적용돼요": "Tap to apply instantly",
 };
