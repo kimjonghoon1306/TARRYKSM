@@ -6,6 +6,21 @@ let currentSoon = '';
 
 /* 뷰 전환 */
 function switchView(view, soonLabel){
+  // 운영 기능(상품·주문·고객·분석·설정)은 더 이상 '준비중' 막을 띄우지 않는다.
+  //  · 비로그인 구경꾼 → 로그인/회원가입 팝업
+  //  · 로그인 운영자  → 실제 운영 대시보드로 이동
+  if(view === 'soon'){
+    document.getElementById('rail')?.classList.remove('open');
+    document.getElementById('navScrim')?.classList.remove('on');
+    if(window.needLogin && window.needLogin()) return; // 팝업 띄우고 중단
+    const OP_ROUTES = {
+      '주문':'/dashboard/orders', '설정':'/dashboard/settings',
+      '상품':'/dashboard/products', '고객':'/dashboard/customers',
+      '분석':'/dashboard'
+    };
+    location.href = OP_ROUTES[soonLabel || currentSoon] || '/dashboard';
+    return;
+  }
   currentView = view;
   if(soonLabel) currentSoon = soonLabel;
 

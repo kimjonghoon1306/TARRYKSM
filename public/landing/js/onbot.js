@@ -64,7 +64,9 @@
     ".ob-q:hover{border-color:#7c6dff}.ob-q .c{color:#aaa}" +
     ".ob-qt{font-weight:800;margin-bottom:8px}.ob-a{line-height:1.7;color:var(--txt-2,#555)}" +
     ".ob-code{margin:8px 0;padding:9px;border-radius:8px;background:rgba(124,109,255,.1);font-family:ui-monospace,monospace;font-size:11px;line-height:1.6}" +
-    ".ob-foot{padding:10px;text-align:center;font-size:11px;color:var(--sub,#999);border-top:1px solid var(--line,rgba(0,0,0,.06))}";
+    ".ob-foot{padding:10px;text-align:center;font-size:11px;color:var(--sub,#999);border-top:1px solid var(--line,rgba(0,0,0,.06))}" +
+    /* 모바일: 하단 탭바 위로 올려 손가락/버튼 겹침 방지 */
+    "@media(max-width:860px){.ob-btn{bottom:calc(74px + env(safe-area-inset-bottom))}.ob-panel{bottom:calc(140px + env(safe-area-inset-bottom));max-height:62vh}}";
 
   function inject() {
     if (document.getElementById("onbot-style")) return;

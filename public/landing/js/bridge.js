@@ -31,6 +31,13 @@ window.needLogin = function () {
   return true;
 };
 
+/* 알림 벨 — 구경 대문엔 실제 알림이 없으므로 빨간 뱃지는 숨김(index.html에서 hidden).
+   비로그인이 누르면 로그인/회원가입 팝업, 로그인 상태면 '알림 없음' 안내. */
+window.bellClick = function () {
+  if (window.needLogin()) return;
+  if (typeof toast === 'function') toast('🔔 새 알림이 없어요');
+};
+
 /* 새 쇼핑몰 만들기 / "이 스킨으로 제작하기" → 로그인 전엔 안내 팝업.
    로그인 상태면 해당 스킨으로 만들기 화면으로 이동. */
 window.openCreate = function (skin) {

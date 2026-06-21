@@ -39,7 +39,9 @@
   .mall-grid{grid-template-columns:1fr}
   .skin-pick{grid-template-columns:repeat(4,1fr)}
   .device.mobile{max-width:100%}
-  .device-screen{height:480px}
+  /* 더 구체적인 .device.mobile .device-screen(600px)까지 확실히 눌러서 탭바와 겹침 방지 */
+  .device-screen,
+  .device.mobile .device-screen{height:480px}
   .vh-title{font-size:24px}
   .ps-tools{margin-left:0;width:100%}
 }

@@ -2,7 +2,8 @@
    studio.js — 스킨 스튜디오 · 내 쇼핑몰 · 생성 모달
 ════════════════════════════════════════ */
 let activeSkin = 'mono';     // 스튜디오에서 미리보는 스킨
-let deviceMode = 'desktop';
+// 보고 있는 화면 폭에 맞춰 미리보기 기본 디바이스 결정 (모바일이면 '모바일' 먼저)
+let deviceMode = (typeof window !== 'undefined' && window.innerWidth <= 760) ? 'mobile' : 'desktop';
 let createSkin = 'mono';     // 생성 모달에서 고른 스킨
 const malls = [];            // 생성된 쇼핑몰 [{name, skin}]
 
