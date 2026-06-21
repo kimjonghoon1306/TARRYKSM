@@ -4,9 +4,11 @@ export type Plan = "free" | "basic" | "pro" | "premium";
 export type PlanInfo = {
   id: Plan;
   name: string;
+  name_en: string;
   price: number; // 월 요금(원)
   maxStores: number; // 만들 수 있는 쇼핑몰 수 (Infinity 가능)
   features: string[];
+  features_en: string[];
   highlight?: boolean;
 };
 
@@ -14,31 +16,39 @@ export const PLANS: Record<Plan, PlanInfo> = {
   free: {
     id: "free",
     name: "무료",
+    name_en: "Free",
     price: 0,
     maxStores: 1,
     features: ["쇼핑몰 1개", "상품·스킨·대문 꾸미기", "주문·송장 관리", "🚚 배송추적 조회", "🤖 챗봇", "🚚 배송비", "💬 상품문의·⭐리뷰", "🎉 이벤트 팝업·띠배너"],
+    features_en: ["1 store", "Products, skins & storefront", "Orders & invoices", "🚚 Shipment tracking", "🤖 Chatbot", "🚚 Shipping fees", "💬 Q&A · ⭐ Reviews", "🎉 Event popups & banners"],
   },
   basic: {
     id: "basic",
     name: "베이직",
+    name_en: "Basic",
     price: 29000,
     maxStores: 2,
     features: ["쇼핑몰 2개", "무료 기능 전체", "🏷️ 할인가/정가", "🎟️ 쿠폰", "💰 적립금", "🔔 재입고 알림", "🌐 커스텀 도메인", "📈 매출·분석"],
+    features_en: ["2 stores", "Everything in Free", "🏷️ Sale / list price", "🎟️ Coupons", "💰 Reward points", "🔔 Restock alerts", "🌐 Custom domain", "📈 Sales & analytics"],
     highlight: true,
   },
   pro: {
     id: "pro",
     name: "프로",
+    name_en: "Pro",
     price: 49000,
     maxStores: 5,
     features: ["쇼핑몰 5개", "모든 베이직 기능", "💎 회원 등급(VIP)", "📋 상품 대량등록(엑셀)", "우선 지원", "향후 카드결제(PG) 우선 적용"],
+    features_en: ["5 stores", "Everything in Basic", "💎 Member tiers (VIP)", "📋 Bulk upload (Excel)", "Priority support", "Early access to card payments"],
   },
   premium: {
     id: "premium",
     name: "프리미엄",
+    name_en: "Premium",
     price: 79000,
     maxStores: 10,
     features: ["쇼핑몰 10개", "모든 프로 기능", "최우선 지원", "향후 신기능 우선 제공"],
+    features_en: ["10 stores", "Everything in Pro", "Top-priority support", "Early access to new features"],
   },
 };
 
