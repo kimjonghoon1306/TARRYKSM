@@ -5,6 +5,7 @@ import ThemeToggle from "@/components/ThemeToggle";
 import OnBot from "@/components/OnBot";
 import FounderPopup from "@/components/FounderPopup";
 import SubscriptionExpiredGate from "@/components/SubscriptionExpiredGate";
+import DashTranslator from "@/components/DashTranslator";
 import { getMe } from "@/lib/role";
 import { getActor } from "@/lib/actor";
 import { createClient } from "@/lib/supabase/server";
@@ -21,12 +22,13 @@ export default async function DashboardLayout({
   children: React.ReactNode;
 }) {
   const me = await getMe();
+  // 대문에서 고른 언어(쿠키) — 영어면 런타임 번역 레이어(DashTranslator) 가동
+  const langEn = (await cookies()).get("lang")?.value === "en";
 
   // 비로그인 방문자(요금제 둘러보기 등)는 관리자 사이드바 대신 깔끔한 공개 레이아웃을 본다.
   // (게이트(proxy)에서 비로그인은 /dashboard/plan 만 통과하므로 사실상 요금제 페이지 전용)
   if (!me.userId) {
-    // 대문에서 고른 언어(쿠키) 반영
-    const en = (await cookies()).get("lang")?.value === "en";
+    const en = langEn;
     const L = {
       back: en ? "← Back to browse" : "← 둘러보기",
       login: en ? "Log in" : "로그인",
@@ -69,6 +71,7 @@ export default async function DashboardLayout({
           </div>
         </header>
         <main className="mx-auto max-w-5xl px-5 py-10">{children}</main>
+        <DashTranslator enabled={en} />
       </div>
     );
   }
@@ -104,6 +107,7 @@ export default async function DashboardLayout({
       </AdminShell>
       {/* 창업자 전용 도우미 — 손님 쇼핑몰(/[slug])엔 뜨지 않도록 대시보드에만 둠 */}
       <OnBot />
+      <DashTranslator enabled={langEn} />
       {popups.length > 0 && (
         <FounderPopup items={popups.map((a) => ({ id: a.id, title: a.title, body: a.body }))} />
       )}
