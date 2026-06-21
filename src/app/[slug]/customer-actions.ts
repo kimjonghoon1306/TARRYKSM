@@ -9,6 +9,7 @@ import { createAdminClient } from "@/lib/supabase/admin";
 // 비번은 PBKDF2로 해시(salt:hash). 세션 토큰은 httpOnly 쿠키(cust_session).
 
 const COOKIE = "cust_session";
+const SESSION_DAYS = 14;
 
 function hashPw(password: string, salt?: string): string {
   const s = salt || crypto.randomBytes(16).toString("hex");
@@ -22,27 +23,34 @@ function verifyPw(password: string, stored: string): boolean {
 }
 
 // 🔒 저장된 비번 해시를 "서버 안에서만" 조회 — 해시를 절대 클라이언트(anon)로 내보내지 않음.
-// service_role 키가 있으면 RLS 우회로 customers 직접 조회(권장),
-// 키 미설정 환경에서만 기존 RPC로 폴백(배포엔 키가 있어 항상 service 경로).
+// service_role 키로 RLS를 우회해 customers를 직접 조회한다.
+// 공개 RPC로 해시를 꺼내는 이전 경로는 보안상 사용하지 않는다.
 async function getCustomerHash(
   storeId: string,
   email: string
 ): Promise<{ id: string; password_hash: string } | null> {
   const admin = createAdminClient();
-  if (admin) {
-    const { data } = await admin
-      .from("customers")
-      .select("id,password_hash")
-      .eq("store_id", storeId)
-      .eq("email", email)
-      .maybeSingle();
-    return (data as { id: string; password_hash: string } | null) ?? null;
-  }
-  const supabase = await createClient();
-  const { data } = await supabase.rpc("customer_get_hash", { p_store: storeId, p_email: email });
-  return data && (data as { id: string; password_hash: string }[]).length
-    ? (data as { id: string; password_hash: string }[])[0]
-    : null;
+  if (!admin) return null;
+  const { data } = await admin
+    .from("customers")
+    .select("id,password_hash")
+    .eq("store_id", storeId)
+    .eq("email", email)
+    .maybeSingle();
+  return (data as { id: string; password_hash: string } | null) ?? null;
+}
+
+async function issueCustomerSession(customerId: string): Promise<string | null> {
+  const admin = createAdminClient();
+  if (!admin) return null;
+  const token = crypto.randomBytes(32).toString("hex");
+  const expiresAt = new Date(Date.now() + SESSION_DAYS * 24 * 60 * 60 * 1000).toISOString();
+  const { error } = await admin.from("customer_sessions").insert({
+    token,
+    customer_id: customerId,
+    expires_at: expiresAt,
+  });
+  return error ? null : token;
 }
 
 type Res = { ok: boolean; error?: string };
@@ -87,19 +95,19 @@ export async function customerLogin(
   input: { email: string; password: string }
 ): Promise<Res> {
   const email = input.email.trim().toLowerCase();
-  const supabase = await createClient();
-  // 🔒 저장된 해시를 서버 안에서만 조회해 같은 salt로 재해시 비교(해시는 클라이언트로 안 나감)
+  // 저장된 해시는 service_role 서버 클라이언트로만 조회한다. 공개 RPC로 해시를 꺼내지 않는다.
   const row = await getCustomerHash(storeId, email);
   if (!row || !verifyPw(input.password, row.password_hash)) {
     return { ok: false, error: "이메일 또는 비밀번호가 올바르지 않아요." };
   }
-  const { data: token } = await supabase.rpc("customer_new_session", { p_id: row.id });
+  const token = await issueCustomerSession(row.id);
   if (!token) return { ok: false, error: "로그인에 실패했어요." };
-  (await cookies()).set(COOKIE, token as string, {
+  (await cookies()).set(COOKIE, token, {
     httpOnly: true,
     sameSite: "lax",
     path: "/",
-    maxAge: 60 * 60 * 24 * 30,
+    maxAge: 60 * 60 * 24 * SESSION_DAYS,
+    secure: process.env.NODE_ENV === "production",
   });
   return { ok: true };
 }
@@ -268,14 +276,20 @@ export async function customerResetPw(
   input: { email: string; name: string; phone: string; newPassword: string }
 ): Promise<Res> {
   if (input.newPassword.length < 6) return { ok: false, error: "새 비밀번호는 6자 이상이어야 해요." };
-  const supabase = await createClient();
-  const { data, error } = await supabase.rpc("customer_reset_pw", {
-    p_store: storeId,
-    p_email: input.email.trim().toLowerCase(),
-    p_name: input.name.trim(),
-    p_phone: input.phone.trim(),
-    p_newhash: hashPw(input.newPassword),
-  });
+  const admin = createAdminClient();
+  if (!admin) return { ok: false, error: "비밀번호 재설정 설정이 필요해요." };
+  const email = input.email.trim().toLowerCase();
+  const name = input.name.trim();
+  const phone = input.phone.trim();
+  const { data, error } = await admin
+    .from("customers")
+    .update({ password_hash: hashPw(input.newPassword) })
+    .eq("store_id", storeId)
+    .eq("email", email)
+    .eq("name", name)
+    .eq("phone", phone)
+    .select("id")
+    .maybeSingle();
   if (error || !data) return { ok: false, error: "정보가 일치하지 않아요. 이메일·이름·전화를 확인해 주세요." };
   return { ok: true };
 }

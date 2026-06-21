@@ -17,6 +17,7 @@ export async function enterAsFounder(founderId: string, gotoPath?: string) {
     sameSite: "lax",
     path: "/",
     maxAge: 60 * 60 * 6, // 6시간
+    secure: process.env.NODE_ENV === "production",
   });
   revalidatePath("/dashboard", "layout");
   redirect(gotoPath || "/dashboard");

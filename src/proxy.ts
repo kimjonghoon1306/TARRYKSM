@@ -92,7 +92,12 @@ export async function proxy(request: NextRequest) {
       return timeoutRes;
     }
     // 활동 시각 갱신(세션 쿠키 — 브라우저를 닫으면 함께 삭제됨)
-    response.cookies.set("la", String(Date.now()), { path: "/", sameSite: "lax", httpOnly: true });
+    response.cookies.set("la", String(Date.now()), {
+      path: "/",
+      sameSite: "lax",
+      httpOnly: true,
+      secure: process.env.NODE_ENV === "production",
+    });
   }
 
   // 관리자 컨트롤타워(/dashboard)는 로그인 필요.
