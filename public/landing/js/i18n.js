@@ -25,6 +25,21 @@ const I18N = {
     ed_close:'닫기', ed_save:'저장', ed_skins:'스킨', ed_pick:'스킨을 눌러 실시간으로 바꿔보세요',
     soon_t:'준비 중인 기능이에요', soon_s:'스킨 스튜디오가 먼저 — 운영 기능은 순차 오픈됩니다',
     toast_made:'쇼핑몰이 생성됐어요', toast_skin:'스킨 적용:', toast_saved:'저장됐어요',
+    // 시네마틱 인트로(대문)
+    cine_hook1:'쇼핑몰', cine_hook2:'만들고 싶다', cine_hook3:'어디서부터<em>…?</em>',
+    cine_brandtag:'하나의 브랜드를 — <em>퍼스널하게</em>',
+    cine_demotitle:'<b>5분</b>이면 누구나', cine_dbnew:'＋ 새 쇼핑몰',
+    prod_candle:'소이 캔들', prod_sneaker:'스니커즈', prod_serum:'세럼',
+    prod_tote:'토트백', prod_watch:'워치', prod_earbuds:'이어버즈',
+    cine_skinscap:'<b>28가지</b> 스킨 · 누구나 퍼스널 쇼핑몰',
+    cine_tftitle:'한 클릭으로 <em>브랜드 전체</em>를 바꾸다', cine_tfbtn:'컬렉션 보기 →',
+    cine_fttitle:'더 스마트하게 운영',
+    ft_coupon_t:'쿠폰·적립', ft_coupon_s:'할인·포인트로 단골 만들기',
+    ft_grade_t:'회원 등급', ft_grade_s:'VIP부터 등급제 관리',
+    ft_bot_t:'나만의 챗봇', ft_bot_s:'고객 응대 자동화',
+    ft_store_t:'퍼스널 쇼핑몰', ft_store_s:'5분이면 오픈 완성',
+    cine_fintitle:'지금 시작하세요', cine_fincta:'제작하기 <span>→</span>', cine_finauto:'자동 입장',
+    cine_skip:'건너뛰기 <span>→</span>',
   },
   en:{
     new_mall:'New Store', new_sub:'One-click',
@@ -48,14 +63,26 @@ const I18N = {
     ed_close:'Close', ed_save:'Save', ed_skins:'Skin', ed_pick:'Tap a skin to switch live',
     soon_t:'Coming soon', soon_s:'Skin Studio first — operations roll out next',
     toast_made:'Store created', toast_skin:'Skin applied:', toast_saved:'Saved',
+    cine_hook1:'My own', cine_hook2:'online store', cine_hook3:'but where to<em> start…?</em>',
+    cine_brandtag:'One brand — <em>made personal</em>',
+    cine_demotitle:'Anyone, in <b>5 minutes</b>', cine_dbnew:'＋ New store',
+    prod_candle:'Soy Candle', prod_sneaker:'Sneakers', prod_serum:'Serum',
+    prod_tote:'Tote Bag', prod_watch:'Watch', prod_earbuds:'Earbuds',
+    cine_skinscap:'<b>28</b> skins · a personal store for anyone',
+    cine_tftitle:'Reskin your <em>entire brand</em> in one click', cine_tfbtn:'View collection →',
+    cine_fttitle:'Operate smarter',
+    ft_coupon_t:'Coupons & Points', ft_coupon_s:'Turn buyers into regulars',
+    ft_grade_t:'Member Tiers', ft_grade_s:'Manage VIPs & tiers',
+    ft_bot_t:'Your own chatbot', ft_bot_s:'Automate customer support',
+    ft_store_t:'Personal storefront', ft_store_s:'Open in 5 minutes',
+    cine_fintitle:'Start now', cine_fincta:'Build it <span>→</span>', cine_finauto:'Auto-entering',
+    cine_skip:'Skip <span>→</span>',
   },
 };
 
 let curLang = 'ko';
 const LANG_META = {
   ko:{flag:'🇰🇷',name:'한국어'}, en:{flag:'🇺🇸',name:'English'},
-  ja:{flag:'🇯🇵',name:'日本語'}, vi:{flag:'🇻🇳',name:'Tiếng Việt'},
-  th:{flag:'🇹🇭',name:'ภาษาไทย'}, id:{flag:'🇮🇩',name:'Indonesia'},
 };
 
 /* 번역 조회 (없으면 en → ko 폴백) */
@@ -74,9 +101,17 @@ function applyLang(){
   const m = LANG_META[curLang] || LANG_META.ko;
   const f = document.getElementById('langFlag'); const n = document.getElementById('langName');
   if(f) f.textContent = m.flag; if(n) n.textContent = m.name;
+  const introF = document.getElementById('introLangFlag');   // 시네마틱 인트로 상단 토글
+  if(introF) introF.textContent = m.flag;
 }
 
 function toggleLang(e){ e && e.stopPropagation(); document.getElementById('lang').classList.toggle('open'); }
+/* 인트로 상단 토글 — 언어가 2개뿐이라 클릭하면 순환(ko↔en) */
+function cycleLang(){
+  const order = Object.keys(LANG_META);
+  const i = order.indexOf(curLang);
+  setLang(order[(i + 1) % order.length]);
+}
 function setLang(code){
   curLang = code;
   document.getElementById('lang').classList.remove('open');
