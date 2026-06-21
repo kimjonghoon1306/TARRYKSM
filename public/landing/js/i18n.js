@@ -81,12 +81,20 @@ const I18N = {
 };
 
 let curLang = 'ko';
+function persistLang(code){
+  // 대시보드(Next.js)가 같은 언어를 보도록 쿠키 + localStorage에 보존
+  try {
+    document.cookie = 'lang=' + code + ';path=/;max-age=31536000;samesite=lax';
+    localStorage.setItem('lang', code);
+  } catch (e) {}
+}
 // 저장된 언어 복원(쿠키 → localStorage) — 페이지 새로고침/대시보드 이동에도 유지
 try {
   const _m = document.cookie.match(/(?:^|;\s*)lang=(ko|en)/);
   const _s = (_m && _m[1]) || localStorage.getItem('lang');
   if (_s === 'en' || _s === 'ko') curLang = _s;
 } catch (e) {}
+persistLang(curLang); // 로드 시 쿠키를 현재 언어로 동기화(옛 캐시로 쿠키 누락돼도 자가복구)
 const LANG_META = {
   ko:{flag:'🇰🇷',name:'한국어'}, en:{flag:'🇺🇸',name:'English'},
 };
@@ -120,11 +128,7 @@ function cycleLang(){
 }
 function setLang(code){
   curLang = code;
-  // 대시보드(Next.js)까지 전달되도록 쿠키로 저장 + 로컬에도 보존
-  try {
-    document.cookie = 'lang=' + code + ';path=/;max-age=31536000;samesite=lax';
-    localStorage.setItem('lang', code);
-  } catch (e) {}
+  persistLang(code); // 대시보드까지 전달되도록 쿠키+로컬 저장
   document.getElementById('lang')?.classList.remove('open');
   applyLang();
   if(typeof rerenderView === 'function') rerenderView();
